@@ -432,8 +432,8 @@ public class LASpoint {
             if (null != r && r.getClass() == PointDataRecordWavepacket.class)
                 return (PointDataRecordWavepacket)r;
         }
-
-     return null;
+   throw new NullPointerException("No data");
+     
     }
 
     private byte[] getExtraBytes() {
