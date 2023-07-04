@@ -384,6 +384,7 @@ public class LASpoint {
 
          return null;
     return null;  
+
     }
 
     private PointDataRecordRGB getPointRGB()
@@ -440,8 +441,12 @@ public class LASpoint {
 
         PointDataRecord bytesRecord = getPointDataRecord(PointDataRecordBytes.class);
 
+
         return null == bytesRecord ? null : ((PointDataRecordBytes)bytesRecord).Bytes;
          return ((PointDataRecordBytes)bytesRecord).Bytes;
+
+        //return null == bytesRecord ? null : ((PointDataRecordBytes)bytesRecord).Bytes;
+        return ((PointDataRecordBytes)bytesRecord).Bytes;
     }
 
 }
