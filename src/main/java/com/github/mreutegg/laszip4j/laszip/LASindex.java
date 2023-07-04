@@ -210,7 +210,7 @@ public class LASindex {
         {
          if (verbose) fprintf(stderr,"total cells/intervals %d/%d full %d (%.2f)\n", total_cells, total_intervals, total_full, 100.0f*total_full/total_total);
         }
-        
+
     }
 
     LASquadtree get_spatial() 
@@ -314,7 +314,7 @@ public class LASindex {
         if (file_name == null) return FALSE;
 
         // open reader
-
+        if (lasreader != null) return true;
         LASreader lasreader = lasreadopener.open(file_name);
          if (lasreader == null) return FALSE;
         if (lasreader.header.laszip == null) return FALSE;
