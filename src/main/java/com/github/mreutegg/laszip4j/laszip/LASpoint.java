@@ -256,7 +256,7 @@ public class LASpoint {
     public double get_attributeDouble(int start) { return ByteBuffer.wrap(getExtraBytes()).order(ByteOrder.LITTLE_ENDIAN).getDouble(start); };
     public void set_attribute(int start, double data) { ByteBuffer.wrap(getExtraBytes()).order(ByteOrder.LITTLE_ENDIAN).putDouble(start, data); };
 
-    public int getX() { return getPointXYZ().X; }
+    public int getX() { return getPointXYZ().X;}
     public void setX(int x) { getPointXYZ().X = x; }
     public int getY() { return getPointXYZ().Y; };
     public void setY(int y) { getPointXYZ().Y = y; }
@@ -368,7 +368,7 @@ public class LASpoint {
         return null;
     }
 
-    private PointDataRecordXYZBase getPointXYZ()
+    private  PointDataRecordXYZBase getPointXYZ()
     {
         for(PointDataRecord  r : PointRecords)
         {
@@ -382,10 +382,8 @@ public class LASpoint {
                 return (PointDataRecordXYZBase)r;
         }
 
-        return null;
-    return null;
-        
-        
+         return null;
+    return null;  
     }
 
     private PointDataRecordRGB getPointRGB()
@@ -402,7 +400,7 @@ public class LASpoint {
                 return (PointDataRecordRGB)r;
         }
 
-        return null;
+           return null;
     }
 
     private PointDataRecordRgbNIR getPointRGBNIR()
@@ -424,7 +422,7 @@ public class LASpoint {
                 return (IGpsTimeProvider)r;
         }
 
-        return null;
+     return null;
     }
 
     private PointDataRecordWavepacket getWavepacket()
@@ -435,7 +433,7 @@ public class LASpoint {
                 return (PointDataRecordWavepacket)r;
         }
 
-        return null;
+     return null;
     }
 
     private byte[] getExtraBytes() {
@@ -443,7 +441,7 @@ public class LASpoint {
         PointDataRecord bytesRecord = getPointDataRecord(PointDataRecordBytes.class);
 
         return null == bytesRecord ? null : ((PointDataRecordBytes)bytesRecord).Bytes;
-        return ((PointDataRecordBytes)bytesRecord).Bytes;
+         return ((PointDataRecordBytes)bytesRecord).Bytes;
     }
 
 }

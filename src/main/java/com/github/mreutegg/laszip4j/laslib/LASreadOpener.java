@@ -206,6 +206,7 @@ public class LASreadOpener {
             use_stdin = FALSE;
             if ((file_names.size() > 1) && merged)
             {
+               
                 LASreaderMerged lasreadermerged = new LASreaderMerged();
                 lasreadermerged.set_scale_factor(scale_factor);
                 lasreadermerged.set_offset(offset);
@@ -245,6 +246,8 @@ public class LASreadOpener {
                 {
                     return lasreadermerged;
                 }
+
+                
             }
             else if ((buffer_size > 0) && ((file_names.size() > 1) || (neighbor_file_names.size() > 0)))
             {
