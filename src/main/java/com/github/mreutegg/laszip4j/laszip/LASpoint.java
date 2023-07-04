@@ -381,7 +381,9 @@ public class LASpoint {
             if (null != r && r.getClass() == PointDataRecordPoint10.class)
                 return (PointDataRecordXYZBase)r;
         }
-        throw new NullPointerException("No data"); 
+
+         return null;
+    return null;  
 
     }
 
