@@ -422,7 +422,7 @@ public class LASpoint {
                 return (IGpsTimeProvider)r;
         }
 
-     return null;
+   throw new NullPointerException("No data");
     }
 
     private PointDataRecordWavepacket getWavepacket()
