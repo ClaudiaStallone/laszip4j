@@ -735,7 +735,7 @@ public class Laszip {
                             {
                                 b = stream.getByte();
                                 Cstdio.fputc(b, file);
-
+                            break;
                             }
                         }
                         catch (Exception e)
