@@ -382,8 +382,7 @@ public class LASpoint {
                 return (PointDataRecordXYZBase)r;
         }
 
-         return null;
-    return null;  
+        throw new NullPointerException("No data");
 
     }
 
