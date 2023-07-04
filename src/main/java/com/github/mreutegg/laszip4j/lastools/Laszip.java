@@ -759,7 +759,7 @@ public class Laszip {
     }
 
     private static double taketime() {
-        return System.currentTimeMillis() / 1000;
+        return (double) System.currentTimeMillis() / 1000;
     }
 
     private static void usage() {
