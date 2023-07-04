@@ -131,9 +131,9 @@ public class LASheader extends LASattributer {
             }
             else
             {
-                x_offset = ((int)((min_x + max_x)/200000))*100000;
-                y_offset = ((int)((min_y + max_y)/200000))*100000;
-                z_offset = ((int)((min_z + max_z)/200000))*100000;
+                x_offset = ((double)((min_x + max_x)/200000))*100000;
+                y_offset = ((double)((min_y + max_y)/200000))*100000;
+                z_offset = ((double)((min_z + max_z)/200000))*100000;
             }
         }
         this.min_x = x_offset + x_scale_factor*I32_QUANTIZE((min_x-x_offset)/x_scale_factor);
