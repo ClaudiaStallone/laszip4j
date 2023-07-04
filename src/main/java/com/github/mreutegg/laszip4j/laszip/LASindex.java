@@ -206,7 +206,11 @@ public class LASindex {
             total_total += interval.total;
             total_intervals += intervals;
         }
+        if(total_total != 0)
+        {
          if (verbose) fprintf(stderr,"total cells/intervals %d/%d full %d (%.2f)\n", total_cells, total_intervals, total_full, 100.0f*total_full/total_total);
+        }
+        
     }
 
     LASquadtree get_spatial() 
