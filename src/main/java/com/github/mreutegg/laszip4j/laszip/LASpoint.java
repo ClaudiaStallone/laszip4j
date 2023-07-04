@@ -400,7 +400,7 @@ public class LASpoint {
                 return (PointDataRecordRGB)r;
         }
 
-           return null;
+           throw new NullPointerException("No data");
     }
 
     private PointDataRecordRgbNIR getPointRGBNIR()
