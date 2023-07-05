@@ -22,6 +22,8 @@ import static com.github.mreutegg.laszip4j.clib.Cstring.strncmp;
 import static com.github.mreutegg.laszip4j.laszip.LASzip.LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
+import java.util.HashMap;
+import java.util.Map;
 
 public class LASfilter {
 
@@ -146,282 +148,86 @@ public class LASfilter {
 
         int keep_classification_mask = 0; // unsigned
         int drop_classification_mask = 0; // unsigned
-
-     boolean hasHelpOption = false;
-boolean isValid = true;
-int i = 1;
-
-while (i < argc) {
-    if (argv[i].isEmpty()) {
-        i++;
-        continue;
-    } else if (argv[i].equals("-h") || argv[i].equals("-help")) {
-        hasHelpOption = true;
-        break;
-    } else if (argv[i].startsWith("-clip_")) {
-        if (argv[i].equals("-clip_z_below") || argv[i].equals("-clip_z_above")) {
-            if (i + 1 >= argc) {
-                isValid = false;
-                break;
-            }
-        } else if (!(argv[i].equals("-clip_to_bounding_box") || argv[i].equals("-clip_to_bb"))) {
-            isValid = false;
-            break;
-        }
-    } else if (argv[i].startsWith("-keep_")) {
-        if (argv[i].equals("-keep_first")) {
-            if (i + 1 < argc && argv[i + 1].equals("-keep_first_of_many")) {
-                i++;
-            }
-        } else if (argv[i].equals("-keep_middle")) {
-            // Handle keep_middle option
-        } else if (argv[i].startsWith("-keep_last")) {
-            if (i + 1 < argc && argv[i + 1].equals("-keep_last_of_many")) {
-                i++;
-            }
-        } else if (argv[i].startsWith("-keep_class")) {
-            if (argv[i].equals("-keep_classification") || argv[i].equals("-keep_class")) {
-                if (i + 1 >= argc) {
-                    // Handle missing argument
-                    isValid = false;
-                    break;
-                }
-
-                i++;
-                while (i < argc && isNumeric(argv[i]) && Integer.parseInt(argv[i]) >= 0 && Integer.parseInt(argv[i]) <= 31) {
-                    i++;
-                }
-                i--;
-            }
-        } else if (argv[i].startsWith("-keep_x")) {
-            if (argv[i].equals("-keep_xy")) {
-                if (i + 4 >= argc) {
-                    // Handle missing arguments
-                    isValid = false;
-                    break;
-                }
-                i += 4;
-            } else if (argv[i].equals("-keep_xyz")) {
-                if (i + 6 >= argc) {
-                    // Handle missing arguments
-                    isValid = false;
-                    break;
-                }
-                i += 6;
-            } else if (argv[i].equals("-keep_x")) {
-                if (i + 2 >= argc) {
-                    // Handle missing arguments
-                    isValid = false;
-                    break;
-                }
-                i += 2;
-            }
-        } else if (argv[i].equals("-keep_y")) {
-            if (i + 2 >= argc) {
-                // Handle missing arguments
-                isValid = false;
-                break;
-            }
-            i += 2;
-        } else if (argv[i].equals("-keep_z")) {
-            if (i + 2 >= argc) {
-                // Handle missing arguments
-                isValid = false;
-                break;
-            }
-            i += 2;
-        } else if (argv[i].startsWith("-keep_X")) {
-            if (argv[i].equals("-keep_XY")) {
-                if (i + 4 >= argc) {
-                    // Handle missing arguments
-                    isValid = false;
-                    break;
-                }
-                i += 4;
-            } else if (argv[i].equals("-keep_X")) {
-                if (i + 2 >= argc) {
-                    // Handle missing arguments
-                    isValid = false;
-                    break;
-                }
-                i += 2;
-            }
-        } else if (argv[i].equals("-keep_Y")) {
-            if (i + 2 >= argc) {
-                // Handle missing arguments
-                isValid = false;
-                break;
-            }
-            i += 2;
-        } else if (argv[i].equals("-keep_Z")) {
-            if (i + 2 >= argc) {
-                // Handle missing arguments
-                isValid = false;
-                break;
-            }
-            i += 2;
-        } else if (argv[i].equals("-keep_tile")) {
-            if (i + 3 >= argc) {
-                // Handle missing arguments
-                isValid = false;
-                break;
-            }
-            i += 3;
-        } else if (argv[i].equals("-keep_circle")) {
-            if (i + 3 >= argc) {
-                // Handle missing arguments
-                isValid = false;
-                break;
-            }
-            i += 3;
-        } else if (argv[i].equals("-keep_return")) {
-            if (i + 1 >= argc) {
-                // Handle missing arguments
-                isValid = false;
-                break;
-            }
-            i++;
-            while (i < argc && isNumeric(argv[i])) {
-                i++;
-            }
-            i--;
-        } else if (argv[i].equals("-keep_return_mask")) {
-            if (i + 1 >= argc) {
-                // Handle missing arguments
-                isValid = false;
-                break;
-            }
-            i++;
-        } else if (argv[i].equals("-keep_single")) {
-            // Handle keep_single option
-        } else if (argv[i].equals("-keep_double")) {
-            // Handle keep_double option
-        } else if (argv[i].equals("-keep_triple")) {
-            // Handle keep_triple option
-        } else if (argv[i].equals("-keep_quadruple")) {
-            // Handle keep_quadruple option
-        } else if (argv[i].equals("-keep_quintuple")) {
-            // Handle keep_quintuple option
-        } else if (argv[i].startsWith("-keep_intensity")) {
-            if (argv[i].equals("-keep_intensity")) {
-                if (i + 2 >= argc) {
-                    // Handle missing arguments
-                    isValid = false;
-                    break;
-                }
-                i += 2;
-            } else if (argv[i].equals("-keep_intensity_above") || argv[i].equals("-keep_intensity_below")) {
-                if (i + 1 >= argc) {
-                    // Handle missing arguments
-                    isValid = false;
-                    break;
-                }
-                i++;
-            }
-        } else if (argv[i].startsWith("-keep_RGB_")) {
-            if (argv[i].substring(10).equals("red") || argv[i].substring(10).equals("green") ||
-                argv[i].substring(10).equals("blue") || argv[i].substring(10).equals("nir")) {
-                if (i + 2 >= argc) {
-                    // Handle missing arguments
-                    isValid = false;
-                    break;
-                }
-                i += 2;
-            }
-        } else if (argv[i].equals("-keep_scan_angle")) {
-            if (i + 2 >= argc) {
-                // Handle missing arguments
-                isValid = false;
-                break;
-            }
-            i += 2;
-        } else if (argv[i].equals("-keep_synthetic")) {
-            // Handle keep_synthetic option
-        } else if (argv[i].equals("-keep_keypoint")) {
-            // Handle keep_keypoint option
-        } else if (argv[i].equals("-keep_withheld")) {
-            // Handle keep_withheld option
-       
-        } else if (argv[i].equals("-keep_overlap")) {
-            // Handle keep_overlap option
-        } else if (argv[i].equals("-keep_wavepacket")) {
-            if (i + 1 >= argc) {
-                // Handle missing arguments
-                isValid = false;
-                break;
-            }
-            i++;
-        } else if (argv[i].startsWith("-keep_user_data")) {
-            if (argv[i].equals("-keep_user_data")) {
-                if (i + 1 >= argc) {
-                    // Handle missing arguments
-                    isValid = false;
-                    break;
-                }
-                i++;
-            } else if (argv[i].equals("-keep_user_data_below") || argv[i].equals("-keep_user_data_above")) {
-                if (i + 2 >= argc) {
-                    // Handle missing arguments
-                    isValid = false;
-                    break;
-                }
-                i += 2;
-            } else if (argv[i].equals("-keep_user_data_between")) {
-                if (i + 2 >= argc) {
-                    // Handle missing arguments
-                    isValid = false;
-                    break;
-                }
-                i += 2;
-            }
-        } else if (argv[i].startsWith("-keep_point_source")) {
-            if (argv[i].equals("-keep_point_source")) {
-                if (i + 1 >= argc) {
-                    // Handle missing arguments
-                    isValid = false;
-                    break;
-                }
-                i++;
-            } else if (argv[i].equals("-keep_point_source_between")) {
-                if (i + 2 >= argc) {
-                    // Handle missing arguments
-                    isValid = false;
-                    break;
-                }
-                i += 2;
-            }
-        } else if (argv[i].startsWith("-keep_gps")) {
-            if (argv[i].equals("-keep_gps_time") || argv[i].equals("-keep_gpstime")) {
-                if (i + 2 >= argc) {
-                    // Handle missing arguments
-                    isValid = false;
-                    break;
-                }
-                i += 2;
-            }
-        } else if (argv[i].equals("-keep_every_nth")) {
-            if (i + 1 >= argc) {
-                // Handle missing arguments
-                isValid = false;
-                break;
-            }
-            i++;
-        } else if (argv[i].equals("-keep_random_fraction")) {
-            // Handle keep_random_fraction option
-        } else {
-            // Handle unrecognized options
-            isValid = false;
-            break;
-        }
     }
-    
-    // Handle the final result based on the value of isValid
-    if (isValid) {
-        return true;
-    } else {
-        return false;
+
+
+
+
+public class CommandProcessor {
+    private Map<String, CommandAction> commandMap;
+
+    public CommandProcessor() {
+        commandMap = new HashMap<>();
+        initializeCommands();
+    }
+
+    private void initializeCommands() {
+        // Aggiungi i comandi supportati e le relative azioni
+        commandMap.put("-h", () -> hasHelpOption = true);
+        commandMap.put("-help", () -> hasHelpOption = true);
+        commandMap.put("-clip_z_below", () -> handleClipZBelowCommand());
+        commandMap.put("-clip_z_above", () -> handleClipZAboveCommand());
+        commandMap.put("-clip_to_bounding_box", () -> handleClipToBoundingBoxCommand());
+        commandMap.put("-clip_to_bb", () -> handleClipToBoundingBoxCommand());
+        commandMap.put("-keep_first", () -> handleKeepFirstCommand());
+        commandMap.put("-keep_first_of_many", () -> handleKeepFirstOfManyCommand());
+        // Aggiungi gli altri comandi e le relative azioni...
+    }
+
+    public void processCommands(String[] args) {
+        boolean isValid = true;
+        int i = 1;
+
+        while (i < args.length) {
+            String command = args[i];
+
+            if (command.isEmpty()) {
+                i++;
+                continue;
+            }
+
+            if (commandMap.containsKey(command)) {
+                commandMap.get(command).execute();
+            } else {
+                isValid = false;
+                break;
+            }
+
+            i++;
+        }
+
+        // Gestisci il risultato finale in base al valore di isValid...
+    }
+
+    // Definisci le azioni associate ai comandi
+    private void handleClipZBelowCommand() {
+        // Azione per il comando "-clip_z_below"
+    }
+
+    private void handleClipZAboveCommand() {
+        // Azione per il comando "-clip_z_above"
+    }
+
+    private void handleClipToBoundingBoxCommand() {
+        // Azione per il comando "-clip_to_bounding_box" o "-clip_to_bb"
+    }
+
+    private void handleKeepFirstCommand() {
+        // Azione per il comando "-keep_first"
+    }
+
+    private void handleKeepFirstOfManyCommand() {
+        // Azione per il comando "-keep_first_of_many"
+    }
+
+    // Aggiungi altre azioni per gli altri comandi...
+
+    // Interfaccia per le azioni dei comandi
+    private interface CommandAction {
+        void execute();
     }
 }
+
 
 
         if (drop_return_mask != 0)
