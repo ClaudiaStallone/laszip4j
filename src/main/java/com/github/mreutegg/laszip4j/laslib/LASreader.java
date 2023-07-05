@@ -436,7 +436,7 @@ public abstract class LASreader implements Closeable {
     public double get_y(int y) { return header.get_y(y); };
     public double get_z(int z) { return header.get_z(z); };
 
-    public int get_X(double x) { return header.get_X(x); };
+    public int get_Asse_X(double x) { return header.get_X(x); };
     public int get_Y(double y) { return header.get_Y(y); };
     public int get_Z(double z) { return header.get_Z(z); };
 
