@@ -189,13 +189,13 @@ public class LASpoint {
     public void set_B(char B) { this.setRgb(2, B); };
     public void set_I(char I) { this.setRgb(3, I); };
 
-    public double get_x() { return quantizer.get_x(getX()); };
-    public double get_y() { return quantizer.get_y(getY()); };
-    public double get_z() { return quantizer.get_z(getZ()); };
+    public double get_ax() { return quantizer.get_x(getX()); };
+    public double get_ay() { return quantizer.get_y(getY()); };
+    public double get_az() { return quantizer.get_z(getZ()); };
 
-    public void set_x(double x) { this.setX(quantizer.get_X(x)); };
-    public void set_y(double y) { this.setY(quantizer.get_Y(y)); };
-    public void set_z(double z) { this.setZ(quantizer.get_Z(z)); };
+    public void set_ax(double x) { this.setX(quantizer.get_X(x)); };
+    public void set_ay(double y) { this.setY(quantizer.get_Y(y)); };
+    public void set_az(double z) { this.setZ(quantizer.get_Z(z)); };
 
     // generic functions for attributes in extra bytes
 

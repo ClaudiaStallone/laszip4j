@@ -23,9 +23,9 @@ public class LASquantizer {
     public double get_y(int Y) { return y_scale_factor*Y+y_offset; };
     public double get_z(int Z) { return z_scale_factor*Z+z_offset; };
 
-    public int get_X(double x) { if (x >= x_offset) return (int)((x-x_offset)/x_scale_factor+0.5); else return (int)((x-x_offset)/x_scale_factor-0.5); };
-    public int get_Y(double y) { if (y >= y_offset) return (int)((y-y_offset)/y_scale_factor+0.5); else return (int)((y-y_offset)/y_scale_factor-0.5); };
-    public int get_Z(double z) { if (z >= z_offset) return (int)((z-z_offset)/z_scale_factor+0.5); else return (int)((z-z_offset)/z_scale_factor-0.5); };
+    public int get_AX(double x) { if (x >= x_offset) return (int)((x-x_offset)/x_scale_factor+0.5); else return (int)((x-x_offset)/x_scale_factor-0.5); };
+    public int get_AY(double y) { if (y >= y_offset) return (int)((y-y_offset)/y_scale_factor+0.5); else return (int)((y-y_offset)/y_scale_factor-0.5); };
+    public int get_AZ(double z) { if (z >= z_offset) return (int)((z-z_offset)/z_scale_factor+0.5); else return (int)((z-z_offset)/z_scale_factor-0.5); };
 
     public LASquantizer()
     {
