@@ -85,59 +85,43 @@ public class LASinventory {
         return TRUE;
     }
 
-    boolean update_header(LASheader header)
-    {
-        if (header != null)
-        {
-            int i;
-            if (extended_number_of_point_records > Integer.toUnsignedLong(U32_MAX))
-            {
-                if (header.version_minor >= 4)
-                {
-                    header.number_of_point_records = 0;
-                }
-                else
-                {
+    boolean update_header(LASheader header) {
+    if (header != null) {
+        if (extended_number_of_point_records > Integer.toUnsignedLong(U32_MAX)) {
+            if (header.version_minor >= 4) {
+                header.number_of_point_records = 0;
+            } else {
+                return FALSE;
+            }
+        } else {
+            header.number_of_point_records = (int) extended_number_of_point_records;
+        }
+        
+        for (int i = 0; i < 5; i++) {
+            if (extended_number_of_points_by_return[i+1] > Integer.toUnsignedLong(U32_MAX)) {
+                if (header.version_minor >= 4) {
+                    header.number_of_points_by_return[i] = 0;
+                } else {
                     return FALSE;
                 }
+            } else {
+                header.number_of_points_by_return[i] = (int) extended_number_of_points_by_return[i+1];
             }
-            else
-            {
-                header.number_of_point_records = (int)extended_number_of_point_records;
-            }
-            for (i = 0; i < 5; i++)
-            {
-                if (extended_number_of_points_by_return[i+1] > Integer.toUnsignedLong(U32_MAX))
-                {
-                    if (header.version_minor >= 4)
-                    {
-                        header.number_of_points_by_return[i] = 0;
-                    }
-                    else
-                    {
-                        return FALSE;
-                    }
-                }
-                else
-                {
-                    header.number_of_points_by_return[i] = (int)extended_number_of_points_by_return[i+1];
-                }
-            }
-            header.max_x = header.get_x(max_X);
-            header.min_x = header.get_x(min_X);
-            header.max_y = header.get_y(max_Y);
-            header.min_y = header.get_y(min_Y);
-            header.max_z = header.get_z(max_Z);
-            header.min_z = header.get_z(min_Z);
-            header.extended_number_of_point_records = extended_number_of_point_records;
-            for (i = 0; i < 15; i++)
-            {
-                header.extended_number_of_points_by_return[i] = extended_number_of_points_by_return[i+1];
-            }
-            return TRUE;
         }
-        else
-        {
-            return FALSE;
-        }
-    }}
+        
+        header.max_x = header.get_x(max_X);
+        header.min_x = header.get_x(min_X);
+        header.max_y = header.get_y(max_Y);
+        header.min_y = header.get_y(min_Y);
+        header.max_z = header.get_z(max_Z);
+        header.min_z = header.get_z(min_Z);
+        
+        header.extended_number_of_point_records = extended_number_of_point_records;
+        System.arraycopy(extended_number_of_points_by_return, 1, header.extended_number_of_points_by_return, 0, 15);
+        
+        return TRUE;
+    } else {
+        return FALSE;
+    }
+}
+}
