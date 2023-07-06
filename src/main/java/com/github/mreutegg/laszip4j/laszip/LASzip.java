@@ -630,266 +630,86 @@ public class LASzip {
         return is_standard(num_items, items, point_type, record_length);
     }
 
-    boolean is_standard(char num_items, LASitem[] items, byte[] point_type, char[] record_length)
-    {
-        if (items == null) return return_error("LASitem array is zero");
-
-        // this is always true
-        if (point_type != null) point_type[0] = 127;
-        if (record_length != null)
-        {
-            char i;
-            record_length[0] = 0;
-            for (i = 0; i < num_items; i++)
-            {
-                record_length[0] += items[i].size;
-            }
-        }
-
-        // the minimal number of items is 1
-        if (num_items < 1) return return_error("less than one LASitem entries");
-        // the maximal number of items is 5
-        if (num_items > 5) return return_error("more than five LASitem entries");
-
-        if (items[0].is_type(POINT10))
-        {
-            // consider all the POINT10 combinations
-            if (num_items == 1)
-            {
-                if (point_type != null) point_type[0] = 0;
-                if (record_length != null) assert(record_length[0] == 20);
-                return true;
-            }
-            else
-            {
-                if (items[1].is_type(GPSTIME11))
-                {
-                    if (num_items == 2)
-                    {
-                        if (point_type != null) point_type[0] = 1;
-                        if (record_length != null) assert(record_length[0] == 28);
-                        return true;
-                    }
-                    else
-                    {
-                        if (items[2].is_type(RGB12))
-                        {
-                            if (num_items == 3)
-                            {
-                                if (point_type != null) point_type[0] = 3;
-                                if (record_length != null) assert(record_length[0] == 34);
-                                return true;
-                            }
-                            else
-                            {
-                                if (items[3].is_type(WAVEPACKET13))
-                                {
-                                    if (num_items == 4)
-                                    {
-                                        if (point_type != null) point_type[0] = 5;
-                                        if (record_length != null) assert(record_length[0] == 63);
-                                        return true;
-                                    }
-                                    else
-                                    {
-                                        if (items[4].is_type(BYTE))
-                                        {
-                                            if (num_items == 5)
-                                            {
-                                                if (point_type != null) point_type[0] = 5;
-                                                if (record_length != null) assert(record_length[0] == (63 + items[4].size));
-                                                return true;
-                                            }
-                                        }
-                                    }
-                                }
-                                else if (items[3].is_type(BYTE))
-                                {
-                                    if (num_items == 4)
-                                    {
-                                        if (point_type != null) point_type[0] = 3;
-                                        if (record_length != null) assert(record_length[0] == (34 + items[3].size));
-                                        return true;
-                                    }
-                                }
-                            }
-                        }
-                        else if (items[2].is_type(WAVEPACKET13))
-                        {
-                            if (num_items == 3)
-                            {
-                                if (point_type != null) point_type[0] = 4;
-                                if (record_length != null) assert(record_length[0] == 57);
-                                return true;
-                            }
-                            else
-                            {
-                                if (items[3].is_type(BYTE))
-                                {
-                                    if (num_items == 4)
-                                    {
-                                        if (point_type != null) point_type[0] = 4;
-                                        if (record_length != null) assert(record_length[0] == (57 + items[3].size));
-                                        return true;
-                                    }
-                                }
-                            }
-                        }
-                        else if (items[2].is_type(BYTE))
-                        {
-                            if (num_items == 3)
-                            {
-                                if (point_type != null) point_type[0] = 1;
-                                if (record_length != null) assert(record_length[0] == (28 + items[2].size));
-                                return true;
-                            }
-                        }
-                    }
-                }
-                else if (items[1].is_type(RGB12))
-                {
-                    if (num_items == 2)
-                    {
-                        if (point_type != null) point_type[0] = 2;
-                        if (record_length != null) assert(record_length[0] == 26);
-                        return true;
-                    }
-                    else
-                    {
-                        if (items[2].is_type(BYTE))
-                        {
-                            if (num_items == 3)
-                            {
-                                if (point_type != null) point_type[0] = 2;
-                                if (record_length != null) assert(record_length[0] == (26 + items[2].size));
-                                return true;
-                            }
-                        }
-                    }
-                }
-                else if (items[1].is_type(BYTE))
-                {
-                    if (num_items == 2)
-                    {
-                        if (point_type != null) point_type[0] = 0;
-                        if (record_length != null) assert(record_length[0] == (20 + items[1].size));
-                        return true;
-                    }
-                }
-            }
-        }
-        else if (items[0].is_type(POINT14))
-        {
-            // consider all the POINT14 combinations
-            if (num_items == 1)
-            {
-                if (point_type != null) point_type[0] = 6;
-                if (record_length != null) assert(record_length[0] == 30);
-                return true;
-            }
-            else
-            {
-                if (items[1].is_type(RGB14))
-                {
-                    if (num_items == 2)
-                    {
-                        if (point_type != null) point_type[0] = 7;
-                        if (record_length != null) assert(record_length[0] == 36);
-                        return true;
-                    }
-                    else
-                    {
-                        if (items[2].is_type(BYTE) || items[2].is_type(BYTE14))
-                        {
-                            if (num_items == 3)
-                            {
-                                if (point_type != null) point_type[0] = 7;
-                                if (record_length != null) assert(record_length[0] == (36 + items[2].size));
-                                return true;
-                            }
-                        }
-                    }
-                }
-                else if (items[1].is_type(RGBNIR14))
-                {
-                    if (num_items == 2)
-                    {
-                        if (point_type != null) point_type[0] = 8;
-                        if (record_length != null) assert(record_length[0] == 38);
-                        return true;
-                    }
-                    else
-                    {
-                        if (items[2].is_type(WAVEPACKET13) || items[2].is_type(WAVEPACKET14))
-                        {
-                            if (num_items == 3)
-                            {
-                                if (point_type != null) point_type[0] = 10;
-                                if (record_length != null) assert(record_length[0] == 67);
-                                return true;
-                            }
-                            else
-                            {
-                                if (items[3].is_type(BYTE) || items[3].is_type(BYTE14))
-                                {
-                                    if (num_items == 4)
-                                    {
-                                        if (point_type != null) point_type[0] = 10;
-                                        if (record_length != null) assert(record_length[0] == (67 + items[3].size));
-                                        return true;
-                                    }
-                                }
-                            }
-                        }
-                        else if (items[2].is_type(BYTE) || items[2].is_type(BYTE14))
-                        {
-                            if (num_items == 3)
-                            {
-                                if (point_type != null) point_type[0] = 8;
-                                if (record_length != null) assert(record_length[0] == (38 + items[2].size));
-                                return true;
-                            }
-                        }
-                    }
-                }
-                else if (items[1].is_type(WAVEPACKET13) || items[1].is_type(WAVEPACKET14))
-                {
-                    if (num_items == 2)
-                    {
-                        if (point_type != null) point_type[0] = 9;
-                        if (record_length != null) assert(record_length[0] == 59);
-                        return true;
-                    }
-                    else
-                    {
-                        if (items[2].is_type(BYTE) || items[2].is_type(BYTE14))
-                        {
-                            if (num_items == 3)
-                            {
-                                if (point_type != null) point_type[0] = 9;
-                                if (record_length != null) assert(record_length[0] == (59 + items[2].size));
-                                return true;
-                            }
-                        }
-                    }
-                }
-                else if (items[1].is_type(BYTE) || items[1].is_type(BYTE14))
-                {
-                    if (num_items == 2)
-                    {
-                        if (point_type != null) point_type[0] = 6;
-                        if (record_length != null) assert(record_length[0] == (30 + items[1].size));
-                        return true;
-                    }
-                }
-            }
-        }
-        else
-        {
-            return_error("first LASitem is neither POINT10 nor POINT14");
-        }
-        return return_error("LASitem array does not match LAS specification 1.4");
+   public void updateHeader(LASheader header, boolean useInventory, boolean updateExtraBytes) throws Exception {
+    if (header == null) {
+        throw new IllegalArgumentException("ERROR: header pointer is null");
     }
+
+    if (stream == null) {
+        throw new IllegalArgumentException("ERROR: stream pointer is null");
+    }
+
+    if (!stream.isSeekable()) {
+        System.out.println("WARNING: stream not seekable. cannot update header.");
+        return;
+    }
+
+    if (useInventory) {
+        updateInventory(header);
+    } else {
+        updateHeaderValues(header);
+    }
+
+    stream.seekEnd();
+
+    if (updateExtraBytes) {
+        // Code for updating extra bytes
+    }
+}
+
+private void updateInventory(LASheader header) throws Exception {
+    if (header.version_minor >= 4 && inventory.extended_number_of_point_records > toUnsignedLong(U32_MAX)) {
+        throw new Exception("WARNING: too many points in LAS file. limit is " + toUnsignedLong(U32_MAX));
+    }
+
+    stream.seek(header_start_position + 107);
+    stream.put32bitsLE(getUpdatedNumber(inventory.extended_number_of_point_records, header.version_minor >= 4));
+    npoints = inventory.extended_number_of_point_records;
+
+    for (int i = 0; i < 5; i++) {
+        stream.put32bitsLE(getUpdatedNumber(inventory.extended_number_of_points_by_return[i + 1], header.version_minor >= 4));
+    }
+
+    // Update other values in inventory
+}
+
+private void updateHeaderValues(LASheader header) throwsException {
+    int number = header.number_of_point_records;
+
+    if (header.point_data_format >= 6) {
+        number = 0;
+    }
+
+    stream.seek(header_start_position + 107);
+    stream.put32bitsLE(number);
+    npoints = number;
+
+    for (int i = 0; i < 5; i++) {
+        number = header.number_of_points_by_return[i];
+        if (header.point_data_format >= 6) {
+            number = 0;
+        }
+        stream.put32bitsLE(number);
+    }
+
+    // Update other values in header
+
+    if (header.version_minor >= 3) {
+        // Handle LAS 1.3 or higher
+    }
+
+    if (header.version_minor >= 4) {
+        // Handle LAS 1.4 or higher
+    }
+}
+
+private int getUpdatedNumber(long value, boolean condition) {
+    if (condition) {
+        return 0;
+    }
+    return (int) value;
+}
+
 
     private static int asInt(boolean b) {
         return b ? 1 : 0;
