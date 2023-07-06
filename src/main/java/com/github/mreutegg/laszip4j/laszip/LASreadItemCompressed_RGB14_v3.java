@@ -119,116 +119,49 @@ public class LASreadItemCompressed_RGB14_v3 extends LASreadItemCompressed{
   
   @Override
   public PointDataRecord read(int context) {
-
     PointDataRecordRGB result = new PointDataRecordRGB();
-
-    // get last
     PointDataRecordRGB last_item = contexts[current_context].last_item;
 
-    // check for context switch
-
-    if (current_context != context)
-    {
-        current_context = context; // all other items use context set by POINT14 reader
-        if (contexts[current_context].unused)
-        {
+    if (current_context != context) {
+        current_context = context;
+        if (contexts[current_context].unused) {
             createAndInitModelsAndDecompressors(current_context, last_item);
         }
         last_item = contexts[current_context].last_item;
     }
 
-    // decompress
+    if (changed_RGB) {
+        int corr;
+        int diff = 0;
+        int sym = dec_RGB.decodeSymbol(contexts[current_context].m_byte_used);
 
-    if (changed_RGB)
-    {
-      int corr;
-      int diff = 0;
-      int sym = dec_RGB.decodeSymbol(contexts[current_context].m_byte_used);
-      if ((sym & (1 << 0)) != 0)
-      {
-        corr = dec_RGB.decodeSymbol(contexts[current_context].m_rgb_diff_0);
-        byte b = U8_FOLD(corr + (last_item.R & 255));
-        result.R = (char)Byte.toUnsignedInt(b);
-      }
-      else 
-      {
-        result.R = (char)(last_item.R&0xFF);
-      }
-      if ((sym & (1 << 1)) != 0)
-      {
-        corr = dec_RGB.decodeSymbol(contexts[current_context].m_rgb_diff_1);
-        byte b = U8_FOLD(corr + (last_item.R >>> 8));
-        result.R |= (((char) Byte.toUnsignedInt(b)) << 8);
-      }
-      else
-      {
-        result.R |= (last_item.R&0xFF00);
-      }
-      if ((sym & (1 << 6)) != 0)
-      {
-        diff = (result.R&0x00FF) - (last_item.R&0x00FF);
-        if ((sym & (1 << 2)) != 0)
-        {
-          corr = dec_RGB.decodeSymbol(contexts[current_context].m_rgb_diff_2);
-          byte b = U8_FOLD(corr + U8_CLAMP(diff + (last_item.G & 255)));
-          result.G = (char) Byte.toUnsignedInt(b);
+        result.R = (char) ((sym & (1 << 0)) != 0 ? U8_FOLD(dec_RGB.decodeSymbol(contexts[current_context].m_rgb_diff_0)) + (last_item.R & 255) : (last_item.R & 0xFF));
+        result.R |= (char) ((sym & (1 << 1)) != 0 ? U8_FOLD(dec_RGB.decodeSymbol(contexts[current_context].m_rgb_diff_1)) + (last_item.R >>> 8) : (last_item.R & 0xFF00));
+
+        if ((sym & (1 << 6)) != 0) {
+            diff = (result.R & 0x00FF) - (last_item.R & 0x00FF);
+            result.G = (char) ((sym & (1 << 2)) != 0 ? U8_FOLD(dec_RGB.decodeSymbol(contexts[current_context].m_rgb_diff_2)) + U8_CLAMP(diff + (last_item.G & 255)) : (last_item.G & 0xFF));
+            result.B = (char) ((sym & (1 << 4)) != 0 ? U8_FOLD(dec_RGB.decodeSymbol(contexts[current_context].m_rgb_diff_4)) + U8_CLAMP(diff + (last_item.B & 255)) : (last_item.B & 0xFF));
+            diff = (result.R >>> 8) - (last_item.R >>> 8);
+            result.G |= (char) ((sym & (1 << 3)) != 0 ? U8_FOLD(dec_RGB.decodeSymbol(contexts[current_context].m_rgb_diff_3)) + U8_CLAMP(diff + (last_item.G >>> 8)) : (last_item.G & 0xFF00));
+            result.B |= (char) ((sym & (1 << 5)) != 0 ? U8_FOLD(dec_RGB.decodeSymbol(contexts[current_context].m_rgb_diff_5)) + U8_CLAMP(diff + (last_item.B >>> 8)) : (last_item.B & 0xFF00));
+        } else {
+            result.G = result.R;
+            result.B = result.R;
         }
-        else
-        {
-          result.G = (char)(last_item.G&0xFF);
-        }
-        if ((sym & (1 << 4)) != 0)
-        {
-          corr = dec_RGB.decodeSymbol(contexts[current_context].m_rgb_diff_4);
-          diff = (diff + ((result.G&0x00FF) - (last_item.G&0x00FF))) / 2;
-          byte b = U8_FOLD(corr + U8_CLAMP(diff + (last_item.B & 255)));
-          result.B = (char) Byte.toUnsignedInt(b);
-        }
-        else
-        {
-          result.B = (char)(last_item.B&0xFF);
-        }
-        diff = (result.R>>>8) - (last_item.R>>>8);
-        if ((sym & (1 << 3)) != 0)
-        {
-          corr = dec_RGB.decodeSymbol(contexts[current_context].m_rgb_diff_3);
-          byte b = U8_FOLD(corr + U8_CLAMP(diff + (last_item.G >>> 8)));
-          result.G |= (((char) Byte.toUnsignedInt(b)) << 8);
-        }
-        else
-        {
-          result.G |= (last_item.G&0xFF00);
-        }
-        if ((sym & (1 << 5)) != 0)
-        {
-          corr = dec_RGB.decodeSymbol(contexts[current_context].m_rgb_diff_5);
-          diff = (diff + ((result.G>>>8) - (last_item.G>>>8))) / 2;
-          byte b = U8_FOLD(corr + U8_CLAMP(diff + (last_item.B >>> 8)));
-          result.B |= (((char) Byte.toUnsignedInt(b)) << 8);
-        }
-        else
-        {
-          result.B |= (last_item.B&0xFF00);
-        }
-      }
-      else
-      {
-        result.G = result.R;
-        result.B = result.R;
-      }
-      last_item.R = result.R;
-      last_item.G = result.G;
-      last_item.B = result.B;
-    }
-    else
-    {
-        result.R=last_item.R;
-        result.G=last_item.G;
-        result.B=last_item.B;
+
+        last_item.R = result.R;
+        last_item.G = result.G;
+        last_item.B = result.B;
+    } else {
+        result.R = last_item.R;
+        result.G = last_item.G;
+        result.B = last_item.B;
     }
 
     return result;
-  }
+}
+
 
   private boolean createAndInitModelsAndDecompressors(int context, PointDataRecordRGB seedItem)
   {
