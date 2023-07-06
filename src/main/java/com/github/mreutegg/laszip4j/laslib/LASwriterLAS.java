@@ -565,22 +565,27 @@ private boolean updateHeaderInfoData(int numberOfPointRecords, int numberOfPoint
             fprintf(stderr,"ERROR: writing header->number_of_variable_length_records\n");
             return FALSE;
         }
-        if (compressor != 0) point_data_format[0] |= 128;
-        if (!stream.putByte(point_data_format[0]))
-        {
-            fprintf(stderr,"ERROR: writing header->point_data_format\n");
-            return FALSE;
-        }
-        if (!stream.put16bitsLE(header.point_data_record_length))
-        {
-            fprintf(stderr,"ERROR: writing header->point_data_record_length\n");
-            return FALSE;
-        }
-        if (!stream.put32bitsLE(header.number_of_point_records))
-        {
-            fprintf(stderr,"ERROR: writing header->number_of_point_records\n");
-            return FALSE;
-        }
+if (compressor != 0) {
+    point_data_format[0] |= 128;
+}
+
+if (!stream.putByte(point_data_format[0])) {
+    handleError("header->point_data_format");
+}
+
+if (!stream.put16bitsLE(header.point_data_record_length)) {
+    handleError("header->point_data_record_length");
+}
+
+if (!stream.put32bitsLE(header.number_of_point_records)) {
+    handleError("header->number_of_point_records");
+}
+
+private void handleError(String errorMessage) {
+    System.err.println("ERROR: writing " + errorMessage);
+    return FALSE;
+}
+
         for (i = 0; i < 5; i++)
         {
             if (!stream.put32bitsLE(header.number_of_points_by_return[i]))
