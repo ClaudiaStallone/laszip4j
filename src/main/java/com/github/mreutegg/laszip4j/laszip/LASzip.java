@@ -241,58 +241,37 @@ public class LASzip {
         return return_error(error);
     }
 
-    boolean check_item(LASitem item)
-    {
-        switch (item.type)
-        {
-            case POINT10:
-                if (item.size != 20) return return_error("POINT10 has size != 20");
-                if (item.version > 2) return return_error("POINT10 has version > 2");
-                break;
-            case GPSTIME11:
-                if (item.size != 8) return return_error("GPSTIME11 has size != 8");
-                if (item.version > 2) return return_error("GPSTIME11 has version > 2");
-                break;
-            case RGB12:
-                if (item.size != 6) return return_error("RGB12 has size != 6");
-                if (item.version > 2) return return_error("RGB12 has version > 2");
-                break;
-            case WAVEPACKET13:
-                if (item.size != 29) return return_error("WAVEPACKET13 has size != 29");
-                if (item.version > 1) return return_error("WAVEPACKET13 has version > 1");
-                break;
-            case BYTE:
-                if (item.size < 1) return return_error("BYTE has size < 1");
-                if (item.version > 2) return return_error("BYTE has version > 2");
-                break;
-            case POINT14:
-                if (item.size != 30) return return_error("POINT14 has size != 30");
-                if ((item.version != 0) && (item.version != 2) && (item.version != 3) && (item.version != 4)) return return_error("POINT14 has version != 0 and != 2 and != 3 and != 4"); // version == 2 from lasproto, version == 4 fixes context-switch
-                break;
-            case RGB14:
-                if (item.size != 6) return return_error("RGB14 has size != 6");
-                if ((item.version != 0) && (item.version != 2) && (item.version != 3) && (item.version != 4)) return return_error("RGB14 has version != 0 and != 2 and != 3 and != 4"); // version == 2 from lasproto, version == 4 fixes context-switch
-                break;
-            case BYTE14:
-                if (item.size < 1) return return_error("BYTE14 has size < 1");
-                if ((item.version != 0) && (item.version != 2) && (item.version != 3) && (item.version != 4)) return return_error("BYTE14 has version != 0 and != 2 and != 3 and != 4"); // version == 2 from lasproto, version == 4 fixes context-switch
-                break;
-            case RGBNIR14:
-                if (item.size != 8) return return_error("RGBNIR14 has size != 8");
-                if ((item.version != 0) && (item.version != 2) && (item.version != 3) && (item.version != 4)) return return_error("RGBNIR14 has version != 0 and != 2 and != 3 and != 4"); // version == 2 from lasproto, version == 4 fixes context-switch
-                break;
-            case WAVEPACKET14:
-                if (item.size != 29) return return_error("WAVEPACKET14 has size != 29");
-                if ((item.version != 0) && (item.version != 3) && (item.version != 4)) return return_error("WAVEPACKET14 has version != 0 and != 3 and != 4"); // version == 4 fixes context-switch
-                break;
-            default:
-                {
-                    String error = String.format("item unknown (%d,%d,%d)", item.type.ordinal(), (int) item.size, (int) item.version);
-                    return return_error(error);
-                }
-        }
-        return true;
+    boolean check_item(LASitem item) {
+    int size = (int) item.size;
+    int version = (int) item.version;
+
+    switch (item.type) {
+        case POINT10:
+            return (size == 20 && version <= 2);
+        case GPSTIME11:
+            return (size == 8 && version <= 2);
+        case RGB12:
+            return (size == 6 && version <= 2);
+        case WAVEPACKET13:
+            return (size == 29 && version <= 1);
+        case BYTE:
+            return (size >= 1 && version <= 2);
+        case POINT14:
+            return (size == 30 && (version == 0 || version == 2 || version == 3 || version == 4));
+        case RGB14:
+            return (size == 6 && (version == 0 || version == 2 || version == 3 || version == 4));
+        case BYTE14:
+            return (size >= 1 && (version == 0 || version == 2 || version == 3 || version == 4));
+        case RGBNIR14:
+            return (size == 8 && (version == 0 || version == 2 || version == 3 || version == 4));
+        case WAVEPACKET14:
+            return (size == 29 && (version == 0 || version == 3 || version == 4));
+        default:
+            String error = String.format("item unknown (%d,%d,%d)", item.type.ordinal(), size, version);
+            return return_error(error);
     }
+}
+
 
     boolean check_items(char num_items, LASitem[] items)
     {
