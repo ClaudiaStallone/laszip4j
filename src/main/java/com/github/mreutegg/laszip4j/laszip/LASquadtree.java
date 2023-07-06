@@ -524,99 +524,93 @@ public class LASquadtree {
     }
 
     // read from file
-    boolean read(ByteStreamIn stream)
-    {
-        // read data in the following order
-        //     U32  levels          4 bytes 
-        //     U32  level_index     4 bytes (default 0)
-        //     U32  implicit_levels 4 bytes (only used when level_index != 0))
-        //     float  min_x           4 bytes 
-        //     float  max_x           4 bytes 
-        //     float  min_y           4 bytes 
-        //     float  max_y           4 bytes 
-        // which totals 28 bytes
-
-        byte[] signature = new byte[4];
-        try { stream.getBytes(signature, 4); } catch (Exception e)
-        {
-            fprintf(stderr,"ERROR (LASquadtree): reading LASspatial signature\n");
-            return FALSE;
-        }
-        if (strncmp(stringFromByteArray(signature), "LASS", 4) != 0)
-        {
-            fprintf(stderr,"ERROR (LASquadtree): wrong LASspatial signature %4s instead of 'LASS'\n", stringFromByteArray(signature));
-            return FALSE;
-        }
-        int type;
-        try { type = stream.get32bitsLE(); } catch (Exception e)
-        {
-            fprintf(stderr,"ERROR (LASquadtree): reading LASspatial type\n");
-            return FALSE;
-        }
-        if (type != LAS_SPATIAL_QUAD_TREE)
-        {
-            fprintf(stderr,"ERROR (LASquadtree): unknown LASspatial type %d\n", type);
-            return FALSE;
-        }
-        try { stream.getBytes(signature, 4); } catch (Exception e)
-        {
-            fprintf(stderr,"ERROR (LASquadtree): reading signature\n");
-            return FALSE;
-        }
-        if (strncmp(stringFromByteArray(signature), "LASQ", 4) != 0)
-        {
-            //    fprintf(stderr,"ERROR (LASquadtree): wrong signature %4s instead of 'LASV'\n", signature);
-            //    return FALSE;
-            levels = ByteBuffer.wrap(signature).order(ByteOrder.LITTLE_ENDIAN).getInt();
-        }
-        else
-        {
-            int version;
-            try { version = stream.get32bitsLE(); } catch (Exception e)
-            {
-                fprintf(stderr,"ERROR (LASquadtree): reading version\n");
-                return FALSE;
-            }
-            try { levels = stream.get32bitsLE(); } catch (Exception e)
-            {
-                fprintf(stderr,"ERROR (LASquadtree): reading levels\n");
-                return FALSE;
-            }
-        }
-        int level_index;
-        try { level_index = stream.get32bitsLE(); } catch (Exception e)
-        {
-            fprintf(stderr,"ERROR (LASquadtree): reading level_index\n");
-            return FALSE;
-        }
-        int implicit_levels;
-        try { implicit_levels = stream.get32bitsLE(); } catch (Exception e)
-        {
-            fprintf(stderr,"ERROR (LASquadtree): reading implicit_levels\n");
-            return FALSE;
-        }
-        try { min_x = intBitsToFloat(stream.get32bitsLE()); } catch (Exception e)
-        {
-            fprintf(stderr,"ERROR (LASquadtree): reading min_x\n");
-            return FALSE;
-        }
-        try { max_x = intBitsToFloat(stream.get32bitsLE()); } catch (Exception e)
-        {
-            fprintf(stderr,"ERROR (LASquadtree): reading max_x\n");
-            return FALSE;
-        }
-        try { min_y = intBitsToFloat(stream.get32bitsLE()); } catch (Exception e)
-        {
-            fprintf(stderr,"ERROR (LASquadtree): reading min_y\n");
-            return FALSE;
-        }
-        try { max_y = intBitsToFloat(stream.get32bitsLE()); } catch (Exception e)
-        {
-            fprintf(stderr,"ERROR (LASquadtree): reading max_y\n");
-            return FALSE;
-        }
-        return TRUE;
+    boolean read(ByteStreamIn stream) {
+    byte[] signature = new byte[4];
+    try {
+        stream.getBytes(signature, 4);
+    } catch (Exception e) {
+        fprintf(stderr,"ERROR (LASquadtree): reading LASspatial signature\n");
+        return FALSE;
     }
+    if (!Arrays.equals(signature, "LASS".getBytes())) {
+        fprintf(stderr,"ERROR (LASquadtree): wrong LASspatial signature %4s instead of 'LASS'\n", stringFromByteArray(signature));
+        return FALSE;
+    }
+    int type;
+    try {
+        type = stream.get32bitsLE();
+    } catch (Exception e) {
+        fprintf(stderr,"ERROR (LASquadtree): reading LASspatial type\n");
+        return FALSE;
+    }
+    if (type != LAS_SPATIAL_QUAD_TREE) {
+        fprintf(stderr,"ERROR (LASquadtree): unknown LASspatial type %d\n", type);
+        return FALSE;
+    }
+    try {
+        stream.getBytes(signature, 4);
+    } catch (Exception e) {
+        fprintf(stderr,"ERROR (LASquadtree): reading signature\n");
+        return FALSE;
+    }
+    if (!Arrays.equals(signature, "LASQ".getBytes())) {
+        levels = ByteBuffer.wrap(signature).order(ByteOrder.LITTLE_ENDIAN).getInt();
+    } else {
+        int version;
+        try {
+            version = stream.get32bitsLE();
+        } catch (Exception e) {
+            fprintf(stderr,"ERROR (LASquadtree): reading version\n");
+            return FALSE;
+        }
+        try {
+            levels = stream.get32bitsLE();
+        } catch (Exception e) {
+            fprintf(stderr,"ERROR (LASquadtree): reading levels\n");
+            return FALSE;
+        }
+    }
+    int level_index;
+    try {
+        level_index = stream.get32bitsLE();
+    } catch (Exception e) {
+        fprintf(stderr,"ERROR (LASquadtree): reading level_index\n");
+        return FALSE;
+    }
+    int implicit_levels;
+    try {
+        implicit_levels = stream.get32bitsLE();
+    } catch (Exception e) {
+        fprintf(stderr,"ERROR (LASquadtree): reading implicit_levels\n");
+        return FALSE;
+    }
+    try {
+        min_x = intBitsToFloat(stream.get32bitsLE());
+    } catch (Exception e) {
+        fprintf(stderr,"ERROR (LASquadtree): reading min_x\n");
+        return FALSE;
+    }
+    try {
+        max_x = intBitsToFloat(stream.get32bitsLE());
+    } catch (Exception e) {
+        fprintf(stderr,"ERROR (LASquadtree): reading max_x\n");
+        return FALSE;
+    }
+    try {
+        min_y = intBitsToFloat(stream.get32bitsLE());
+    } catch (Exception e) {
+        fprintf(stderr,"ERROR (LASquadtree): reading min_y\n");
+        return FALSE;
+    }
+    try {
+        max_y = intBitsToFloat(stream.get32bitsLE());
+    } catch (Exception e) {
+        fprintf(stderr,"ERROR (LASquadtree): reading max_y\n");
+        return FALSE;
+    }
+    return TRUE;
+}
+
 
     boolean write(ByteStreamOut stream)
     {
