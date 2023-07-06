@@ -69,31 +69,30 @@ public class LASwriteOpener {
         writer = new LASwriterLAS();
         errorMessage = "ERROR: cannot open laswriterlas to NULL\n";
     } else {
-        switch (format) {
-            case LAS_TOOLS_FORMAT_LAZ:
-                writer = new LASwriterLAS();
-                errorMessage = String.format("ERROR: cannot open laswriterlas with file name '%s'\n", file_name);
-                break;
-            case LAS_TOOLS_FORMAT_TXT:
-                writer = new LASwriterTXT();
-                errorMessage = String.format("ERROR: cannot open laswritertxt with file name '%s'\n", file_name);
-                break;
-            case LAS_TOOLS_FORMAT_BIN:
-                writer = new LASwriterBIN();
-                errorMessage = String.format("ERROR: cannot open laswriterbin with file name '%s'\n", file_name);
-                break;
-            case LAS_TOOLS_FORMAT_QFIT:
-                writer = new LASwriterQFIT();
-                errorMessage = String.format("ERROR: cannot open laswriterqfit with file name '%s'\n", file_name);
-                break;
-            case LAS_TOOLS_FORMAT_VRML:
-                writer = new LASwriterWRL();
-                errorMessage = String.format("ERROR: cannot open laswriterwrl with file name '%s'\n", file_name);
-                break;
-            default:
-                errorMessage = String.format("ERROR: unknown format %d\n", format);
-                break;
-        }
+      switch (format) {
+    case LAS_TOOLS_FORMAT_LAZ -> {
+        writer = new LASwriterLAS();
+        errorMessage = String.format("ERROR: cannot open laswriterlas with file name '%s'\n", file_name);
+    }
+    case LAS_TOOLS_FORMAT_TXT -> {
+        writer = new LASwriterTXT();
+        errorMessage = String.format("ERROR: cannot open laswritertxt with file name '%s'\n", file_name);
+    }
+    case LAS_TOOLS_FORMAT_BIN -> {
+        writer = new LASwriterBIN();
+        errorMessage = String.format("ERROR: cannot open laswriterbin with file name '%s'\n", file_name);
+    }
+    case LAS_TOOLS_FORMAT_QFIT -> {
+        writer = new LASwriterQFIT();
+        errorMessage = String.format("ERROR: cannot open laswriterqfit with file name '%s'\n", file_name);
+    }
+    case LAS_TOOLS_FORMAT_VRML -> {
+        writer = new LASwriterWRL();
+        errorMessage = String.format("ERROR: cannot open laswriterwrl with file name '%s'\n", file_name);
+    }
+    default -> errorMessage = String.format("ERROR: unknown format %d\n", format);
+}
+
     }
 
     if (writer == null && use_stdout) {
