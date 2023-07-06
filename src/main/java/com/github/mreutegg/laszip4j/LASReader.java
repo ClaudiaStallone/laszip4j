@@ -65,8 +65,8 @@ public final class LASReader {
      *
      * @return this reader.
      */
-    public LASReader insideTile(float ll_x, float ll_y, float size) {
-        constraint = reader -> reader.inside_tile(ll_x, ll_y, size);
+    public LASReader insideTile(float x, float y, float size) {
+        constraint = reader -> reader.inside_tile(x, y, size);
         return this;
     }
 
@@ -77,8 +77,8 @@ public final class LASReader {
      *
      * @return this reader.
      */
-    public LASReader insideCircle(double center_x, double center_y, double radius) {
-        constraint = reader -> reader.inside_circle(center_x, center_y, radius);
+    public LASReader insideCircle(double cx, double cy, double radius) {
+        constraint = reader -> reader.inside_circle(cx, cy, radius);
         return this;
     }
 
@@ -89,8 +89,8 @@ public final class LASReader {
      *
      * @return this reader.
      */
-    public LASReader insideRectangle(double min_x, double min_y, double max_x, double max_y) {
-        constraint = reader -> reader.inside_rectangle(min_x, min_y, max_x, max_y);
+    public LASReader insideRectangle(double m_x, double m_y, double m_x, double m_y) {
+        constraint = reader -> reader.inside_rectangle(m_x, m_y, m_x, m_y);
         return this;
     }
 
