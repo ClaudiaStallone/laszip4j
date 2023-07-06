@@ -94,101 +94,62 @@ public class LASreadItemCompressed_BYTE14_v3 extends LASreadItemCompressed{
 
     @Override
     public void init(PointDataRecord seedItem, int context) {
+    int i;
 
-        int i;
+    ByteStreamIn instream = instreamProvider.getByteStreamIn();
 
-        ByteStreamIn instream = instreamProvider.getByteStreamIn();
-      
-        /* on the first init create instreams and decoders */
-      
-        if (instream_Bytes == null)
-        {
-          /* create instream pointer array */
-      
-          instream_Bytes = new ByteStreamInArray[number];
-      
-          /* create instreams */
-      
-          for (i = 0; i < number; i++)
-          {
-              instream_Bytes[i] = new ByteStreamInArray();
-          }
-      
-          /* create decoder pointer array */
-      
-          dec_Bytes = new ArithmeticDecoder[number];
-      
-          /* create layer decoders */
-      
-          for (i = 0; i < number; i++)
-          {
+    if (instream_Bytes == null) {
+        instream_Bytes = new ByteStreamInArray[number];
+        dec_Bytes = new ArithmeticDecoder[number];
+
+        for (i = 0; i < number; i++) {
+            instream_Bytes[i] = new ByteStreamInArray();
             dec_Bytes[i] = new ArithmeticDecoder();
-          }
         }
-      
-        /* how many bytes do we need to read */
-      
-        int num_bytes = 0;
-      
-        for (i = 0; i < number; i++)
-        {
-          if (requested_Bytes[i]) num_bytes += num_bytes_Bytes[i];
+    }
+
+    int num_bytes = 0;
+    for (i = 0; i < number; i++) {
+        if (requested_Bytes[i]) {
+            num_bytes += num_bytes_Bytes[i];
         }
-      
-        /* make sure the buffer is sufficiently large */
-      
-        if (num_bytes > num_bytes_allocated)
-        {
-          bytes = new byte[num_bytes];
-          num_bytes_allocated = num_bytes;
-        }
-      
-        /* load the requested bytes and init the corresponding instreams an decoders */
-      
-        num_bytes = 0;
-        for (i = 0; i < number; i++)
-        {
-          if (requested_Bytes[i])
-          {
-            if (num_bytes_Bytes[i] != 0)
-            {
-              instream.getBytes(bytes, num_bytes_Bytes[i]);
-              instream_Bytes[i].init(bytes, num_bytes_Bytes[i]);
-              dec_Bytes[i].init(instream_Bytes[i]);
-              num_bytes += num_bytes_Bytes[i];
-              changed_Bytes[i] = true;
+    }
+
+    if (num_bytes > num_bytes_allocated) {
+        bytes = new byte[num_bytes];
+        num_bytes_allocated = num_bytes;
+    }
+
+    num_bytes = 0;
+    for (i = 0; i < number; i++) {
+        if (requested_Bytes[i]) {
+            if (num_bytes_Bytes[i] != 0) {
+                instream.getBytes(bytes, num_bytes_Bytes[i]);
+                instream_Bytes[i].init(bytes, num_bytes_Bytes[i]);
+                dec_Bytes[i].init(instream_Bytes[i]);
+                num_bytes += num_bytes_Bytes[i];
+                changed_Bytes[i] = true;
+            } else {
+                dec_Bytes[i].init(null);
+                changed_Bytes[i] = false;
             }
-            else
-            {
-              dec_Bytes[i].init(null);
-              changed_Bytes[i] = false;
-            }
-          }
-          else
-          {
-            if (num_bytes_Bytes[i] != 0)
-            {
-              instream.skipBytes(num_bytes_Bytes[i]);
+        } else {
+            if (num_bytes_Bytes[i] != 0) {
+                instream.skipBytes(num_bytes_Bytes[i]);
             }
             changed_Bytes[i] = false;
-          }
         }
-      
-        /* mark the four scanner channel contexts as unused */
-      
-        for (int c = 0; c < 4; c++)
-        {
-          contexts[c].unused = true;
-        }
-      
-        /* set scanner channel as current context */
-      
-        current_context = context; // all other items use context set by POINT14 reader
-      
-        /* create and init models and decompressors */
-      
-        createAndInitModelsAndDecompressors(current_context, (PointDataRecordBytes)seedItem);
     }
+
+    for (int c = 0; c < 4; c++) {
+        contexts[c].unused = true;
+    }
+
+    current_context = context;
+
+    createAndInitModelsAndDecompressors(current_context, (PointDataRecordBytes)seedItem);
+}
+
 
     @Override
     public boolean chunk_sizes() {
