@@ -411,267 +411,129 @@ public class LASreadItemCompressed_POINT14_v3 extends LASreadItemCompressed {
     }
 
     @Override
-    public PointDataRecord read(int context) 
-    {
-        // get last
+    public PointDataRecord read(int context) {
+    PointDataRecordPoint14 last_item = contexts[current_context].last_item;
 
-        PointDataRecordPoint14 last_item = contexts[current_context].last_item;
+    int lpr = (last_item.getReturnNumber() == 1 ? 1 : 0);
+    int nrgp = last_item.getNumberOfReturns();
+    lpr += (last_item.getReturnNumber() >= nrgp ? 2 : 0);
+    lpr += (last_item.gps_time_change ? 4 : 0);
 
-        ////////////////////////////////////////
-        // decompress returns_XY layer 
-        ////////////////////////////////////////
+    int changed_values = dec_channel_returns_XY.decodeSymbol(contexts[current_context].m_changed_values[lpr]);
 
-        // create single (3) / first (1) / last (2) / intermediate (0) context from last point return
+    if ((changed_values & (1 << 6)) != 0) {
+        int diff = dec_channel_returns_XY.decodeSymbol(contexts[current_context].m_scanner_channel);
+        int scanner_channel = (current_context + diff + 1) % 4;
 
-        int lpr = (last_item.getReturnNumber() == 1 ? 1 : 0); // first?
-        int nrgp = last_item.getNumberOfReturns();
-        lpr += (last_item.getReturnNumber() >= nrgp ? 2 : 0); // last?
-
-        // add info whether the GPS time changed in the last return to the context
-
-        lpr += (last_item.gps_time_change ? 4 : 0);
-
-        // decompress which values have changed with last point return context
-
-        int changed_values = dec_channel_returns_XY.decodeSymbol(contexts[current_context].m_changed_values[lpr]);
-
-        // if scanner channel has changed
-
-        if ((changed_values & (1 << 6)) != 0)
-        {
-            int diff = dec_channel_returns_XY.decodeSymbol(contexts[current_context].m_scanner_channel); // curr = last + (sym + 1)
-            int scanner_channel = (current_context + diff + 1) % 4;
-            // maybe create and init entropy models and integer compressors
-            if (contexts[scanner_channel].unused)
-            {
-                // create and init entropy models and integer decompressors
-                createAndInitModelsAndDecompressors(scanner_channel, contexts[current_context].last_item);
-            }
-            // switch context to current scanner channel
-            current_context = scanner_channel;
-
-            // get last for new context
-            last_item = contexts[current_context].last_item;
-            last_item.setScannerChannel( (byte)scanner_channel );
+        if (contexts[scanner_channel].unused) {
+            createAndInitModelsAndDecompressors(scanner_channel, contexts[current_context].last_item);
         }
 
-        // determine changed attributes
-
-        boolean point_source_change = (changed_values & (1 << 5)) != 0;
-        boolean gps_time_change = (changed_values & (1 << 4)) != 0;
-        boolean scan_angle_change = (changed_values & (1 << 3)) != 0;
-
-        // get last return counts
-
-        int last_n = last_item.getNumberOfReturns();
-        int last_r = last_item.getReturnNumber();
-
-        // if number of returns is different we decompress it
-
-        int n;
-        if ((changed_values & (1 << 2)) != 0)
-        {
-            if (contexts[current_context].m_number_of_returns[last_n] == null)
-            {
-                contexts[current_context].m_number_of_returns[last_n] = dec_channel_returns_XY.createSymbolModel(16);
-                dec_channel_returns_XY.initSymbolModel(contexts[current_context].m_number_of_returns[last_n]);
-            }
-            n = dec_channel_returns_XY.decodeSymbol(contexts[current_context].m_number_of_returns[last_n]);
-            last_item.setNumberOfReturns((byte)n);
-        }
-        else
-        {
-            n = last_n;
-        }
-
-        // how is the return number different
-
-        int r;
-        if ((changed_values & 3) == 0) // same return number
-        {
-            r = last_r;
-        }
-        else if ((changed_values & 3) == 1) // return number plus 1 mod 16
-        {
-            r = ((last_r + 1) % 16);
-            last_item.setReturnNumber((byte)r);
-        }
-        else if ((changed_values & 3) == 2) // return number minus 1 mod 16
-        {
-            r = ((last_r + 15) % 16);
-            last_item.setReturnNumber((byte)r);
-        }
-        else
-        {
-            // the return number difference is bigger than +1 / -1 so we decompress how it is different
-
-            if (gps_time_change) // if the GPS time has changed
-            {
-                if (contexts[current_context].m_return_number[last_r] == null)
-                {
-                    contexts[current_context].m_return_number[last_r] = dec_channel_returns_XY.createSymbolModel(16);
-                    dec_channel_returns_XY.initSymbolModel(contexts[current_context].m_return_number[last_r]);
-                }
-                r = dec_channel_returns_XY.decodeSymbol(contexts[current_context].m_return_number[last_r]);
-            }
-            else // if the GPS time has not changed
-            {
-                int sym = dec_channel_returns_XY.decodeSymbol(contexts[current_context].m_return_number_gps_same);
-                r = (last_r + (sym + 2)) % 16;
-            }
-            last_item.setReturnNumber((byte)r);
-        }
-
-        // get return map m and return level l context for current point
-
-        int m = number_return_map_6ctx[n][r];
-        int l = number_return_level_8ctx[n][r];
-
-        // create single (3) / first (1) / last (2) / intermediate (0) return context for current point
-
-        int cpr = (r == 1 ? 2 : 0); // first ?
-        cpr += (r >= n ? 1 : 0); // last ?
-
-        int k_bits;
-        int median, diff;
-
-        // decompress X coordinate
-        median = contexts[current_context].last_X_diff_median5[(m<<1) | (gps_time_change?1:0)].get();
-        diff = contexts[current_context].ic_dX.decompress(median, n==1?1:0);
-        last_item.X += diff;
-        contexts[current_context].last_X_diff_median5[(m<<1) | (gps_time_change?1:0)].add(diff);
-
-        // decompress Y coordinate
-        median = contexts[current_context].last_Y_diff_median5[(m<<1) | (gps_time_change?1:0)].get();
-        k_bits = contexts[current_context].ic_dX.getK();
-        diff = contexts[current_context].ic_dY.decompress(median, (n==1?1:0) + ( k_bits < 20 ? U32_ZERO_BIT_0(k_bits) : 20 ));
-        last_item.Y += diff;
-        contexts[current_context].last_Y_diff_median5[(m<<1) | (gps_time_change?1:0)].add(diff);
-
-        ////////////////////////////////////////
-        // decompress Z layer (if changed and requested)
-        ////////////////////////////////////////
-
-        if (changed_Z) // if the Z coordinate should be decompressed and changes within this chunk
-        {
-            k_bits = (contexts[current_context].ic_dX.getK() + contexts[current_context].ic_dY.getK()) / 2;
-            last_item.Z = contexts[current_context].ic_Z.decompress((int)contexts[current_context].last_Z[l], (n==1?1:0) + (k_bits < 18 ? U32_ZERO_BIT_0(k_bits) : 18));
-            contexts[current_context].last_Z[l] = last_item.Z;
-        }
-
-        ////////////////////////////////////////
-        // decompress classifications layer (if changed and requested)
-        ////////////////////////////////////////
-
-        if (changed_classification) // if the classification should be decompressed and changes within this chunk
-        {
-            int last_classification = last_item.Classification;
-            int ccc = ((last_classification & 0x1F) << 1) + (cpr == 3 ? 1 : 0);
-            if (contexts[current_context].m_classification[ccc] == null)
-            {
-                contexts[current_context].m_classification[ccc] = dec_classification.createSymbolModel(256);
-                dec_classification.initSymbolModel(contexts[current_context].m_classification[ccc]);
-            }
-            last_item.Classification = (short)dec_classification.decodeSymbol(contexts[current_context].m_classification[ccc]);
-        }
-
-        ////////////////////////////////////////
-        // decompress flags layer (if changed and requested)
-        ////////////////////////////////////////
-
-        if (changed_flags) // if the flags should be decompressed and change within this chunk
-        {
-            // These flag bit locations don't agree with the las spec because the scanner channel bits are omitted from 'flags' here.
-            // So scan_direction_flag is at bit 4, and edge_of_flight_line is at bit 5
-            // (classification flags are per spec, 4 bits covering bits 0-3)
-            
-            int last_flags = ((last_item.hasScanFlag(ScanFlag.EdgeOfFlightLine)?1:0) << 5) |
-                             ((last_item.hasScanFlag(ScanFlag.ScanDirection)?1:0) << 4) |
-                             last_item.getClassificationFlags();
-            if (contexts[current_context].m_flags[last_flags] == null)
-            {
-                contexts[current_context].m_flags[last_flags] = dec_flags.createSymbolModel(64);
-                dec_flags.initSymbolModel(contexts[current_context].m_flags[last_flags]);
-            }
-            int flags = dec_flags.decodeSymbol(contexts[current_context].m_flags[last_flags]);
-            last_item.setScanDirection( ((flags >>> 4) & 1) == 1 );
-            last_item.setEdgeOfFlightLine( ((flags >>> 5) & 1) == 1 );
-            last_item.setClassificationFlags( (byte)(flags & 0x0F) );
-        }
-
-        ////////////////////////////////////////
-        // decompress intensity layer (if changed and requested)
-        ////////////////////////////////////////
-
-        if (changed_intensity) // if the intensity should be decompressed and changes within this chunk
-        {
-            int intensity = contexts[current_context].ic_intensity.decompress(
-                contexts[current_context].last_intensity[(cpr<<1) | (gps_time_change?1:0)], cpr);
-            contexts[current_context].last_intensity[(cpr<<1) | (gps_time_change?1:0)] = (char)intensity;
-            last_item.Intensity = (char)intensity;
-        }
-
-        ////////////////////////////////////////
-        // decompress scan_angle layer (if changed and requested)
-        ////////////////////////////////////////
-
-        if (changed_scan_angle) // if the scan angle should be decompressed and changes within this chunk
-        {
-            if (scan_angle_change) // if the scan angle has actually changed
-            {
-                last_item.ScanAngle = (short)contexts[current_context].ic_scan_angle.decompress(last_item.ScanAngle, (gps_time_change?1:0));
-            }
-        }
-
-        ////////////////////////////////////////
-        // decompress user_data layer (if changed and requested)
-        ////////////////////////////////////////
-
-        if (changed_user_data) // if the user data should be decompressed and changes within this chunk
-        {
-            if (contexts[current_context].m_user_data[last_item.UserData/4] == null)
-            {
-                contexts[current_context].m_user_data[last_item.UserData/4] = dec_user_data.createSymbolModel(256);
-                dec_user_data.initSymbolModel(contexts[current_context].m_user_data[last_item.UserData/4]);
-            }
-            last_item.UserData = (short)dec_user_data.decodeSymbol(contexts[current_context].m_user_data[last_item.UserData/4] );
-        }
-
-        
-
-        ////////////////////////////////////////
-        // decompress point_source layer (if changed and requested)
-        ////////////////////////////////////////
-
-        if (changed_point_source) // if the point source ID should be decompressed and changes within this chunk
-        {
-            if (point_source_change) // if the point source ID has actually changed
-            {
-                last_item.PointSourceID = (char)contexts[current_context].ic_point_source_ID.decompress(last_item.PointSourceID);
-            }
-        }
-
-        ////////////////////////////////////////
-        // decompress gps_time layer (if changed and requested)
-        ////////////////////////////////////////
-
-        if (changed_gps_time) // if the GPS time should be decompressed and changes within this chunk
-        {
-            if (gps_time_change) // if the GPS time has actually changed
-            {
-                read_gps_time();
-                last_item.GPSTime = contexts[current_context].last_gpstime[contexts[current_context].last];
-            }
-        }
-
-        PointDataRecordPoint14 result = new PointDataRecordPoint14(last_item);
-        result.CompressionContext = current_context;
-
-        // remember if the last point had a gps_time_change
-        last_item.gps_time_change = gps_time_change;
-
-        return result; 
+        current_context = scanner_channel;
+        last_item = contexts[current_context].last_item;
+        last_item.setScannerChannel((byte) scanner_channel);
     }
+
+    boolean point_source_change = (changed_values & (1 << 5)) != 0;
+    boolean gps_time_change = (changed_values & (1 << 4)) != 0;
+    boolean scan_angle_change = (changed_values & (1 << 3)) != 0;
+
+    int last_n = last_item.getNumberOfReturns();
+    int last_r = last_item.getReturnNumber();
+
+    int n;
+    if ((changed_values & (1 << 2)) != 0) {
+        if (contexts[current_context].m_number_of_returns[last_n] == null) {
+            contexts[current_context].m_number_of_returns[last_n] = dec_channel_returns_XY.createSymbolModel(16);
+            dec_channel_returns_XY.initSymbolModel(contexts[current_context].m_number_of_returns[last_n]);
+        }
+        n = dec_channel_returns_XY.decodeSymbol(contexts[current_context].m_number_of_returns[last_n]);
+        last_item.setNumberOfReturns((byte) n);
+    } else {
+        n = last_n;
+    }
+
+    int r;
+    if ((changed_values & 3) == 0) {
+        r = last_r;
+    } else if ((changed_values & 3) == 1) {
+        r = ((last_r + 1) % 16);
+        last_item.setReturnNumber((byte) r);
+    } else if ((changed_values & 3) == 2) {
+        r = ((last_r + 15) % 16);
+        last_item.setReturnNumber((byte) r);
+    } else {
+        if (gps_time_change) {
+            if (contexts[current_context].m_return_number[last_r] == null) {
+                contexts[current_context].m_return_number[last_r] = dec_channel_returns_XY.createSymbolModel(16);
+                dec_channel_returns_XY.initSymbolModel(contexts[current_context].m_return_number[last_r]);
+            }
+            r = dec_channel_returns_XY.decodeSymbol(contexts[current_context].m_return_number[last_r]);
+        } else {
+            int sym = dec_channel_returns_XY.decodeSymbol(contexts[current_context].m_return_number_gps_same);
+            r = (last_r + (sym + 2)) % 16;
+        }
+        last_item.setReturnNumber((byte) r);
+    }
+
+    int m = number_return_map_6ctx[n][r];
+    int l = number_return_level_8ctx[n][r];
+
+    int cpr = (r == 1 ? 2 : 0);
+    cpr += (r >= n ? 1 : 0);
+
+    int k_bits;
+    int median, diff;
+
+    median = contexts[current_context].last_X_diff_median5[(m << 1) | (gps_time_change ? 1 : 0)].get();
+    diff = contexts[current_context].ic_dX.decompress(median, n == 1 ? 1 : 0);
+    last_item.X += diff;
+    contexts[current_context].last_X_diff_median5[(m << 1) | (gps_time_change ? 1 : 0)].add(diff);
+
+    median = contexts[current_context].last_Y_diff_median5[(m << 1) | (gps_time_change ? 1 : 0)].get();
+    k_bits = contexts[current_context].ic_dX.getK();
+    diff = contexts[current_context].ic_dY.decompress(median, (n == 1 ? 1 : 0) + (k_bits < 20 ? U32_ZERO_BIT_0(k_bits) : 20));
+    last_item.Y += diff;
+    contexts[current_context].last_Y_diff_median5[(m << 1) | (gps_time_change ? 1 : 0)].add(diff);
+
+    if (changed_Z) {
+        k_bits = (contexts[current_context].ic_dX.getK() + contexts[current_context].ic_dY.getK()) / 2;
+        last_item.Z = contexts[current_context].ic_Z.decompress((int) contexts[current_context].last_Z[l], (n == 1 ? 1 : 0) + (k_bits < 18 ? U32_ZERO_BIT_0(k_bits) : 18));
+        contexts[current_context].last_Z[l] = last_item.Z;
+    }
+
+    if (changed_classification) {
+        int last_classification = last_item.Classification;
+        int ccc = ((last_classification & 0x1F) << 1) + (cpr == 3 ? 1 : 0);
+        if (contexts[current_context].m_classification[ccc] == null) {
+            contexts[current_context].m_classification[ccc] = dec_classification.createSymbolModel(256);
+            dec_classification.initSymbolModel(contexts[current_context].m_classification[ccc]);
+        }
+        last_item.Classification = (short) dec_classification.decodeSymbol(contexts[current_context].m_classification[ccc]);
+    }
+
+    if (changed_flags) {
+        int last_flags = ((last_item.hasScanFlag(ScanFlag.EdgeOfFlightLine) ? 1 : 0) << 5) |
+                ((last_item.hasScanFlag(ScanFlag.ScanDirection) ? 1 : 0) << 4) |
+                last_item.getClassificationFlags();
+        if (contexts[current_context].m_flags[last_flags] == null) {
+            contexts[current_context].m_flags[last_flags] = dec_flags.createSymbolModel(64);
+            dec_flags.initSymbolModel(contexts[current_context].m_flags[last_flags]);
+        }
+        int flags = dec_flags.decodeSymbol(contexts[current_context].m_flags[last_flags]);
+        last_item.setScanDirection(((flags >>> 4) & 1) == 1);
+        last_item.setEdgeOfFlightLine(((flags >>> 5) & 1) == 1);
+        last_item.setClassificationFlags((byte) (flags & 0x0F));
+    }
+
+    if (changed_intensity) {
+        int intensity = contexts[current_context].ic_intensity.decompress(
+                contexts[current_context].last_intensity[(cpr << 1) | (gps_time_change ? 1 : 0)], cpr);
+        contexts[current_context].last_intensity[(cpr << 1) | (gps_time_change ? 1 : 0)] = intensity;
+    }
+
+}
+
 
     @Override
     public boolean chunk_sizes() {
