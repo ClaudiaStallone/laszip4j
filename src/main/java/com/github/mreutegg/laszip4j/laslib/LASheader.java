@@ -354,74 +354,66 @@ public class LASheader extends LASattributer {
 
     // note that data needs to be allocated with new [] and not malloc and that LASheader
     // will become the owner over this and manage its deallocation 
-    void add_vlr(String user_id, char record_id, char record_length_after_header, byte[] data, boolean keep_description, String description, boolean keep_existing)
-    {
-        int i = 0;
-        boolean found_description = FALSE;
-        if (vlrs != null)
-        {
-            if (keep_existing)
-            {
-                i = number_of_variable_length_records;
-            }
-            else
-            {
-                for (i = 0; i < number_of_variable_length_records; i++)
-                {
-                    if ((strcmp(vlrs[i].user_id, user_id) == 0) && (vlrs[i].record_id == record_id))
-                    {
-                        if (vlrs[i].record_length_after_header != 0)
-                        {
-                            offset_to_point_data -= vlrs[i].record_length_after_header;
-                            vlrs[i].data = null;
-                        }
-                        found_description = TRUE;
-                        break;
-                    }
+    void add_vlr(String user_id, char record_id, char record_length_after_header, byte[] data, boolean keep_description, String description, boolean keep_existing) {
+    boolean found_description = false;
+    int i;
+
+    if (vlrs != null) {
+        if (keep_existing) {
+            i = number_of_variable_length_records;
+        } else {
+            i = findVLRIndex(user_id, record_id);
+            if (i != -1) {
+                if (vlrs[i].record_length_after_header != 0) {
+                    offset_to_point_data -= vlrs[i].record_length_after_header;
+                    vlrs[i].data = null;
                 }
-            }
-            if (i == number_of_variable_length_records)
-            {
-                number_of_variable_length_records++;
-                offset_to_point_data += 54;
-                vlrs = realloc(vlrs, number_of_variable_length_records);
+                found_description = true;
             }
         }
-        else
-        {
-            number_of_variable_length_records = 1;
+
+        if (i == number_of_variable_length_records) {
+            number_of_variable_length_records++;
             offset_to_point_data += 54;
-            vlrs = new LASvlr[number_of_variable_length_records];
-        }
-        if (null == vlrs[i])
+            vlrs = realloc(vlrs, number_of_variable_length_records);
             vlrs[i] = new LASvlr();
-            
-        vlrs[i].reserved = 0; // used to be 0xAABB
-        vlrs[i].user_id = MyDefs.asByteArray(user_id);
-        vlrs[i].record_id = record_id;
-        vlrs[i].record_length_after_header = record_length_after_header;
-        if (keep_description && found_description)
-        {
-            // do nothing
         }
-        else if (description != null)
-        {
-            sprintf(vlrs[i].description, "%.31s", description);
-        }
-        else
-        {
-            sprintf(vlrs[i].description, "by LAStools of rapidlasso GmbH");
-        }
-        if (record_length_after_header != 0)
-        {
-            offset_to_point_data += record_length_after_header;
-            vlrs[i].data = data;
-        }
-        else
-        {
-            vlrs[i].data = null;
+    } else {
+        number_of_variable_length_records = 1;
+        offset_to_point_data += 54;
+        vlrs = new LASvlr[number_of_variable_length_records];
+        vlrs[i] = new LASvlr();
+    }
+
+    vlrs[i].reserved = 0; // used to be 0xAABB
+    vlrs[i].user_id = MyDefs.asByteArray(user_id);
+    vlrs[i].record_id = record_id;
+    vlrs[i].record_length_after_header = record_length_after_header;
+
+    if (keep_description && found_description) {
+        // do nothing
+    } else if (description != null) {
+        sprintf(vlrs[i].description, "%.31s", description);
+    } else {
+        sprintf(vlrs[i].description, "by LAStools of rapidlasso GmbH");
+    }
+
+    if (record_length_after_header != 0) {
+        offset_to_point_data += record_length_after_header;
+        vlrs[i].data = data;
+    } else {
+        vlrs[i].data = null;
+    }
+}
+
+private int findVLRIndex(String user_id, char record_id) {
+    for (int i = 0; i < number_of_variable_length_records; i++) {
+        if (strcmp(vlrs[i].user_id, user_id) == 0 && vlrs[i].record_id == record_id) {
+            return i;
         }
     }
+    return -1;
+}
 
     public LASvlr get_vlr(String user_id, int record_id) {
         return get_vlr(user_id, (char) record_id);
