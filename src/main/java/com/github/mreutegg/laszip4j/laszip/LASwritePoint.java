@@ -56,54 +56,64 @@ public class LASwritePoint {
         number_chunks++;
         return TRUE;
     }
-    private boolean write_chunk_table() {
-        int i; // unsigned
-        long position = outstream.tell();
-        if (chunk_table_start_position != -1) // stream is seekable
-        {
-            if (!outstream.seek(chunk_table_start_position))
-            {
-                return FALSE;
-            }
-            if (!outstream.put64bitsLE(position))
-            {
-                return FALSE;
-            }
-            if (!outstream.seek(position))
-            {
-                return FALSE;
-            }
+   private boolean write_chunk_table() {
+    int i; // unsigned
+    long position = outstream.tell();
+    
+    if (chunk_table_start_position != -1) { // stream is seekable
+        if (!outstream.seek(chunk_table_start_position)) {
+            return false;
         }
-        int version = 0; // unsigned
-        if (!outstream.put32bitsLE(version))
-        {
-            return FALSE;
+        if (!outstream.put64bitsLE(position)) {
+            return false;
         }
-        if (!outstream.put32bitsLE(number_chunks))
-        {
-            return FALSE;
+        if (!outstream.seek(position)) {
+            return false;
         }
-        if (number_chunks > 0)
-        {
-            enc.init(outstream);
-            IntegerCompressor ic = new IntegerCompressor(enc, 32, 2);
-            ic.initCompressor();
-            for (i = 0; Integer.compareUnsigned(i, number_chunks) < 0; i++)
-            {
-                if (chunk_size == U32_MAX) ic.compress((i != 0 ? chunk_sizes[i-1] : 0), chunk_sizes[i], 0);
-                ic.compress((i != 0 ? chunk_bytes[i-1] : 0), chunk_bytes[i], 1);
-            }
-            enc.done();
-        }
-        if (chunk_table_start_position == -1) // stream is not-seekable
-        {
-            if (!outstream.put64bitsLE(position))
-            {
-                return FALSE;
-            }
-        }
-        return TRUE;
     }
+    
+    int version = 0; // unsigned
+    if (!outstream.put32bitsLE(version)) {
+        return false;
+    }
+    if (!outstream.put32bitsLE(number_chunks)) {
+        return false;
+    }
+    
+    if (number_chunks > 0) {
+        enc.init(outstream);
+        IntegerCompressor ic = new IntegerCompressor(enc, 32, 2);
+        ic.initCompressor();
+        
+        int prevChunkSize = 0;
+        int prevChunkBytes = 0;
+        
+        for (i = 0; i < number_chunks; i++) {
+            int currentChunkSize = (chunk_size == U32_MAX) ? chunk_sizes[i] : 0;
+            int currentChunkBytes = chunk_bytes[i];
+            
+            if (i != 0) {
+                ic.compress(prevChunkSize, currentChunkSize, 0);
+            }
+            
+            ic.compress(prevChunkBytes, currentChunkBytes, 1);
+            
+            prevChunkSize = currentChunkSize;
+            prevChunkBytes = currentChunkBytes;
+        }
+        
+        enc.done();
+    }
+    
+    if (chunk_table_start_position == -1) { // stream is not-seekable
+        if (!outstream.put64bitsLE(position)) {
+            return false;
+        }
+    }
+    
+    return true;
+}
+
 
     public boolean setup(int /* unsigned */ num_items, LASitem[] items) {
         return setup(num_items, items, null);
