@@ -79,181 +79,178 @@ public class LASreadPoint {
         return setup(num_items, items, null);
     }
 
-    public boolean setup(int num_items /*unsigned*/, LASitem[] items, LASzip laszip)
-    {
-        int i;
+    public boolean setup(int num_items /*unsigned*/, LASitem[] items, LASzip laszip) {
+    int i;
 
-        // is laszip exists then we must use its items
-        if (laszip != null)
-        {
-            if (num_items != laszip.num_items) return FALSE;
-            if (items != laszip.items) return FALSE;
+    if (laszip != null) {
+        if (num_items != laszip.num_items || items != laszip.items) {
+            return false;
         }
+    }
 
-        // create entropy decoder (if requested)
-        if (dec != null)
-        {
-            dec = null;
-            layered_las14_compression = false;
+    if (dec != null) {
+        dec = null;
+        layered_las14_compression = false;
+    }
+    
+    if (laszip != null && laszip.compressor != 0) {
+        switch (laszip.coder) {
+            case LASZIP_CODER_ARITHMETIC:
+                dec = new ArithmeticDecoder();
+                break;
+            default:
+                return false;
         }
-        if (laszip != null && laszip.compressor != 0)
-        {
-            switch (laszip.coder)
-            {
-                case LASZIP_CODER_ARITHMETIC:
-                    dec = new ArithmeticDecoder();
-                    break;
-                default:
-                    // entropy decoder not supported
-                    return FALSE;
-            }
-            // maybe layered compression for LAS 1.4 
-            layered_las14_compression = (laszip.compressor == LASZIP_COMPRESSOR_LAYERED_CHUNKED);
+        layered_las14_compression = (laszip.compressor == LASZIP_COMPRESSOR_LAYERED_CHUNKED);
+    }
+
+    readers = null;
+    num_readers = num_items;
+    chunk_size = (int) U32_MAX;
+    readers_raw = new LASreadItem[num_readers];
+
+    for (i = 0; i < num_readers; i++) {
+        switch (items[i].type) {
+            case POINT10:
+                readers_raw[i] = new LASreadItemRaw_POINT10();
+                break;
+            case GPSTIME11:
+                readers_raw[i] = new LASreadItemRaw_GPSTIME11();
+                break;
+            case RGB12:
+            case RGB14:
+                readers_raw[i] = new LASreadItemRaw_RGB12();
+                break;
+            case WAVEPACKET13:
+            case WAVEPACKET14:
+                readers_raw[i] = new LASreadItemRaw_WAVEPACKET13();
+                break;
+            case BYTE:
+            case BYTE14:
+                readers_raw[i] = new LASreadItemRaw_BYTE(items[i].size);
+                break;
+            case POINT14:
+                readers_raw[i] = new LASreadItemRaw_POINT14();
+                break;
+            case RGBNIR14:
+                readers_raw[i] = new LASreadItemRaw_RGBNIR14();
+                break;
+            default:
+                return false;
         }
+        point_size += items[i].size;
+    }
 
-        // initizalize the readers
-        readers = null;
-        num_readers = num_items;
+    if (dec != null) {
+        readers_compressed = new LASreadItem[num_readers];
+        seek_point = new PointDataRecord[num_items];
 
-        // disable chunking
-        chunk_size = (int) U32_MAX;
-
-        // always create the raw readers
-        readers_raw = new LASreadItem[num_readers];
-        for (i = 0; i < num_readers; i++)
-        {
-            switch (items[i].type)
-            {
+        for (i = 0; i < num_readers; i++) {
+            switch (items[i].type) {
                 case POINT10:
-                    readers_raw[i] = new LASreadItemRaw_POINT10();
+                    seek_point[i] = new PointDataRecordPoint10();
+                    if (items[i].version == 1) {
+                        readers_compressed[i] = new LASreadItemCompressed_POINT10_v1(dec);
+                    } else if (items[i].version == 2) {
+                        readers_compressed[i] = new LASreadItemCompressed_POINT10_v2(dec);
+                    } else {
+                        return false;
+                    }
                     break;
                 case GPSTIME11:
-                    readers_raw[i] = new LASreadItemRaw_GPSTIME11();
+                    seek_point[i] = new PointDataRecordGpsTime();
+                    if (items[i].version == 1) {
+                        readers_compressed[i] = new LASreadItemCompressed_GPSTIME11_v1(dec);
+                    } else if (items[i].version == 2) {
+                        readers_compressed[i] = new LASreadItemCompressed_GPSTIME11_v2(dec);
+                    } else {
+                        return false;
+                    }
                     break;
                 case RGB12:
+                    seek_point[i] = new PointDataRecordRGB();
+                    if (items[i].version == 1) {
+                        readers_compressed[i] = new LASreadItemCompressed_RGB12_v1(dec);
+                    } else if (items[i].version == 2) {
+                        readers_compressed[i] = new LASreadItemCompressed_RGB12_v2(dec);
+                    } else {
+                        return false;
+                    }
+                    break;
                 case RGB14:
-                    readers_raw[i] = new LASreadItemRaw_RGB12();
+                    seek_point[i] = new PointDataRecordRGB();
+                    if (items[i].version == 4 || items[i].version == 3 || items[i].version == 2) {
+                        readers_compressed[i] = new LASreadItemCompressed_RGB14_v3(dec, decompress_selective);
+                    } else {
+                        return false;
+                    }
                     break;
                 case WAVEPACKET13:
+                    seek_point[i] = new PointDataRecordWavepacket();
+                    if (items[i].version == 1) {
+                        readers_compressed[i] = new LASreadItemCompressed_WAVEPACKET13_v1(dec);
+                    } else {
+                        return false;
+                    }
+                    break;
                 case WAVEPACKET14:
-                    readers_raw[i] = new LASreadItemRaw_WAVEPACKET13();
+                    seek_point[i] = new PointDataRecordWavepacket();
+                    if (items[i].version == 4 || items[i].version == 3) {
+                        readers_compressed[i] = new LASreadItemCompressed_WAVEPACKET14_v3(dec, decompress_selective);
+                    } else {
+                        return false;
+                    }
                     break;
                 case BYTE:
+                    seek_point[i] = new PointDataRecordBytes(items[i].size);
+                    if (items[i].version == 1) {
+                        readers_compressed[i] = new LASreadItemCompressed_BYTE_v1(dec, items[i].size);
+                    } else if (items[i].version == 2) {
+                        readers_compressed[i] = new LASreadItemCompressed_BYTE_v2(dec, items[i].size);
+                    } else {
+                        return false;
+                    }
+                    break;
                 case BYTE14:
-                    readers_raw[i] = new LASreadItemRaw_BYTE(items[i].size);
+                    seek_point[i] = new PointDataRecordBytes(items[i].size);
+                    if (items[i].version == 4 || items[i].version == 3) {
+                        readers_compressed[i] = new LASreadItemCompressed_BYTE14_v3(dec, items[i].size, decompress_selective);
+                    } else {
+                        return false;
+                    }
                     break;
                 case POINT14:
-                    readers_raw[i] = new LASreadItemRaw_POINT14();
+                    seek_point[i] = new PointDataRecordPoint14();
+                    if (items[i].version == 4 || items[i].version == 3 || items[i].version == 2) {
+                        readers_compressed[i] = new LASreadItemCompressed_POINT14_v3(dec, decompress_selective);
+                    } else {
+                        return false;
+                    }
                     break;
                 case RGBNIR14:
-                    readers_raw[i] = new LASreadItemRaw_RGBNIR14();
+                    seek_point[i] = new PointDataRecordRgbNIR();
+                    if (items[i].version == 4 || items[i].version == 3 || items[i].version == 2) {
+                        readers_compressed[i] = new LASreadItemCompressed_RGBNIR14_v3(dec, decompress_selective);
+                    } else {
+                        return false;
+                    }
                     break;
-
                 default:
-                    return FALSE;
-            }
-            point_size += items[i].size;
-        }
-
-        if (dec != null)
-        {
-            readers_compressed = new LASreadItem[num_readers];
-            // seeks with compressed data need a seek point
-            seek_point = new PointDataRecord[num_items];
-            for (i = 0; i < num_readers; i++)
-            {
-                switch (items[i].type)
-                {
-                    case POINT10:
-                        seek_point[i] = new PointDataRecordPoint10();
-                        if (items[i].version == 1)
-                            readers_compressed[i] = new LASreadItemCompressed_POINT10_v1(dec);
-                        else if (items[i].version == 2)
-                            readers_compressed[i] = new LASreadItemCompressed_POINT10_v2(dec);
-                        else
-                            return FALSE;
-                        break;
-                    case GPSTIME11:
-                        seek_point[i] = new PointDataRecordGpsTime();
-                        if (items[i].version == 1)
-                            readers_compressed[i] = new LASreadItemCompressed_GPSTIME11_v1(dec);
-                        else if (items[i].version == 2)
-                            readers_compressed[i] = new LASreadItemCompressed_GPSTIME11_v2(dec);
-                        else
-                            return FALSE;
-                        break;
-                    case RGB12:
-                        seek_point[i] = new PointDataRecordRGB();
-                        if (items[i].version == 1)
-                            readers_compressed[i] = new LASreadItemCompressed_RGB12_v1(dec);
-                        else if (items[i].version == 2)
-                            readers_compressed[i] = new LASreadItemCompressed_RGB12_v2(dec);
-                        else 
-                            return FALSE;
-                        break;
-                    case RGB14:
-                        seek_point[i] = new PointDataRecordRGB();
-                        if ((items[i].version == 4) || (items[i].version == 3) || (items[i].version == 2))
-                            readers_compressed[i] = new LASreadItemCompressed_RGB14_v3(dec, decompress_selective);
-                        else 
-                            return FALSE;
-                        break;
-                    case WAVEPACKET13:
-                        seek_point[i] = new PointDataRecordWavepacket();
-                        if (items[i].version == 1)
-                            readers_compressed[i] = new LASreadItemCompressed_WAVEPACKET13_v1(dec);
-                        else
-                            return FALSE;
-                        break;
-                    case WAVEPACKET14:
-                        seek_point[i] = new PointDataRecordWavepacket();
-                        if ( (items[i].version == 4) || (items[i].version == 3))
-                            readers_compressed[i] = new LASreadItemCompressed_WAVEPACKET14_v3(dec, decompress_selective);
-                        else
-                            return FALSE;
-                        break;
-                    case BYTE:
-                        seek_point[i] = new PointDataRecordBytes(items[i].size);
-                        if (items[i].version == 1)
-                            readers_compressed[i] = new LASreadItemCompressed_BYTE_v1(dec, items[i].size);
-                        else if (items[i].version == 2)
-                            readers_compressed[i] = new LASreadItemCompressed_BYTE_v2(dec, items[i].size);
-                        else
-                            return FALSE;
-                        break;
-                    case BYTE14:
-                        seek_point[i] = new PointDataRecordBytes(items[i].size);
-                        if ((items[i].version == 4) || (items[i].version == 3))
-                            readers_compressed[i] = new LASreadItemCompressed_BYTE14_v3(dec, items[i].size, decompress_selective);
-                        else
-                            return FALSE;
-                        break;
-                    case POINT14:
-                        seek_point[i] = new PointDataRecordPoint14();
-                        if ((items[i].version == 4) || (items[i].version == 3) || (items[i].version == 2)) // version == 2 from lasproto
-                            readers_compressed[i] = new LASreadItemCompressed_POINT14_v3(dec, decompress_selective);
-                        else
-                            return FALSE;
-                        break;
-                    case RGBNIR14:
-                        seek_point[i] = new PointDataRecordRgbNIR();
-                        if ((items[i].version == 4) || (items[i].version == 3) || (items[i].version == 2)) // version == 2 from lasproto
-                            readers_compressed[i] = new LASreadItemCompressed_RGBNIR14_v3(dec, decompress_selective);
-                        else
-                            return FALSE;
-                        break;
-                    default:
-                        return FALSE;
-                }
-            }
-            if (laszip.compressor != LASZIP_COMPRESSOR_POINTWISE)
-            {
-                if (laszip.chunk_size != 0) chunk_size = laszip.chunk_size;
-                number_chunks = (int) U32_MAX;
+                    return false;
             }
         }
-        return TRUE;
+        
+        if (laszip.compressor != LASZIP_COMPRESSOR_POINTWISE) {
+            if (laszip.chunk_size != 0) {
+                chunk_size = laszip.chunk_size;
+            }
+            number_chunks = (int) U32_MAX;
+        }
     }
+    
+    return true;
+}
+
 
     public boolean init(ByteStreamIn instream)
     {
