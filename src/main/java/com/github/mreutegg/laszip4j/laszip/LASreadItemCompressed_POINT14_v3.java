@@ -155,260 +155,61 @@ public class LASreadItemCompressed_POINT14_v3 extends LASreadItemCompressed {
 
     @Override
     public void init(PointDataRecord seedItem, int notUsed) {
+    ByteStreamIn instream = instreamProvider.getByteStreamIn();
 
-        ByteStreamIn instream = instreamProvider.getByteStreamIn();
+    if (null == instream_channel_returns_XY) {
+        instream_channel_returns_XY = new ByteStreamInArray();
+        instream_Z = new ByteStreamInArray();
+        instream_classification = new ByteStreamInArray();
+        instream_flags = new ByteStreamInArray();
+        instream_intensity = new ByteStreamInArray();
+        instream_scan_angle = new ByteStreamInArray();
+        instream_user_data = new ByteStreamInArray();
+        instream_point_source = new ByteStreamInArray();
+        instream_gps_time = new ByteStreamInArray();
 
-        /* on the first init create instreams and decoders */
-
-        if (null == instream_channel_returns_XY)
-        {
-            /* create instreams */
-
-            instream_channel_returns_XY = new ByteStreamInArray();
-            instream_Z = new ByteStreamInArray();
-            instream_classification = new ByteStreamInArray();
-            instream_flags = new ByteStreamInArray();
-            instream_intensity = new ByteStreamInArray();
-            instream_scan_angle = new ByteStreamInArray();
-            instream_user_data = new ByteStreamInArray();
-            instream_point_source = new ByteStreamInArray();
-            instream_gps_time = new ByteStreamInArray();
-
-            /* create decoders */
-
-            dec_channel_returns_XY = new ArithmeticDecoder();
-            dec_Z = new ArithmeticDecoder();
-            dec_classification = new ArithmeticDecoder();
-            dec_flags = new ArithmeticDecoder();
-            dec_intensity = new ArithmeticDecoder();
-            dec_scan_angle = new ArithmeticDecoder();
-            dec_user_data = new ArithmeticDecoder();
-            dec_point_source = new ArithmeticDecoder();
-            dec_gps_time = new ArithmeticDecoder();
-        }
-
-        /* load the requested bytes and init the corresponding instreams and decoders */
-
-        byte[] bytes = new byte[num_bytes_channel_returns_XY];
-        instream.getBytes(bytes, num_bytes_channel_returns_XY);
-        instream_channel_returns_XY.init(bytes, num_bytes_channel_returns_XY);
-        dec_channel_returns_XY.init(instream_channel_returns_XY);
-
-        if (requested_Z)
-        {
-            if (num_bytes_Z > 0 )
-            {
-                bytes = new byte[num_bytes_Z];
-                instream.getBytes(bytes, num_bytes_Z);
-                instream_Z.init(bytes, num_bytes_Z);
-                dec_Z.init(instream_Z);
-                changed_Z = true;
-            }
-            else
-            {
-                instream_Z.init(null, 0L);
-                changed_Z = false;
-            }
-        }
-        else 
-        {
-            if (num_bytes_Z > 0)
-            {
-                instream.skipBytes(num_bytes_Z);
-            }
-            changed_Z = false;
-        }
-
-        if (requested_classification)
-        {
-            if (num_bytes_classification > 0)
-            {
-                bytes = new byte[num_bytes_classification];
-                instream.getBytes(bytes, num_bytes_classification);
-                instream_classification.init(bytes, num_bytes_classification);
-                dec_classification.init(instream_classification);
-                changed_classification = true;
-            }
-            else
-            {
-                instream_classification.init(null, 0L);
-                changed_classification = false;
-            }
-        }
-        else 
-        {
-            if (num_bytes_classification > 0)
-            {
-                instream.skipBytes(num_bytes_classification);
-            }
-            changed_classification = false;
-        }
-
-        if (requested_flags)
-        {
-            if (num_bytes_flags > 0)
-            {
-                bytes = new byte[num_bytes_flags];
-                instream.getBytes(bytes, num_bytes_flags);
-                instream_flags.init(bytes, num_bytes_flags);
-                dec_flags.init(instream_flags);
-                changed_flags = true;
-            }
-            else
-            {
-                instream_flags.init(null, 0L);
-                changed_flags = false;
-            }
-        }
-        else 
-        {
-            if (num_bytes_flags > 0)
-            {
-                instream.skipBytes(num_bytes_flags);
-            }
-            changed_flags = false;
-        }
-
-        if (requested_intensity)
-        {
-            if (num_bytes_intensity > 0)
-            {
-                bytes = new byte[num_bytes_intensity];
-                instream.getBytes(bytes, num_bytes_intensity);
-                instream_intensity.init(bytes, num_bytes_intensity);
-                dec_intensity.init(instream_intensity);
-                changed_intensity = true;
-            }
-            else
-            {
-                instream_intensity.init(null, 0L);
-                changed_intensity = false;
-            }
-        }
-        else 
-        {
-            if (num_bytes_intensity > 0)
-            {
-                instream.skipBytes(num_bytes_intensity);
-            }
-            changed_intensity = false;
-        }
-
-        if (requested_scan_angle)
-        {
-            if (num_bytes_scan_angle > 0)
-            {
-                bytes = new byte[num_bytes_scan_angle];
-                instream.getBytes(bytes, num_bytes_scan_angle);
-                instream_scan_angle.init(bytes, num_bytes_scan_angle);
-                dec_scan_angle.init(instream_scan_angle);
-                changed_scan_angle = true;
-            }
-            else
-            {
-                instream_scan_angle.init(null, 0L);
-                changed_scan_angle = false;
-            }
-        }
-        else 
-        {
-            if (num_bytes_scan_angle > 0)
-            {
-                instream.skipBytes(num_bytes_scan_angle);
-            }
-            changed_scan_angle = false;
-        }
-
-        if (requested_user_data)
-        {
-            if (num_bytes_user_data > 0)
-            {
-                bytes = new byte[num_bytes_user_data];
-                instream.getBytes(bytes, num_bytes_user_data);
-                instream_user_data.init(bytes, num_bytes_user_data);
-                dec_user_data.init(instream_user_data);
-                changed_user_data = true;
-            }
-            else
-            {
-                instream_user_data.init(null, 0L);
-                changed_user_data = false;
-            }
-        }
-        else 
-        {
-            if (num_bytes_user_data > 0)
-            {
-                instream.skipBytes(num_bytes_user_data);
-            }
-            changed_user_data = false;
-        }
-
-        if (requested_point_source)
-        {
-            if (num_bytes_point_source > 0)
-            {
-                bytes = new byte[num_bytes_point_source];
-                instream.getBytes(bytes, num_bytes_point_source);
-                instream_point_source.init(bytes, num_bytes_point_source);
-                dec_point_source.init(instream_point_source);
-                changed_point_source = true;
-            }
-            else
-            {
-                instream_point_source.init(null, 0L);
-                changed_point_source = false;
-            }
-        }
-        else
-        {
-            if (num_bytes_point_source > 0)
-            {
-                instream.skipBytes(num_bytes_point_source);
-            }
-            changed_point_source = false;
-        }
-
-        if (requested_gps_time)
-        {
-            if (num_bytes_gps_time > 0)
-            {
-                bytes = new byte[num_bytes_gps_time];
-                instream.getBytes(bytes, num_bytes_gps_time);
-                instream_gps_time.init(bytes, num_bytes_gps_time);
-                dec_gps_time.init(instream_gps_time);
-                changed_gps_time = true;
-            }
-            else
-            {
-                instream_gps_time.init(null, 0L);
-                changed_gps_time = false;
-            }
-        }
-        else
-        {
-            if (num_bytes_gps_time > 0)
-            {
-                instream.skipBytes(num_bytes_gps_time);
-            }
-            changed_gps_time = false;
-        }
-
-        /* mark the four scanner channel contexts as unused */
-
-        for (int c = 0; c < 4; c++)
-        {
-            contexts[c].unused = true;
-        }
-
-        /* set scanner channel as current context */
-
-        current_context = ((PointDataRecordPoint14)seedItem).getScannerChannel();
-
-        /* create and init models and decompressors */
-
-        createAndInitModelsAndDecompressors(current_context, (PointDataRecordPoint14)seedItem);
+        dec_channel_returns_XY = new ArithmeticDecoder();
+        dec_Z = new ArithmeticDecoder();
+        dec_classification = new ArithmeticDecoder();
+        dec_flags = new ArithmeticDecoder();
+        dec_intensity = new ArithmeticDecoder();
+        dec_scan_angle = new ArithmeticDecoder();
+        dec_user_data = new ArithmeticDecoder();
+        dec_point_source = new ArithmeticDecoder();
+        dec_gps_time = new ArithmeticDecoder();
     }
+
+    byte[] bytes;
+
+    bytes = readBytes(instream, num_bytes_channel_returns_XY);
+    instream_channel_returns_XY.init(bytes, num_bytes_channel_returns_XY);
+    dec_channel_returns_XY.init(instream_channel_returns_XY);
+
+    if (requested_Z && num_bytes_Z > 0) {
+        bytes = readBytes(instream, num_bytes_Z);
+        instream_Z.init(bytes, num_bytes_Z);
+        dec_Z.init(instream_Z);
+        changed_Z = true;
+    } else {
+        instream_Z.init(null, 0L);
+        changed_Z = false;
+    }
+
+     for (int c = 0; c < 4; c++) {
+        contexts[c].unused = true;
+    }
+
+    current_context = ((PointDataRecordPoint14) seedItem).getScannerChannel();
+
+    createAndInitModelsAndDecompressors(current_context, (PointDataRecordPoint14) seedItem);
+}
+
+private byte[] readBytes(ByteStreamIn instream, int numBytes) {
+    byte[] bytes = new byte[numBytes];
+    instream.getBytes(bytes, numBytes);
+    return bytes;
+}
+
 
     @Override
     public PointDataRecord read(int context) {
