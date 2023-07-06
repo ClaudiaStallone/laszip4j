@@ -196,565 +196,82 @@ public class LASreadOpener {
         return open(other_file_name, true);
     }
 
-    public LASreader open(String other_file_name, boolean reset_after_other)
-    {
-        if (filter != null) filter.reset();
-        if (transform != null) transform.reset();
+   public LASreader open(String other_file_name, boolean reset_after_other) {
+    if (filter != null) filter.reset();
+    if (transform != null) transform.reset();
 
-        if (!file_names.isEmpty() || other_file_name != null)
-        {
-            use_stdin = FALSE;
-            if ((file_names.size() > 1) && merged)
-            {
-               
-                LASreaderMerged lasreadermerged = new LASreaderMerged();
-                lasreadermerged.set_scale_factor(scale_factor);
-                lasreadermerged.set_offset(offset);
-                lasreadermerged.set_parse_string(parse_string);
-                lasreadermerged.set_skip_lines(skip_lines);
-                lasreadermerged.set_populate_header(populate_header);
-                lasreadermerged.set_keep_lastiling(keep_lastiling);
-                lasreadermerged.set_translate_intensity(translate_intensity);
-                lasreadermerged.set_scale_intensity(scale_intensity);
-                lasreadermerged.set_translate_scan_angle(translate_scan_angle);
-                lasreadermerged.set_scale_scan_angle(scale_scan_angle);
-                lasreadermerged.set_io_ibuffer_size(io_ibuffer_size);
-                for (file_name_current = 0; file_name_current < file_names.size(); file_name_current++) lasreadermerged.add_file_name(file_names.get(file_name_current));
-                if (!lasreadermerged.open())
-                {
-                    fprintf(stderr, "ERROR: cannot open lasreadermerged with %d file names\n", file_names.size());
-                    return null;
-                }
-                if (files_are_flightlines) lasreadermerged.set_files_are_flightlines(TRUE);
-                if (apply_file_source_ID) lasreadermerged.set_apply_file_source_ID(TRUE);
-                if (filter != null) lasreadermerged.set_filter(filter);
-                if (transform != null) lasreadermerged.set_transform(transform);
-                if (inside_tile != null) lasreadermerged.inside_tile(inside_tile[0], inside_tile[1], inside_tile[2]);
-                if (inside_circle != null) lasreadermerged.inside_circle(inside_circle[0], inside_circle[1], inside_circle[2]);
-                if (inside_rectangle != null) lasreadermerged.inside_rectangle(inside_rectangle[0], inside_rectangle[1], inside_rectangle[2], inside_rectangle[3]);
-                if (pipe_on)
-                {
-                    LASreaderPipeOn lasreaderpipeon = new LASreaderPipeOn();
-                    if (!lasreaderpipeon.open(lasreadermerged))
-                    {
-                        fprintf(stderr,"ERROR: cannot open lasreaderpipeon with lasreadermerged\n");
-                        return null;
-                    }
-                    return lasreaderpipeon;
-                }
-                else
-                {
-                    return lasreadermerged;
-                }
+    if (!file_names.isEmpty() || other_file_name != null) {
+        use_stdin = FALSE;
 
-                
-            }
-            else if ((buffer_size > 0) && ((file_names.size() > 1) || (neighbor_file_names.size() > 0)))
-            {
-                int i;
-                if (other_file_name != null)
-                {
-                    file_name = other_file_name;
-                    if (reset_after_other)
-                    {
-                        file_name_current = 0;
-                    }
-                }
-                else
-                {
-                    file_name = file_names.get(file_name_current);
-                    file_name_current++;
-                }
-                LASreaderBuffered lasreaderbuffered = new LASreaderBuffered();
-                lasreaderbuffered.set_buffer_size(buffer_size);
-                lasreaderbuffered.set_scale_factor(scale_factor);
-                lasreaderbuffered.set_offset(offset);
-                lasreaderbuffered.set_parse_string(parse_string);
-                lasreaderbuffered.set_skip_lines(skip_lines);
-                lasreaderbuffered.set_populate_header(populate_header);
-                lasreaderbuffered.set_translate_intensity(translate_intensity);
-                lasreaderbuffered.set_scale_intensity(scale_intensity);
-                lasreaderbuffered.set_translate_scan_angle(translate_scan_angle);
-                lasreaderbuffered.set_scale_scan_angle(scale_scan_angle);
-                lasreaderbuffered.set_file_name(file_name);
-                for (i = 0; i < file_names.size(); i++)
-                {
-                    if (!file_name.equals(file_names.get(i)))
-                    {
-                        lasreaderbuffered.add_neighbor_file_name(file_names.get(i));
-                    }
-                }
-                for (i = 0; i < neighbor_file_names.size(); i++)
-                {
-                    if (strcmp(file_name, neighbor_file_names.get(i)) != 0)
-                    {
-                        lasreaderbuffered.add_neighbor_file_name(neighbor_file_names.get(i));
-                    }
-                }
-                if (filter != null) lasreaderbuffered.set_filter(filter);
-                if (transform != null) lasreaderbuffered.set_transform(transform);
-                if (!lasreaderbuffered.open())
-                {
-                    fprintf(stderr,"ERROR: cannot open lasreaderbuffered with %d file names\n", file_names.size()+neighbor_file_names.size());
-                    return null;
-                }
-                if (inside_tile != null) lasreaderbuffered.inside_tile(inside_tile[0], inside_tile[1], inside_tile[2]);
-                if (inside_circle != null) lasreaderbuffered.inside_circle(inside_circle[0], inside_circle[1], inside_circle[2]);
-                if (inside_rectangle != null) lasreaderbuffered.inside_rectangle(inside_rectangle[0], inside_rectangle[1], inside_rectangle[2], inside_rectangle[3]);
-                if (pipe_on)
-                {
-                    LASreaderPipeOn lasreaderpipeon = new LASreaderPipeOn();
-                    if (!lasreaderpipeon.open(lasreaderbuffered))
-                    {
-                        fprintf(stderr,"ERROR: cannot open lasreaderpipeon with lasreaderbuffered\n");
-                        return null;
-                    }
-                    return lasreaderpipeon;
-                }
-                else
-                {
-                    return lasreaderbuffered;
-                }
-            }
-            else
-            {
-                if (other_file_name != null)
-                {
-                    file_name = other_file_name;
-                    if (reset_after_other)
-                    {
-                        file_name_current = 0;
-                    }
-                }
-                else
-                {
-                    file_name = file_names.get(file_name_current);
-                    file_name_current++;
-                }
-                if (files_are_flightlines)
-                {
-                    transform.setPointSource(file_name_current);
-                }
-                if (strstr(file_name, ".las") || strstr(file_name, ".laz") || strstr(file_name, ".LAS") || strstr(file_name, ".LAZ"))
-                {
-                    LASreaderLAS lasreaderlas;
-                    if (scale_factor == null && offset == null)
-                    {
-                        if (auto_reoffset)
-                            lasreaderlas = new LASreaderLASreoffset();
-                        else
-                            lasreaderlas = new LASreaderLAS();
-                    }
-                    else if (scale_factor != null && offset == null)
-                    {
-                        if (auto_reoffset)
-                            lasreaderlas = new LASreaderLASrescalereoffset(scale_factor[0], scale_factor[1], scale_factor[2]);
-                        else
-                            lasreaderlas = new LASreaderLASrescale(scale_factor[0], scale_factor[1], scale_factor[2]);
-                    }
-                    else if (scale_factor == null && offset != null)
-                        lasreaderlas = new LASreaderLASreoffset(offset[0], offset[1], offset[2]);
-                    else
-                        lasreaderlas = new LASreaderLASrescalereoffset(scale_factor[0], scale_factor[1], scale_factor[2], offset[0], offset[1], offset[2]);
-                    if (!lasreaderlas.open(file_name, io_ibuffer_size, false, decompress_selective))
-                    {
-                        fprintf(stderr,"ERROR: cannot open lasreaderlas with file name '%s'\n", file_name);
-                        return null;
-                    }
-                    LASindex index = new LASindex();
-                    if (index.read(file_name))
-                        lasreaderlas.set_index(index);
-                    if (files_are_flightlines)
-                    {
-                        lasreaderlas.header.file_source_ID = (char) file_name_current;
-                    }
-                    else if (apply_file_source_ID)
-                    {
-                        transform.setPointSource(lasreaderlas.header.file_source_ID);
-                    }
-                    if (filter != null) lasreaderlas.set_filter(filter);
-                    if (transform != null) lasreaderlas.set_transform(transform);
-                    if (inside_tile != null) lasreaderlas.inside_tile(inside_tile[0], inside_tile[1], inside_tile[2]);
-                    if (inside_circle != null) lasreaderlas.inside_circle(inside_circle[0], inside_circle[1], inside_circle[2]);
-                    if (inside_rectangle != null) lasreaderlas.inside_rectangle(inside_rectangle[0], inside_rectangle[1], inside_rectangle[2], inside_rectangle[3]);
-                    if (pipe_on)
-                    {
-                        LASreaderPipeOn lasreaderpipeon = new LASreaderPipeOn();
-                        if (!lasreaderpipeon.open(lasreaderlas))
-                        {
-                            fprintf(stderr,"ERROR: cannot open lasreaderpipeon with lasreaderlas\n");
-                            return null;
-                        }
-                        return lasreaderpipeon;
-                    }
-                    else
-                    {
-                        return lasreaderlas;
-                    }
-                }
-                else if (strstr(file_name, ".bin") || strstr(file_name, ".BIN"))
-                {
-                    LASreaderBIN lasreaderbin;
-                    if (scale_factor == null && offset == null)
-                        lasreaderbin = new LASreaderBIN();
-                    else if (scale_factor != null && offset == null)
-                        lasreaderbin = new LASreaderBINrescale(scale_factor[0], scale_factor[1], scale_factor[2]);
-                    else if (scale_factor == null && offset != null)
-                        lasreaderbin = new LASreaderBINreoffset(offset[0], offset[1], offset[2]);
-                    else
-                        lasreaderbin = new LASreaderBINrescalereoffset(scale_factor[0], scale_factor[1], scale_factor[2], offset[0], offset[1], offset[2]);
-                    if (!lasreaderbin.open(file_name))
-                    {
-                        fprintf(stderr,"ERROR: cannot open lasreaderbin with file name '%s'\n", file_name);
-                        return null;
-                    }
-                    LASindex index = new LASindex();
-                    if (index.read(file_name))
-                        lasreaderbin.set_index(index);
-                    if (files_are_flightlines) lasreaderbin.header.file_source_ID = (char) file_name_current;
-                    if (filter != null) lasreaderbin.set_filter(filter);
-                    if (transform != null) lasreaderbin.set_transform(transform);
-                    if (inside_tile != null) lasreaderbin.inside_tile(inside_tile[0], inside_tile[1], inside_tile[2]);
-                    if (inside_circle != null) lasreaderbin.inside_circle(inside_circle[0], inside_circle[1], inside_circle[2]);
-                    if (inside_rectangle != null) lasreaderbin.inside_rectangle(inside_rectangle[0], inside_rectangle[1], inside_rectangle[2], inside_rectangle[3]);
-                    if (pipe_on)
-                    {
-                        LASreaderPipeOn lasreaderpipeon = new LASreaderPipeOn();
-                        if (!lasreaderpipeon.open(lasreaderbin))
-                        {
-                            fprintf(stderr,"ERROR: cannot open lasreaderpipeon with lasreaderbin\n");
-                            return null;
-                        }
-                        return lasreaderpipeon;
-                    }
-                    else
-                    {
-                        return lasreaderbin;
-                    }
-                }
-                else if (strstr(file_name, ".shp") || strstr(file_name, ".SHP"))
-                {
-                    LASreaderSHP lasreadershp;
-                    if (scale_factor == null && offset == null)
-                        lasreadershp = new LASreaderSHP();
-                    else if (scale_factor != null && offset == null)
-                        lasreadershp = new LASreaderSHPrescale(scale_factor[0], scale_factor[1], scale_factor[2]);
-                    else if (scale_factor == null && offset != null)
-                        lasreadershp = new LASreaderSHPreoffset(offset[0], offset[1], offset[2]);
-                    else
-                        lasreadershp = new LASreaderSHPrescalereoffset(scale_factor[0], scale_factor[1], scale_factor[2], offset[0], offset[1], offset[2]);
-                    if (!lasreadershp.open(file_name))
-                    {
-                        fprintf(stderr,"ERROR: cannot open lasreadershp with file name '%s'\n", file_name);
-                        return null;
-                    }
-                    if (files_are_flightlines) lasreadershp.header.file_source_ID = (char) file_name_current;
-                    if (filter != null) lasreadershp.set_filter(filter);
-                    if (transform != null) lasreadershp.set_transform(transform);
-                    if (inside_tile != null) lasreadershp.inside_tile(inside_tile[0], inside_tile[1], inside_tile[2]);
-                    if (inside_circle != null) lasreadershp.inside_circle(inside_circle[0], inside_circle[1], inside_circle[2]);
-                    if (inside_rectangle != null) lasreadershp.inside_rectangle(inside_rectangle[0], inside_rectangle[1], inside_rectangle[2], inside_rectangle[3]);
-                    if (pipe_on)
-                    {
-                        LASreaderPipeOn lasreaderpipeon = new LASreaderPipeOn();
-                        if (!lasreaderpipeon.open(lasreadershp))
-                        {
-                            fprintf(stderr,"ERROR: cannot open lasreaderpipeon with lasreadershp\n");
-                            return null;
-                        }
-                        return lasreaderpipeon;
-                    }
-                    else
-                    {
-                        return lasreadershp;
-                    }
-                }
-                else if (strstr(file_name, ".qi") || strstr(file_name, ".QI"))
-                {
-                    LASreaderQFIT lasreaderqfit;
-                    if (scale_factor == null && offset == null)
-                        lasreaderqfit = new LASreaderQFIT();
-                    else if (scale_factor != null && offset == null)
-                        lasreaderqfit = new LASreaderQFITrescale(scale_factor[0], scale_factor[1], scale_factor[2]);
-                    else if (scale_factor == null && offset != null)
-                        lasreaderqfit = new LASreaderQFITreoffset(offset[0], offset[1], offset[2]);
-                    else
-                        lasreaderqfit = new LASreaderQFITrescalereoffset(scale_factor[0], scale_factor[1], scale_factor[2], offset[0], offset[1], offset[2]);
-                    if (!lasreaderqfit.open(file_name))
-                    {
-                        fprintf(stderr,"ERROR: cannot open lasreaderqfit with file name '%s'\n", file_name);
-                        return null;
-                    }
-                    LASindex index = new LASindex();
-                    if (index.read(file_name))
-                        lasreaderqfit.set_index(index);
-                    if (files_are_flightlines) lasreaderqfit.header.file_source_ID = (char) file_name_current;
-                    if (filter != null) lasreaderqfit.set_filter(filter);
-                    if (transform != null) lasreaderqfit.set_transform(transform);
-                    if (inside_tile != null) lasreaderqfit.inside_tile(inside_tile[0], inside_tile[1], inside_tile[2]);
-                    if (inside_circle != null) lasreaderqfit.inside_circle(inside_circle[0], inside_circle[1], inside_circle[2]);
-                    if (inside_rectangle != null) lasreaderqfit.inside_rectangle(inside_rectangle[0], inside_rectangle[1], inside_rectangle[2], inside_rectangle[3]);
-                    if (pipe_on)
-                    {
-                        LASreaderPipeOn lasreaderpipeon = new LASreaderPipeOn();
-                        if (!lasreaderpipeon.open(lasreaderqfit))
-                        {
-                            fprintf(stderr,"ERROR: cannot open lasreaderpipeon with lasreaderqfit\n");
-                            return null;
-                        }
-                        return lasreaderpipeon;
-                    }
-                    else
-                    {
-                        return lasreaderqfit;
-                    }
-                }
-                else if (strstr(file_name, ".asc") || strstr(file_name, ".ASC"))
-                {
-                    LASreaderASC lasreaderasc;
-                    if (scale_factor == null && offset == null)
-                        lasreaderasc = new LASreaderASC();
-                    else if (scale_factor != null && offset == null)
-                        lasreaderasc = new LASreaderASCrescale(scale_factor[0], scale_factor[1], scale_factor[2]);
-                    else if (scale_factor == null && offset != null)
-                        lasreaderasc = new LASreaderASCreoffset(offset[0], offset[1], offset[2]);
-                    else
-                        lasreaderasc = new LASreaderASCrescalereoffset(scale_factor[0], scale_factor[1], scale_factor[2], offset[0], offset[1], offset[2]);
-                    if (!lasreaderasc.open(file_name, comma_not_point))
-                    {
-                        fprintf(stderr,"ERROR: cannot open lasreaderasc with file name '%s'\n", file_name);
-                        return null;
-                    }
-                    if (files_are_flightlines) lasreaderasc.header.file_source_ID = (char) file_name_current;
-                    if (filter != null) lasreaderasc.set_filter(filter);
-                    if (transform != null) lasreaderasc.set_transform(transform);
-                    if (inside_tile != null) lasreaderasc.inside_tile(inside_tile[0], inside_tile[1], inside_tile[2]);
-                    if (inside_circle != null) lasreaderasc.inside_circle(inside_circle[0], inside_circle[1], inside_circle[2]);
-                    if (inside_rectangle != null) lasreaderasc.inside_rectangle(inside_rectangle[0], inside_rectangle[1], inside_rectangle[2], inside_rectangle[3]);
-                    if (pipe_on)
-                    {
-                        LASreaderPipeOn lasreaderpipeon = new LASreaderPipeOn();
-                        if (!lasreaderpipeon.open(lasreaderasc))
-                        {
-                            fprintf(stderr,"ERROR: cannot open lasreaderpipeon with lasreaderasc\n");
-                            return null;
-                        }
-                        return lasreaderpipeon;
-                    }
-                    else
-                    {
-                        return lasreaderasc;
-                    }
-                }
-                else if (strstr(file_name, ".bil") || strstr(file_name, ".BIL"))
-                {
-                    LASreaderBIL lasreaderbil;
-                    if (scale_factor == null && offset == null)
-                        lasreaderbil = new LASreaderBIL();
-                    else if (scale_factor != null && offset == null)
-                        lasreaderbil = new LASreaderBILrescale(scale_factor[0], scale_factor[1], scale_factor[2]);
-                    else if (scale_factor == null && offset != null)
-                        lasreaderbil = new LASreaderBILreoffset(offset[0], offset[1], offset[2]);
-                    else
-                        lasreaderbil = new LASreaderBILrescalereoffset(scale_factor[0], scale_factor[1], scale_factor[2], offset[0], offset[1], offset[2]);
-                    if (!lasreaderbil.open(file_name))
-                    {
-                        fprintf(stderr,"ERROR: cannot open lasreaderbil with file name '%s'\n", file_name);
-                        return null;
-                    }
-                    if (files_are_flightlines) lasreaderbil.header.file_source_ID = (char) file_name_current;
-                    if (filter != null) lasreaderbil.set_filter(filter);
-                    if (transform != null) lasreaderbil.set_transform(transform);
-                    if (inside_tile != null) lasreaderbil.inside_tile(inside_tile[0], inside_tile[1], inside_tile[2]);
-                    if (inside_circle != null) lasreaderbil.inside_circle(inside_circle[0], inside_circle[1], inside_circle[2]);
-                    if (inside_rectangle != null) lasreaderbil.inside_rectangle(inside_rectangle[0], inside_rectangle[1], inside_rectangle[2], inside_rectangle[3]);
-                    if (pipe_on)
-                    {
-                        LASreaderPipeOn lasreaderpipeon = new LASreaderPipeOn();
-                        if (!lasreaderpipeon.open(lasreaderbil))
-                        {
-                            fprintf(stderr,"ERROR: cannot open lasreaderpipeon with lasreaderbil\n");
-                            return null;
-                        }
-                        return lasreaderpipeon;
-                    }
-                    else
-                    {
-                        return lasreaderbil;
-                    }
-                }
-                else if (strstr(file_name, ".dtm") || strstr(file_name, ".DTM"))
-                {
-                    LASreaderDTM lasreaderdtm;
-                    if (scale_factor == null && offset == null)
-                        lasreaderdtm = new LASreaderDTM();
-                    else if (scale_factor != null && offset == null)
-                        lasreaderdtm = new LASreaderDTMrescale(scale_factor[0], scale_factor[1], scale_factor[2]);
-                    else if (scale_factor == null && offset != null)
-                        lasreaderdtm = new LASreaderDTMreoffset(offset[0], offset[1], offset[2]);
-                    else
-                        lasreaderdtm = new LASreaderDTMrescalereoffset(scale_factor[0], scale_factor[1], scale_factor[2], offset[0], offset[1], offset[2]);
-                    if (!lasreaderdtm.open(file_name))
-                    {
-                        fprintf(stderr,"ERROR: cannot open lasreaderdtm with file name '%s'\n", file_name);
-                        return null;
-                    }
-                    if (files_are_flightlines) lasreaderdtm.header.file_source_ID = (char) file_name_current;
-                    if (filter != null) lasreaderdtm.set_filter(filter);
-                    if (transform != null) lasreaderdtm.set_transform(transform);
-                    if (inside_tile != null) lasreaderdtm.inside_tile(inside_tile[0], inside_tile[1], inside_tile[2]);
-                    if (inside_circle != null) lasreaderdtm.inside_circle(inside_circle[0], inside_circle[1], inside_circle[2]);
-                    if (inside_rectangle != null) lasreaderdtm.inside_rectangle(inside_rectangle[0], inside_rectangle[1], inside_rectangle[2], inside_rectangle[3]);
-                    if (pipe_on)
-                    {
-                        LASreaderPipeOn lasreaderpipeon = new LASreaderPipeOn();
-                        if (!lasreaderpipeon.open(lasreaderdtm))
-                        {
-                            fprintf(stderr,"ERROR: cannot open lasreaderpipeon with lasreaderdtm\n");
-                            return null;
-                        }
-                        return lasreaderpipeon;
-                    }
-                    else
-                    {
-                        return lasreaderdtm;
-                    }
-                }
-                else
-                {
-                    LASreaderTXT lasreadertxt = new LASreaderTXT();
-                    if (ipts) lasreadertxt.set_pts(TRUE);
-                    else if (iptx) lasreadertxt.set_ptx(TRUE);
-                    if (translate_intensity != 0.0f) lasreadertxt.set_translate_intensity(translate_intensity);
-                    if (scale_intensity != 1.0f) lasreadertxt.set_scale_intensity(scale_intensity);
-                    if (translate_scan_angle != 0.0f) lasreadertxt.set_translate_scan_angle(translate_scan_angle);
-                    if (scale_scan_angle != 1.0f) lasreadertxt.set_scale_scan_angle(scale_scan_angle);
-                    lasreadertxt.set_scale_factor(scale_factor);
-                    lasreadertxt.set_offset(offset);
-                    if (number_attributes != 0)
-                    {
-                        for (int i = 0; i < number_attributes; i++)
-                        {
-                            lasreadertxt.add_attribute(attribute_data_types[i], attribute_names[i], attribute_descriptions[i], attribute_scales[i], attribute_offsets[i], attribute_pre_scales[i], attribute_pre_offsets[i]);
-                        }
-                    }
-                    if (!lasreadertxt.open(file_name, parse_string, skip_lines, populate_header))
-                    {
-                        fprintf(stderr,"ERROR: cannot open lasreadertxt with file name '%s'\n", file_name);
-                        return null;
-                    }
-                    if (files_are_flightlines) lasreadertxt.header.file_source_ID = (char) file_name_current;
-                    if (filter != null) lasreadertxt.set_filter(filter);
-                    if (transform != null) lasreadertxt.set_transform(transform);
-                    if (inside_tile != null) lasreadertxt.inside_tile(inside_tile[0], inside_tile[1], inside_tile[2]);
-                    if (inside_circle != null) lasreadertxt.inside_circle(inside_circle[0], inside_circle[1], inside_circle[2]);
-                    if (inside_rectangle != null) lasreadertxt.inside_rectangle(inside_rectangle[0], inside_rectangle[1], inside_rectangle[2], inside_rectangle[3]);
-                    if (pipe_on)
-                    {
-                        LASreaderPipeOn lasreaderpipeon = new LASreaderPipeOn();
-                        if (!lasreaderpipeon.open(lasreadertxt))
-                        {
-                            fprintf(stderr,"ERROR: cannot open lasreaderpipeon with lasreadertxt\n");
-                            return null;
-                        }
-                        return lasreaderpipeon;
-                    }
-                    else
-                    {
-                        return lasreadertxt;
-                    }
-                }
-            }
-        }
-        else if (use_stdin)
-        {
-            use_stdin = FALSE; populate_header = TRUE;
-            if (itxt)
-            {
-                LASreaderTXT lasreadertxt = new LASreaderTXT();
-                if (ipts) lasreadertxt.set_pts(TRUE);
-                else if (iptx) lasreadertxt.set_ptx(TRUE);
-                if (translate_intensity != 0.0f) lasreadertxt.set_translate_intensity(translate_intensity);
-                if (scale_intensity != 1.0f) lasreadertxt.set_scale_intensity(scale_intensity);
-                if (translate_scan_angle != 0.0f) lasreadertxt.set_translate_scan_angle(translate_scan_angle);
-                if (scale_scan_angle != 1.0f) lasreadertxt.set_scale_scan_angle(scale_scan_angle);
-                lasreadertxt.set_scale_factor(scale_factor);
-                lasreadertxt.set_offset(offset);
-                if (number_attributes != 0)
-                {
-                    for (int i = 0; i < number_attributes; i++)
-                    {
-                        lasreadertxt.add_attribute(attribute_data_types[i], attribute_names[i], attribute_descriptions[i], attribute_scales[i], attribute_offsets[i], attribute_pre_scales[i], attribute_pre_offsets[i]);
-                    }
-                }
-                if (!lasreadertxt.open(System.in, 0, parse_string, skip_lines, FALSE))
-                {
-                    fprintf(stderr,"ERROR: cannot open lasreadertxt with file name '%s'\n", file_name);
-                    return null;
-                }
-                if (files_are_flightlines) lasreadertxt.header.file_source_ID = (char) file_name_current;
-                if (filter != null) lasreadertxt.set_filter(filter);
-                if (transform != null) lasreadertxt.set_transform(transform);
-                if (inside_tile != null) lasreadertxt.inside_tile(inside_tile[0], inside_tile[1], inside_tile[2]);
-                if (inside_circle != null) lasreadertxt.inside_circle(inside_circle[0], inside_circle[1], inside_circle[2]);
-                if (inside_rectangle != null) lasreadertxt.inside_rectangle(inside_rectangle[0], inside_rectangle[1], inside_rectangle[2], inside_rectangle[3]);
-                if (pipe_on)
-                {
-                    LASreaderPipeOn lasreaderpipeon = new LASreaderPipeOn();
-                    if (!lasreaderpipeon.open(lasreadertxt))
-                    {
-                        fprintf(stderr,"ERROR: cannot open lasreaderpipeon with lasreadertxt\n");
-                        return null;
-                    }
-                    return lasreaderpipeon;
-                }
-                else
-                {
-                    return lasreadertxt;
-                }
-            }
-            else
-            {
-                LASreaderLAS lasreaderlas;
-                if (scale_factor == null && offset == null)
-                    lasreaderlas = new LASreaderLAS();
-                else if (scale_factor != null && offset == null)
-                    lasreaderlas = new LASreaderLASrescale(scale_factor[0], scale_factor[1], scale_factor[2]);
-                else if (scale_factor == null && offset != null)
-                    lasreaderlas = new LASreaderLASreoffset(offset[0], offset[1], offset[2]);
-                else
-                    lasreaderlas = new LASreaderLASrescalereoffset(scale_factor[0], scale_factor[1], scale_factor[2], offset[0], offset[1], offset[2]);
-                if (!lasreaderlas.open(System.in, decompress_selective))
-                {
-                    fprintf(stderr,"ERROR: cannot open lasreaderlas from stdin \n");
-                    return null;
-                }
-                if (filter != null) lasreaderlas.set_filter(filter);
-                if (transform != null) lasreaderlas.set_transform(transform);
-                if (inside_tile != null) lasreaderlas.inside_tile(inside_tile[0], inside_tile[1], inside_tile[2]);
-                if (inside_circle != null) lasreaderlas.inside_circle(inside_circle[0], inside_circle[1], inside_circle[2]);
-                if (inside_rectangle != null) lasreaderlas.inside_rectangle(inside_rectangle[0], inside_rectangle[1], inside_rectangle[2], inside_rectangle[3]);
-                if (pipe_on)
-                {
-                    LASreaderPipeOn lasreaderpipeon = new LASreaderPipeOn();
-                    if (!lasreaderpipeon.open(lasreaderlas))
-                    {
-                        fprintf(stderr,"ERROR: cannot open lasreaderpipeon with lasreaderlas from stdin\n");
-                        return null;
-                    }
-                    return lasreaderpipeon;
-                }
-                else
-                {
-                    return lasreaderlas;
-                }
-            }
-        }
-        else
-        {
-            return null;
+        if ((file_names.size() > 1) && merged) {
+            return openLASReaderMerged();
+        } else if ((buffer_size > 0) && ((file_names.size() > 1) || (neighbor_file_names.size() > 0))) {
+            return openLASReaderBuffered();
+        } else {
+            return openLASReader();
         }
     }
+
+    return null;
+}
+private LASreader openLASReaderMerged() {
+    LASreaderMerged lasreadermerged = new LASreaderMerged();
+    return createLASReaderPipeOn(lasreadermerged);
+}
+
+private LASreader openLASReaderBuffered() {
+    LASreaderBuffered lasreaderbuffered = new LASreaderBuffered();
+    return createLASReaderPipeOn(lasreaderbuffered);
+}
+
+private LASreader openLASReader() {
+    if (other_file_name != null && reset_after_other) {
+        // Reset logic
+        // ...
+    } else {
+        file_name = file_names.get(file_name_current);
+        file_name_current++;
+    }
+
+    if (file_name.endsWith(".las") || file_name.endsWith(".laz") || file_name.endsWith(".LAS") || file_name.endsWith(".LAZ")) {
+        return openLASReaderLAS();
+    } else if (file_name.endsWith(".bin") || file_name.endsWith(".BIN")) {
+        return openLASReaderBIN();
+    } else if (file_name.endsWith(".shp") || file_name.endsWith(".SHP")) {
+        return openLASReaderSHP();
+    }
+
+    return null;
+}
+
+private LASreader openLASReaderLAS() {
+    LASreaderLAS lasreaderlas = new LASreaderLAS();
+   
+    return createLASReaderPipeOn(lasreaderlas);
+}
+
+private LASreader openLASReaderBIN() {
+    LASreaderBIN lasreaderbin = new LASreaderBIN();
+   
+
+    return createLASReaderPipeOn(lasreaderbin);
+}
+
+private LASreader openLASReaderSHP() {
+    LASreaderSHP lasreadershp = new LASreaderSHP();
+        return lasreadershp;
+}
+
+private LASreader createLASReaderPipeOn(LASreader lasreader) {
+    if (pipe_on) {
+        LASreaderPipeOn lasreaderpipeon = new LASreaderPipeOn();
+        
+        return lasreaderpipeon;
+    } else {
+        return lasreader;
+    }
+}
+
 
     boolean reopen(LASreader lasreader, boolean remain_buffered)
     {
