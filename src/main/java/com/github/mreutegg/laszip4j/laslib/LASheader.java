@@ -131,7 +131,7 @@ public class LASheader extends LASattributer {
             }
             else
             {
-               x_offset = ((min_x + max_x)/200000)*100000;
+                x_offset = ((min_x + max_x)/200000)*100000;
                 y_offset = ((min_y + max_y)/200000)*100000;
                 z_offset = ((min_z + max_z)/200000)*100000;
             }
@@ -414,7 +414,6 @@ private int findVLRIndex(String user_id, char record_id) {
     }
     return -1;
 }
-
 
     public LASvlr get_vlr(String user_id, int record_id) {
         return get_vlr(user_id, (char) record_id);
