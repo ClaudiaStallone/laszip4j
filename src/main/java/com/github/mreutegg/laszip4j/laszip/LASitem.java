@@ -61,40 +61,30 @@ public class LASitem {
     public static LASitem WavePacket14(int ver) { return new LASitem(Type.WAVEPACKET14, 29, ver); }
     public static LASitem ExtraBytes14(int size, int ver) { return new LASitem(Type.BYTE14, size, ver); }
 
-    boolean is_type(Type t)
-    {
-        if (t != type) return false;
-        switch (t)
-        {
-            case POINT10:
-                if (size != 20) return false;
-                break;
-            case POINT14:
-                if (size != 30) return false;
-                break;
-            case GPSTIME11:
-                if (size != 8) return false;
-                break;
-            case RGB12:
-            case RGB14:
-                if (size != 6) return false;
-                break;
-            case RGBNIR14:
-                if (size != 8) return false;
-                break;
-            case WAVEPACKET13:
-            case WAVEPACKET14:
-                if (size != 29) return false;
-                break;
-            case BYTE:
-            case BYTE14:
-                if (size < 1) return false;
-                break;
-            default:
-                return false;
-        }
-        return true;
+    boolean isType(Type t) {
+    switch (t) {
+        case POINT10:
+            return (size == 20);
+        case POINT14:
+            return (size == 30);
+        case GPSTIME11:
+            return (size == 8);
+        case RGB12:
+        case RGB14:
+            return (size == 6);
+        case RGBNIR14:
+            return (size == 8);
+        case WAVEPACKET13:
+        case WAVEPACKET14:
+            return (size == 29);
+        case BYTE:
+        case BYTE14:
+            return (size >= 1);
+        default:
+            return false;
     }
+}
+
 
     String get_name()
     {
