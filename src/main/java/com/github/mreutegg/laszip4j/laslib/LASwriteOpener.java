@@ -61,146 +61,88 @@ public class LASwriteOpener {
         return ((file_name == null) && use_stdout);
     }
 
-    public LASwriter open(LASheader header)
-    {
-        if (use_nil)
-        {
-            LASwriterLAS laswriterlas = new LASwriterLAS();
-            if (!laswriterlas.open(header, (format == LAS_TOOLS_FORMAT_LAZ ? LASZIP_COMPRESSOR_CHUNKED : LASZIP_COMPRESSOR_NONE), 2, chunk_size))
-            {
-                fprintf(stderr,"ERROR: cannot open laswriterlas to NULL\n");
-                return null;
-            }
-            return laswriterlas;
-        }
-        else if (file_name != null)
-        {
-            if (format <= LAS_TOOLS_FORMAT_LAZ)
-            {
-                LASwriterLAS laswriterlas = new LASwriterLAS();
-                if (!laswriterlas.open(file_name, header, (format == LAS_TOOLS_FORMAT_LAZ ? (ntive ? LASZIP_COMPRESSOR_LAYERED_CHUNKED : LASZIP_COMPRESSOR_CHUNKED) : LASZIP_COMPRESSOR_NONE), 2, chunk_size, io_obuffer_size))
-                {
-                    fprintf(stderr,"ERROR: cannot open laswriterlas with file name '%s'\n", file_name);
-                    return null;
-                }
-                return laswriterlas;
-            }
-            else if (format == LAS_TOOLS_FORMAT_TXT)
-            {
-                LASwriterTXT laswritertxt = new LASwriterTXT();
-                if (opts) laswritertxt.set_pts(TRUE);
-                else if (optx) laswritertxt.set_ptx(TRUE);
-                if (!laswritertxt.open(file_name, header, parse_string, separator))
-                {
-                    fprintf(stderr,"ERROR: cannot open laswritertxt with file name '%s'\n", file_name);
-                    return null;
-                }
-                if (scale_rgb != 1.0f) laswritertxt.set_scale_rgb(scale_rgb);
-                return laswritertxt;
-            }
-            else if (format == LAS_TOOLS_FORMAT_BIN)
-            {
-                LASwriterBIN laswriterbin = new LASwriterBIN();
-                if (!laswriterbin.open(file_name, header, "ts8"))
-                {
-                    fprintf(stderr,"ERROR: cannot open laswriterbin with file name '%s'\n", file_name);
-                    return null;
-                }
-                return laswriterbin;
-            }
-            else if (format == LAS_TOOLS_FORMAT_QFIT)
-            {
-                LASwriterQFIT laswriterqfit = new LASwriterQFIT();
-                if (!laswriterqfit.open(file_name, header, 40))
-                {
-                    fprintf(stderr,"ERROR: cannot open laswriterqfit with file name '%s'\n", file_name);
-                    return null;
-                }
-                return laswriterqfit;
-            }
-            else if (format == LAS_TOOLS_FORMAT_VRML)
-            {
-                LASwriterWRL laswriterwrl = new LASwriterWRL();
-                if (!laswriterwrl.open(file_name, header, parse_string))
-                {
-                    fprintf(stderr,"ERROR: cannot open laswriterwrl with file name '%s'\n", file_name);
-                    return null;
-                }
-                return laswriterwrl;
-            }
-            else
-            {
-                fprintf(stderr,"ERROR: unknown format %d\n", format);
-                return null;
-            }
-        }
-        else if (use_stdout)
-        {
-            if (format <= LAS_TOOLS_FORMAT_LAZ)
-            {
-                LASwriterLAS laswriterlas = new LASwriterLAS();
-                if (!laswriterlas.open(stdout, header, (format == LAS_TOOLS_FORMAT_LAZ ? LASZIP_COMPRESSOR_CHUNKED : LASZIP_COMPRESSOR_NONE), 2, chunk_size))
-                {
-                    fprintf(stderr,"ERROR: cannot open laswriterlas to stdout\n");
-                    return null;
-                }
-                return laswriterlas;
-            }
-            else if (format == LAS_TOOLS_FORMAT_TXT)
-            {
-                LASwriterTXT laswritertxt = new LASwriterTXT();
-                if (opts) laswritertxt.set_pts(TRUE);
-                else if (optx) laswritertxt.set_ptx(TRUE);
-                if (!laswritertxt.open(stdout, header, parse_string, separator))
-                {
-                    fprintf(stderr,"ERROR: cannot open laswritertxt to stdout\n");
-                    return null;
-                }
-                if (scale_rgb != 1.0f) laswritertxt.set_scale_rgb(scale_rgb);
-                return laswritertxt;
-            }
-            else if (format == LAS_TOOLS_FORMAT_BIN)
-            {
-                LASwriterBIN laswriterbin = new LASwriterBIN();
-                if (!laswriterbin.open(stdout, header, "ts8"))
-                {
-                    fprintf(stderr,"ERROR: cannot open laswriterbin to stdout\n");
-                    return null;
-                }
-                return laswriterbin;
-            }
-            else if (format == LAS_TOOLS_FORMAT_QFIT)
-            {
-                LASwriterQFIT laswriterqfit = new LASwriterQFIT();
-                if (!laswriterqfit.open(stdout, header, 40))
-                {
-                    fprintf(stderr,"ERROR: cannot open laswriterbin to stdout\n");
-                    return null;
-                }
-                return laswriterqfit;
-            }
-            else if (format == LAS_TOOLS_FORMAT_VRML)
-            {
-                LASwriterWRL laswriterwrl = new LASwriterWRL();
-                if (!laswriterwrl.open(stdout, header, parse_string))
-                {
-                    fprintf(stderr,"ERROR: cannot open laswriterwrl with file name '%s'\n", file_name);
-                    return null;
-                }
-                return laswriterwrl;
-            }
-            else
-            {
-                fprintf(stderr,"ERROR: unknown format %d\n", format);
-                return null;
-            }
-        }
-        else
-        {
-            fprintf(stderr,"ERROR: no laswriter output specified\n");
-            return null;
+    public LASwriter open(LASheader header) {
+    LASwriter writer = null;
+    String errorMessage = null;
+
+    if (use_nil) {
+        writer = new LASwriterLAS();
+        errorMessage = "ERROR: cannot open laswriterlas to NULL\n";
+    } else {
+        switch (format) {
+            case LAS_TOOLS_FORMAT_LAZ:
+                writer = new LASwriterLAS();
+                errorMessage = String.format("ERROR: cannot open laswriterlas with file name '%s'\n", file_name);
+                break;
+            case LAS_TOOLS_FORMAT_TXT:
+                writer = new LASwriterTXT();
+                errorMessage = String.format("ERROR: cannot open laswritertxt with file name '%s'\n", file_name);
+                break;
+            case LAS_TOOLS_FORMAT_BIN:
+                writer = new LASwriterBIN();
+                errorMessage = String.format("ERROR: cannot open laswriterbin with file name '%s'\n", file_name);
+                break;
+            case LAS_TOOLS_FORMAT_QFIT:
+                writer = new LASwriterQFIT();
+                errorMessage = String.format("ERROR: cannot open laswriterqfit with file name '%s'\n", file_name);
+                break;
+            case LAS_TOOLS_FORMAT_VRML:
+                writer = new LASwriterWRL();
+                errorMessage = String.format("ERROR: cannot open laswriterwrl with file name '%s'\n", file_name);
+                break;
+            default:
+                errorMessage = String.format("ERROR: unknown format %d\n", format);
+                break;
         }
     }
+
+    if (writer == null && use_stdout) {
+        switch (format) {
+            case LAS_TOOLS_FORMAT_LAZ:
+                writer = new LASwriterLAS();
+                errorMessage = "ERROR: cannot open laswriterlas to stdout\n";
+                break;
+            case LAS_TOOLS_FORMAT_TXT:
+                writer = new LASwriterTXT();
+                errorMessage = "ERROR: cannot open laswritertxt to stdout\n";
+                break;
+            case LAS_TOOLS_FORMAT_BIN:
+                writer = new LASwriterBIN();
+                errorMessage = "ERROR: cannot open laswriterbin to stdout\n";
+                break;
+            case LAS_TOOLS_FORMAT_QFIT:
+                writer = new LASwriterQFIT();
+                errorMessage = "ERROR: cannot open laswriterqfit to stdout\n";
+                break;
+            case LAS_TOOLS_FORMAT_VRML:
+                writer = new LASwriterWRL();
+                errorMessage = String.format("ERROR: cannot open laswriterwrl with file name '%s'\n", file_name);
+                break;
+            default:
+                errorMessage = String.format("ERROR: unknown format %d\n", format);
+                break;
+        }
+    }
+
+    if (writer == null) {
+        errorMessage = "ERROR: no laswriter output specified\n";
+    }
+
+    if (writer != null && !writer.open(header, getCompressionType(), 2, chunk_size, io_obuffer_size)) {
+        System.err.printf(errorMessage);
+        return null;
+    }
+
+    return writer;
+}
+
+private int getCompressionType() {
+    if (format == LAS_TOOLS_FORMAT_LAZ) {
+        return (ntive ? LASZIP_COMPRESSOR_LAYERED_CHUNKED : LASZIP_COMPRESSOR_CHUNKED);
+    }
+    return LASZIP_COMPRESSOR_NONE;
+}
+
 
     public LASwaveform13writer open_waveform13(LASheader lasheader)
     {
