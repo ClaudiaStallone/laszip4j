@@ -756,26 +756,27 @@ private LASreader createLASReaderPipeOn(LASreader lasreader) {
                 if (((i+4) < argc) && (atof(argv[i+4]) != 0.0))
                 {
                     if (((i+5) < argc) && ((atof(argv[i+5]) != 0.0) || (strcmp(argv[i+5], "0") == 0) || (strcmp(argv[i+5], "0.0") == 0)))
-                    {
-                        if (((i+6) < argc) && (atof(argv[i+6]) != 0.0))
-                        {
-                            if (((i+7) < argc) && ((atof(argv[i+7]) != 0.0) || (strcmp(argv[i+7], "0") == 0) || (strcmp(argv[i+7], "0.0") == 0)))
-                            {
-                                add_attribute(atoi(argv[i+1]), argv[i+2], argv[i+3], atof(argv[i+4]), atof(argv[i+5]), atof(argv[i+6]), atof(argv[i+7]));
-                                argv[i]="\0"; argv[i+1]="\0"; argv[i+2]="\0"; argv[i+3]="\0"; argv[i+4]="\0"; argv[i+5]="\0"; argv[i+6]="\0"; argv[i+7]="\0"; i+=7;
-                            }
-                            else
-                            {
-                                add_attribute(atoi(argv[i+1]), argv[i+2], argv[i+3], atof(argv[i+4]), atof(argv[i+5]), atof(argv[i+6]));
-                                argv[i]="\0"; argv[i+1]="\0"; argv[i+2]="\0"; argv[i+3]="\0"; argv[i+4]="\0"; argv[i+5]="\0"; argv[i+6]="\0"; i+=6;
-                            }
-                        }
-                        else
-                        {
-                            add_attribute(atoi(argv[i+1]), argv[i+2], argv[i+3], atof(argv[i+4]), atof(argv[i+5]));
-                            argv[i]="\0"; argv[i+1]="\0"; argv[i+2]="\0"; argv[i+3]="\0"; argv[i+4]="\0"; argv[i+5]="\0"; i+=5;
-                        }
-                    }
+                    for (int i = 0; i < argc - 5; i += 6) {
+    int index = i + 1;
+    String arg1 = argv[index];
+    String arg2 = argv[index + 1];
+    String arg3 = argv[index + 2];
+    double arg4 = Double.parseDouble(argv[index + 3]);
+    double arg5 = Double.parseDouble(argv[index + 4]);
+
+    if (i + 7 < argc && (Double.parseDouble(argv[index + 6]) != 0.0 || argv[index + 7].equals("0") || argv[index + 7].equals("0.0"))) {
+        double arg6 = Double.parseDouble(argv[index + 5]);
+        double arg7 = Double.parseDouble(argv[index + 6]);
+        add_attribute(atoi(arg1), arg2, arg3, arg4, arg5, arg6, arg7);
+        argv[i] = argv[i + 1] = argv[i + 2] = argv[i + 3] = argv[i + 4] = argv[i + 5] = argv[i + 6] = argv[i + 7] = "\0";
+        i += 7;
+    } else {
+        add_attribute(atoi(arg1), arg2, arg3, arg4, arg5);
+        argv[i] = argv[i + 1] = argv[i + 2] = argv[i + 3] = argv[i + 4] = argv[i + 5] = "\0";
+        i += 5;
+    }
+}
+
                     else
                     {
                         add_attribute(atoi(argv[i+1]), argv[i+2], argv[i+3], atof(argv[i+4]));
