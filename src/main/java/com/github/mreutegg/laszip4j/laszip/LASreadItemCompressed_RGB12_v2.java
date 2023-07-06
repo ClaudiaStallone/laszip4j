@@ -60,93 +60,66 @@ public class LASreadItemCompressed_RGB12_v2 extends LASreadItemCompressed {
     }
 
     @Override
-    public PointDataRecord read(int notUsed)
-    {
-        int corr;
-        int diff = 0;
-        int sym = dec.decodeSymbol(m_byte_used);
+    public PointDataRecord read(int notUsed) {
+    int corr;
+    int diff = 0;
+    int sym = dec.decodeSymbol(m_byte_used);
 
-        PointDataRecordRGB result = new PointDataRecordRGB();
+    PointDataRecordRGB result = new PointDataRecordRGB();
 
-        if ((sym & (1 << 0)) != 0)
-        {
-          corr = dec.decodeSymbol(m_rgb_diff_0);
-          byte b = U8_FOLD(corr + (last_item.R & 255));
-          result.R = (char)Byte.toUnsignedInt(b);
-        }
-        else 
-        {
-          result.R = (char)(last_item.R&0xFF);
-        }
-        if ((sym & (1 << 1)) != 0)
-        {
-          corr = dec.decodeSymbol(m_rgb_diff_1);
-          byte b = U8_FOLD(corr + (last_item.R >>> 8));
-          result.R |= (((char) Byte.toUnsignedInt(b)) << 8);
-        }
-        else
-        {
-          result.R |= (last_item.R&0xFF00);
-        }
-        if ((sym & (1 << 6)) != 0)
-        {
-          diff = (result.R&0x00FF) - (last_item.R&0x00FF);
-          if ((sym & (1 << 2)) != 0)
-          {
-            corr = dec.decodeSymbol(m_rgb_diff_2);
-            byte b = U8_FOLD(corr + U8_CLAMP(diff + (last_item.G & 255)));
-            result.G = (char) Byte.toUnsignedInt(b);
-          }
-          else
-          {
-            result.G = (char)(last_item.G&0xFF);
-          }
-          if ((sym & (1 << 4)) != 0)
-          {
-            corr = dec.decodeSymbol(m_rgb_diff_4);
-            diff = (diff + ((result.G&0x00FF) - (last_item.G&0x00FF))) / 2;
-            byte b = U8_FOLD(corr + U8_CLAMP(diff + (last_item.B & 255)));
-            result.B = (char) Byte.toUnsignedInt(b);
-          }
-          else
-          {
-            result.B = (char)(last_item.B&0xFF);
-          }
-          diff = (result.R>>>8) - (last_item.R>>>8);
-          if ((sym & (1 << 3)) != 0)
-          {
-            corr = dec.decodeSymbol(m_rgb_diff_3);
-            byte b = U8_FOLD(corr + U8_CLAMP(diff + (last_item.G >>> 8)));
-            result.G |= (((char) Byte.toUnsignedInt(b)) << 8);
-          }
-          else
-          {
-            result.G |= (last_item.G&0xFF00);
-          }
-          if ((sym & (1 << 5)) != 0)
-          {
-            corr = dec.decodeSymbol(m_rgb_diff_5);
-            diff = (diff + ((result.G>>>8) - (last_item.G>>>8))) / 2;
-            byte b = U8_FOLD(corr + U8_CLAMP(diff + (last_item.B >>> 8)));
-            result.B |= (((char) Byte.toUnsignedInt(b)) << 8);
-          }
-          else
-          {
-            result.B |= (last_item.B&0xFF00);
-          }
-        }
-        else
-        {
-          result.G = result.R;
-          result.B = result.R;
-        }
-
-        last_item.R = result.R;
-        last_item.G = result.G;
-        last_item.B = result.B;
-      
-        return result;
+    if ((sym & 1) != 0) {
+        corr = dec.decodeSymbol(m_rgb_diff_0);
+        result.R = (char) (U8_FOLD(corr + (last_item.R & 255)) & 0xFFFF);
+    } else {
+        result.R = (char) (last_item.R & 0xFF);
     }
+    if ((sym & 2) != 0) {
+        corr = dec.decodeSymbol(m_rgb_diff_1);
+        result.R |= ((char) U8_FOLD(corr + (last_item.R >>> 8))) << 8;
+    } else {
+        result.R |= (last_item.R & 0xFF00);
+    }
+    if ((sym & 64) != 0) {
+        diff = (result.R & 0xFF) - (last_item.R & 0xFF);
+        if ((sym & 4) != 0) {
+            corr = dec.decodeSymbol(m_rgb_diff_2);
+            result.G = (char) U8_FOLD(corr + U8_CLAMP(diff + (last_item.G & 255)));
+        } else {
+            result.G = (char) (last_item.G & 0xFF);
+        }
+        if ((sym & 16) != 0) {
+            corr = dec.decodeSymbol(m_rgb_diff_4);
+            diff = (diff + ((result.G & 0xFF) - (last_item.G & 0xFF))) / 2;
+            result.B = (char) U8_FOLD(corr + U8_CLAMP(diff + (last_item.B & 255)));
+        } else {
+            result.B = (char) (last_item.B & 0xFF);
+        }
+        diff = (result.R >>> 8) - (last_item.R >>> 8);
+        if ((sym & 8) != 0) {
+            corr = dec.decodeSymbol(m_rgb_diff_3);
+            result.G |= ((char) U8_FOLD(corr + U8_CLAMP(diff + (last_item.G >>> 8)))) << 8;
+        } else {
+            result.G |= (last_item.G & 0xFF00);
+        }
+        if ((sym & 32) != 0) {
+            corr = dec.decodeSymbol(m_rgb_diff_5);
+            diff = (diff + ((result.G >>> 8) - (last_item.G >>> 8))) / 2;
+            result.B |= ((char) U8_FOLD(corr + U8_CLAMP(diff + (last_item.B >>> 8)))) << 8;
+        } else {
+            result.B |= (last_item.B & 0xFF00);
+        }
+    } else {
+        result.G = result.R;
+        result.B = result.R;
+    }
+
+    last_item.R = result.R;
+    last_item.G = result.G;
+    last_item.B = result.B;
+
+    return result;
+}
+
 
     @Override
     public boolean chunk_sizes() {
