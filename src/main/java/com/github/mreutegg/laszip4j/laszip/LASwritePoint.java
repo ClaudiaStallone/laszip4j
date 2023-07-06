@@ -73,45 +73,41 @@ public class LASwritePoint {
     }
     
     int version = 0; // unsigned
-    if (!outstream.put32bitsLE(version)) {
-        return false;
-    }
-    if (!outstream.put32bitsLE(number_chunks)) {
-        return false;
-    }
-    
-    if (number_chunks > 0) {
-        enc.init(outstream);
-        IntegerCompressor ic = new IntegerCompressor(enc, 32, 2);
-        ic.initCompressor();
-        
-        int prevChunkSize = 0;
-        int prevChunkBytes = 0;
-        
-        for (i = 0; i < number_chunks; i++) {
-            int currentChunkSize = (chunk_size == U32_MAX) ? chunk_sizes[i] : 0;
-            int currentChunkBytes = chunk_bytes[i];
-            
-            if (i != 0) {
-                ic.compress(prevChunkSize, currentChunkSize, 0);
-            }
-            
-            ic.compress(prevChunkBytes, currentChunkBytes, 1);
-            
-            prevChunkSize = currentChunkSize;
-            prevChunkBytes = currentChunkBytes;
+if (!outstream.put32bitsLE(version) || !outstream.put32bitsLE(number_chunks)) {
+    return false;
+}
+
+if (number_chunks > 0) {
+    enc.init(outstream);
+    IntegerCompressor ic = new IntegerCompressor(enc, 32, 2);
+    ic.initCompressor();
+
+    int prevChunkSize = 0;
+    int prevChunkBytes = 0;
+
+    for (i = 0; i < number_chunks; i++) {
+        int currentChunkSize = (chunk_size == U32_MAX) ? chunk_sizes[i] : 0;
+        int currentChunkBytes = chunk_bytes[i];
+
+        if (i != 0) {
+            ic.compress(prevChunkSize, currentChunkSize, 0);
         }
-        
-        enc.done();
+
+        ic.compress(prevChunkBytes, currentChunkBytes, 1);
+
+        prevChunkSize = currentChunkSize;
+        prevChunkBytes = currentChunkBytes;
     }
-    
-    if (chunk_table_start_position == -1) { // stream is not-seekable
-        if (!outstream.put64bitsLE(position)) {
-            return false;
-        }
-    }
-    
-    return true;
+
+    enc.done();
+}
+
+if (chunk_table_start_position == -1 && !outstream.put64bitsLE(position)) {
+    return false;
+}
+
+return true;
+
 }
 
 
