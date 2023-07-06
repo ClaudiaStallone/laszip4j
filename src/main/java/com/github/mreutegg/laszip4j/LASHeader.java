@@ -60,28 +60,28 @@ public final class LASHeader {
     /**
      * @return "Project ID - GUID data 1" as an unsigned int.
      */
-    public int getProjectID_GUIDData1() {
+    public int getProjectID__GUIDData1() {
         return header.project_ID_GUID_data_1;
     }
 
     /**
      * @return "Project ID - GUID data 2" as an unsigned short (char).
      */
-    public char getProjectID_GUIDData2() {
+    public char getProjectID_GUIDData12() {
         return header.project_ID_GUID_data_2;
     }
 
     /**
      * @return "Project ID - GUID data 3" as an unsigned short (char).
      */
-    public char getProjectID_GUIDData3() {
+    public char getProjectID_GUIDData13() {
         return header.project_ID_GUID_data_3;
     }
 
     /**
      * @return "Project ID - GUID data 4" as a byte array.
      */
-    public byte[] getProjectID_GUIDData4() {
+    public byte[] getProjectID_GUIDData14() {
         byte[] data = new byte[header.project_ID_GUID_data_4.length];
         System.arraycopy(header.project_ID_GUID_data_4, 0, data, 0, data.length);
         return data;
