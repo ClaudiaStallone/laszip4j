@@ -374,68 +374,58 @@ public class LASzip {
         if ((options & 1) != 0) compatible = TRUE;
 
         // switch over the point types we know
-        switch (u_point_type)
-        {
-            case 0:
-                extra_bytes_number = (int)point_size - 20;
-                break;
-            case 1:
-                have_gps_time = TRUE;
-                extra_bytes_number = (int)point_size - 28;
-                break;
-            case 2:
-                have_rgb = TRUE;
-                extra_bytes_number = (int)point_size - 26;
-                break;
-            case 3:
-                have_gps_time = TRUE;
-                have_rgb = TRUE;
-                extra_bytes_number = (int)point_size - 34;
-                break;
-            case 4:
-                have_gps_time = TRUE;
-                have_wavepacket = TRUE;
-                extra_bytes_number = (int)point_size - 57;
-                break;
-            case 5:
-                have_gps_time = TRUE;
-                have_rgb = TRUE;
-                have_wavepacket = TRUE;
-                extra_bytes_number = (int)point_size - 63;
-                break;
-            case 6:
-                have_point14 = TRUE;
-                extra_bytes_number = (int)point_size - 30;
-                break;
-            case 7:
-                have_point14 = TRUE;
-                have_rgb = TRUE;
-                extra_bytes_number = (int)point_size - 36;
-                break;
-            case 8:
-                have_point14 = TRUE;
-                have_rgb = TRUE;
+        switch (u_point_type) {
+    case 0:
+        extra_bytes_number = (int) point_size - 20;
+        break;
+    case 1:
+        have_gps_time = TRUE;
+        extra_bytes_number = (int) point_size - 28;
+        break;
+    case 2:
+        have_rgb = TRUE;
+        extra_bytes_number = (int) point_size - 26;
+        break;
+    case 3:
+        have_gps_time = TRUE;
+        have_rgb = TRUE;
+        extra_bytes_number = (int) point_size - 34;
+        break;
+    case 4:
+        have_gps_time = TRUE;
+        have_wavepacket = TRUE;
+        extra_bytes_number = (int) point_size - 57;
+        break;
+    case 5:
+        have_gps_time = TRUE;
+        have_rgb = TRUE;
+        have_wavepacket = TRUE;
+        extra_bytes_number = (int) point_size - 63;
+        break;
+    case 6:
+    case 7:
+    case 8:
+    case 9:
+    case 10:
+        have_point14 = TRUE;
+        extra_bytes_number = (int) point_size - (30 + 6 * (u_point_type - 6));
+        if (u_point_type >= 8) {
+            have_rgb = TRUE;
+            if (u_point_type >= 9) {
                 have_nir = TRUE;
-                extra_bytes_number = (int)point_size - 38;
-                break;
-            case 9:
-                have_point14 = TRUE;
-                have_wavepacket = TRUE;
-                extra_bytes_number = (int)point_size - 59;
-                break;
-            case 10:
-                have_point14 = TRUE;
-                have_rgb = TRUE;
-                have_nir = TRUE;
-                have_wavepacket = TRUE;
-                extra_bytes_number = (int)point_size - 67;
-                break;
-            default:
-                {
-                    String error = String.format("point type %d unknown", u_point_type);
-                    return return_error(error);
+                if (u_point_type >= 10) {
+                    have_wavepacket = TRUE;
                 }
+            }
         }
+        break;
+    default:
+        {
+            String error = String.format("point type %d unknown", u_point_type);
+            return return_error(error);
+        }
+}
+
 
         if (extra_bytes_number < 0)
         {
