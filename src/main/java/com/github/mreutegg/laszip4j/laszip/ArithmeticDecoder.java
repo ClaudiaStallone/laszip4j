@@ -121,56 +121,58 @@ public class ArithmeticDecoder implements IByteStreamInProvider {
     }
 
     public int decodeSymbol(ArithmeticModel m) {
-        int u_n, u_sym, u_x, u_y = u_length;
+    int u_n, u_sym, u_x, u_y = u_length;
 
-        if (m.u_decoder_table != null) {             // use table look-up for faster decoding
+    if (m.u_decoder_table != null) {
+        int u_dv = u_value / (u_length >>>= DM__LengthShift);
+        int t = u_dv >>> m.u_table_shift;
 
-            int u_dv = Integer.divideUnsigned(u_value, u_length >>>= DM__LengthShift);
-            int t = u_dv >>> m.u_table_shift;
+        u_sym = m.u_decoder_table[t];
+        u_n = m.u_decoder_table[t+1] + 1;
 
-            u_sym = m.u_decoder_table[t];      // initial decision based on table look-up
-            u_n = m.u_decoder_table[t+1] + 1;
+        while (u_n - (u_sym + 1) > 0) {
+            int u_k = (u_sym + u_n) >>> 1;
+            if (m.u_distribution[u_k] > u_dv)
+                u_n = u_k;
+            else
+                u_sym = u_k;
+        }
 
-            while (compareUnsigned(u_n, u_sym + 1) > 0) {                      // finish with bisection search
-                int u_k = (u_sym + u_n) >>> 1;
-                if (compareUnsigned(m.u_distribution[u_k], u_dv) > 0) u_n = u_k; else u_sym = u_k;
+        u_x = m.u_distribution[u_sym] * u_length;
+        if (u_sym != m.u_last_symbol)
+            u_y = m.u_distribution[u_sym+1] * u_length;
+    } else {
+        u_x = u_sym = 0;
+        u_length >>>= DM__LengthShift;
+        int u_k = (u_n = m.u_symbols) >>> 1;
+
+        do {
+            int u_z = u_length * m.u_distribution[u_k];
+            if (u_z > u_value) {
+                u_n = u_k;
+                u_y = u_z;
+            } else {
+                u_sym = u_k;
+                u_x = u_z;
             }
-            // compute products
-            u_x = m.u_distribution[u_sym] * u_length;
-            if (u_sym != m.u_last_symbol) u_y = m.u_distribution[u_sym+1] * u_length;
-        }
-
-        else {                                  // decode using only multiplications
-
-            u_x = u_sym = 0;
-            u_length >>>= DM__LengthShift;
-            int u_k = (u_n = m.u_symbols) >>> 1;
-            // decode via bisection search
-            do {
-                int u_z = u_length * m.u_distribution[u_k];
-                if (compareUnsigned(u_z, u_value) > 0) {
-                    u_n = u_k;
-                    u_y = u_z;                                             // value is smaller
-                }
-                else {
-                    u_sym = u_k;
-                    u_x = u_z;                                     // value is larger or equal
-                }
-            } while ((u_k = (u_sym + u_n) >>> 1) != u_sym);
-        }
-
-        u_value -= u_x;                                               // update interval
-        u_length = u_y - u_x;
-
-        if (compareUnsigned(u_length, AC__MinLength) < 0) renorm_dec_interval();        // renormalization
-
-        ++m.u_symbol_count[u_sym];
-        if (--m.u_symbols_until_update == 0) m.update();    // periodic model update
-
-        assert(compareUnsigned(u_sym, m.u_symbols) < 0);
-
-        return u_sym;
+        } while ((u_k = (u_sym + u_n) >>> 1) != u_sym);
     }
+
+    u_value -= u_x;
+    u_length = u_y - u_x;
+
+    if (u_length < AC__MinLength)
+        renorm_dec_interval();
+
+    ++m.u_symbol_count[u_sym];
+    if (--m.u_symbols_until_update == 0)
+        m.update();
+
+    assert (u_sym < m.u_symbols);
+
+    return u_sym;
+}
+
 
     int readBit() {
         int u_sym = Integer.divideUnsigned(u_value, u_length >>>= 1);            // decode symbol, change length
