@@ -68,115 +68,112 @@ public class LASreadItemCompressed_GPSTIME11_v2 extends LASreadItemCompressed {
     }
 
     @Override
-    public PointDataRecord read(int notUsed)
-    {
-        PointDataRecordGpsTime result = new PointDataRecordGpsTime();
+    public PointDataRecord read(int notUsed) {
+    PointDataRecordGpsTime result = new PointDataRecordGpsTime();
+    int multi;
 
-        int multi;
-        if (last_gpstime_diff[last] == 0) // if the last integer difference was zero
-        {
+    while (true) {
+        if (last_gpstime_diff[last] == 0) {
             multi = dec.decodeSymbol(m_gpstime_0diff);
-            if (multi == 1) // the difference can be represented with 32 bits
-            {
+
+            if (multi == 1) {
                 last_gpstime_diff[last] = ic_gpstime.decompress(0, 0);
                 last_item[last].GPSTime += last_gpstime_diff[last];
                 multi_extreme_counter[last] = 0;
+            } else if (multi == 2) {
+                handleMulti2Case();
+            } else if (multi > 2) {
+                last = (last + multi - 2) & 3;
+                continue;
             }
-            else if (multi == 2) // the difference is huge
-            {
-                next = (next+1)&3;
-                last_item[next].GPSTime = ic_gpstime.decompress((int)(last_item[last].GPSTime >>> 32), 8);
-                last_item[next].GPSTime = (last_item[next].GPSTime << 32);
-                last_item[next].GPSTime |= Integer.toUnsignedLong(dec.readInt());
-                last = next;
-                last_gpstime_diff[last] = 0;
-                multi_extreme_counter[last] = 0;
-            }
-            else if (multi > 2) // we switch to another sequence
-            {
-                last = (last+multi-2)&3;
-                result = (PointDataRecordGpsTime)read(notUsed);
-            }
-        }
-        else
-        {
+        } else {
             multi = dec.decodeSymbol(m_gpstime_multi);
-            if (multi == 1)
-            {
-                last_item[last].GPSTime += ic_gpstime.decompress(last_gpstime_diff[last], 1);
-                multi_extreme_counter[last] = 0;
-            }
-            else if (multi < LASZIP_GPSTIME_MULTI_UNCHANGED)
-            {
-                int gpstime_diff;
-                if (multi == 0)
-                {
-                    gpstime_diff = ic_gpstime.decompress(0, 7);
-                    multi_extreme_counter[last]++;
-                    if (multi_extreme_counter[last] > 3)
-                    {
-                        last_gpstime_diff[last] = gpstime_diff;
-                        multi_extreme_counter[last] = 0;
-                    }
-                }
-                else if (multi < LASZIP_GPSTIME_MULTI)
-                {
-                    if (multi < 10)
-                        gpstime_diff = ic_gpstime.decompress(multi*last_gpstime_diff[last], 2);
-                    else
-                        gpstime_diff = ic_gpstime.decompress(multi*last_gpstime_diff[last], 3);
-                }
-                else if (multi == LASZIP_GPSTIME_MULTI)
-                {
-                    gpstime_diff = ic_gpstime.decompress(LASZIP_GPSTIME_MULTI*last_gpstime_diff[last], 4);
-                    multi_extreme_counter[last]++;
-                    if (multi_extreme_counter[last] > 3)
-                    {
-                        last_gpstime_diff[last] = gpstime_diff;
-                        multi_extreme_counter[last] = 0;
-                    }
-                }
-                else
-                {
-                    multi = LASZIP_GPSTIME_MULTI - multi;
-                    if (multi > LASZIP_GPSTIME_MULTI_MINUS)
-                    {
-                        gpstime_diff = ic_gpstime.decompress(multi*last_gpstime_diff[last], 5);
-                    }
-                    else
-                    {
-                        gpstime_diff = ic_gpstime.decompress(LASZIP_GPSTIME_MULTI_MINUS*last_gpstime_diff[last], 6);
-                        multi_extreme_counter[last]++;
-                        if (multi_extreme_counter[last] > 3)
-                        {
-                            last_gpstime_diff[last] = gpstime_diff;
-                            multi_extreme_counter[last] = 0;
-                        }
-                    }
-                }
-                last_item[last].GPSTime += gpstime_diff;
-            }
-            else if (multi ==  LASZIP_GPSTIME_MULTI_CODE_FULL)
-            {
-                next = (next+1)&3;
-                last_item[next].GPSTime = ic_gpstime.decompress((int)(last_item[last].GPSTime >>> 32), 8);
-                last_item[next].GPSTime = last_item[next].GPSTime << 32;
-                last_item[next].GPSTime |= Integer.toUnsignedLong(dec.readInt());
-                last = next;
-                last_gpstime_diff[last] = 0;
-                multi_extreme_counter[last] = 0;
-            }
-            else if (multi >=  LASZIP_GPSTIME_MULTI_CODE_FULL)
-            {
-                last = (last+multi-LASZIP_GPSTIME_MULTI_CODE_FULL)&3;
-                result = (PointDataRecordGpsTime)read(notUsed);
+
+            if (multi == 1) {
+                handleMulti1Case();
+            } else if (multi < LASZIP_GPSTIME_MULTI_UNCHANGED) {
+                handleMultiLessThanLASZIP_GPSTIME_MULTI_UNCHANGED(multi);
+            } else if (multi == LASZIP_GPSTIME_MULTI_CODE_FULL) {
+                handleLASZIP_GPSTIME_MULTI_CODE_FULL();
+            } else if (multi >= LASZIP_GPSTIME_MULTI_CODE_FULL) {
+                last = (last + multi - LASZIP_GPSTIME_MULTI_CODE_FULL) & 3;
+                continue;
             }
         }
 
-        result.GPSTime = last_item[last].GPSTime;
-
-        return result;
+        break;
     }
+
+    result.GPSTime = last_item[last].GPSTime;
+    return result;
+}
+
+private void handleMulti2Case() {
+    next = (next + 1) & 3;
+    long compressedGPSTime = ic_gpstime.decompress((int) (last_item[last].GPSTime >>> 32), 8);
+    compressedGPSTime = (compressedGPSTime << 32) | Integer.toUnsignedLong(dec.readInt());
+    last_item[next].GPSTime = compressedGPSTime;
+    last = next;
+    last_gpstime_diff[last] = 0;
+    multi_extreme_counter[last] = 0;
+}
+
+private void handleMulti1Case() {
+    last_item[last].GPSTime += ic_gpstime.decompress(last_gpstime_diff[last], 1);
+    multi_extreme_counter[last] = 0;
+}
+
+private void handleMultiLessThanLASZIP_GPSTIME_MULTI_UNCHANGED(int multi) {
+    int gpstime_diff;
+
+    if (multi == 0) {
+        gpstime_diff = ic_gpstime.decompress(0, 7);
+        multi_extreme_counter[last]++;
+
+        if (multi_extreme_counter[last] > 3) {
+            last_gpstime_diff[last] = gpstime_diff;
+            multi_extreme_counter[last] = 0;
+        }
+    } else if (multi < LASZIP_GPSTIME_MULTI) {
+        int decompressMultiplier = multi < 10 ? 2 : 3;
+        gpstime_diff = ic_gpstime.decompress(multi * last_gpstime_diff[last], decompressMultiplier);
+    } else if (multi == LASZIP_GPSTIME_MULTI) {
+        gpstime_diff = ic_gpstime.decompress(LASZIP_GPSTIME_MULTI * last_gpstime_diff[last], 4);
+        multi_extreme_counter[last]++;
+
+        if (multi_extreme_counter[last] > 3) {
+            last_gpstime_diff[last] = gpstime_diff;
+            multi_extreme_counter[last] = 0;
+        }
+    } else {
+        multi = LASZIP_GPSTIME_MULTI - multi;
+
+        if (multi > LASZIP_GPSTIME_MULTI_MINUS) {
+            gpstime_diff = ic_gpstime.decompress(multi * last_gpstime_diff[last], 5);
+        } else {
+            gpstime_diff = ic_gpstime.decompress(LASZIP_GPSTIME_MULTI_MINUS * last_gpstime_diff[last], 6);
+            multi_extreme_counter[last]++;
+
+            if (multi_extreme_counter[last] > 3) {
+                last_gpstime_diff[last] = gpstime_diff;
+                multi_extreme_counter[last] = 0;
+            }
+        }
+    }
+
+    last_item[last].GPSTime += gpstime_diff;
+}
+
+private void handleLASZIP_GPSTIME_MULTI_CODE_FULL() {
+    next = (next + 1) & 3;
+    long compressedGPSTime = ic_gpstime.decompress((int) (last_item[last].GPSTime >>> 32), 8);
+    compressedGPSTime = compressedGPSTime << 32 | Integer.toUnsignedLong(dec.readInt());
+    last_item[next].GPSTime = compressedGPSTime;
+    last = next;
+    last_gpstime_diff[last] = 0;
+    multi_extreme_counter[last] = 0;
+}
+
 
     @Override
     public boolean chunk_sizes() {
