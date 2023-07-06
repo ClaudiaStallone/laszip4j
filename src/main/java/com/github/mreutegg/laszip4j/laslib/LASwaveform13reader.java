@@ -96,174 +96,144 @@ public class LASwaveform13reader {
         return compressed;
     }
 
-    boolean open(String file_name, long start_of_waveform_data_packet_record, LASvlr_wave_packet_descr[] wave_packet_descr)
-    {
-        if (file_name == null)
-        {
-            fprintf(stderr,"ERROR: file name pointer is zero\n");
-            return FALSE;
+   boolean open(String file_name, long start_of_waveform_data_packet_record, LASvlr_wave_packet_descr[] wave_packet_descr) {
+    if (file_name == null || wave_packet_descr == null) {
+        fprintf(stderr, "ERROR: file name pointer or wave packet descriptor pointer is null\n");
+        return false;
+    }
+
+    compressed = false;
+
+    for (LASvlr_wave_packet_descr packet_descr : wave_packet_descr) {
+        if (packet_descr != null && packet_descr.getCompressionType() > 0) {
+            compressed = true;
+            break;
         }
+    }
 
-        if (wave_packet_descr == null)
-        {
-            fprintf(stderr,"ERROR: wave packet descriptor pointer is zero\n");
-            return FALSE;
-        }
+    String lowercaseFileName = file_name.toLowerCase();
+    boolean isWdpFile = lowercaseFileName.endsWith(".wdp");
+    boolean isWdzFile = lowercaseFileName.endsWith(".wdz");
 
-        // check if compressed or not
-
-        int i;
-        compressed = FALSE;
-
-        for (i = 0; i < 256; i++)
-        {
-            if (wave_packet_descr[i] != null)
-            {
-                compressed = compressed || (wave_packet_descr[i].getCompressionType() > 0);
-            }
-        }
-
-        // create file name and open file
-
-        if (start_of_waveform_data_packet_record == 0)
-        {
-            if (!compressed && (strstr(".wdp", file_name) || strstr(".WDP", file_name)))
-            {
-                file = fopenRAF(file_name.toCharArray(), "rb");
-            }
-            else if (compressed && (strstr(".wdz", file_name) || strstr(".WDZ", file_name)))
-            {
-                file = fopenRAF(file_name.toCharArray(), "rb");
-            }
-            else
-            {
-                char[] file_name_temp = file_name.toCharArray();
-                int len = strlen(file_name_temp);
-                if ((file_name_temp[len-3] == 'L') || (file_name_temp[len-3] == 'W'))
-                {
-                    file_name_temp[len-3] = 'W';
-                    file_name_temp[len-2] = 'D';
-                    file_name_temp[len-1] = (compressed ? 'Z' : 'P');
-                }
-                else
-                {
-                    file_name_temp[len-3] = 'w';
-                    file_name_temp[len-2] = 'd';
-                    file_name_temp[len-1] = (compressed ? 'z' : 'p');
-                }
-                file = fopenRAF(file_name_temp, "rb");
-            }
-        }
-        else
-        {
+    if (start_of_waveform_data_packet_record == 0) {
+        if (!compressed && (isWdpFile || isWdzFile)) {
             file = fopenRAF(file_name.toCharArray(), "rb");
+        } else {
+            char[] file_name_temp = file_name.toCharArray();
+            int len = strlen(file_name_temp);
+            if ((file_name_temp[len - 3] == 'L') || (file_name_temp[len - 3] == 'W')) {
+                file_name_temp[len - 3] = 'W';
+                file_name_temp[len - 2] = 'D';
+                file_name_temp[len - 1] = (compressed ? 'Z' : 'P');
+            } else {
+                file_name_temp[len - 3] = 'w';
+                file_name_temp[len - 2] = 'd';
+                file_name_temp[len - 1] = (compressed ? 'z' : 'p');
+            }
+            file = fopenRAF(file_name_temp, "rb");
         }
+    } else {
+        file = fopenRAF(file_name.toCharArray(), "rb");
+    }
 
-        if (file == null)
-        {
-            fprintf(stderr, "ERROR: cannot open waveform file '%s'\n", file_name);
-            return FALSE;
+    if (file == null) {
+        fprintf(stderr, "ERROR: cannot open waveform file '%s'\n", file_name);
+        return false;
+    }
+
+    stream = new ByteStreamInFile(file);
+
+    this.start_of_waveform_data_packet_record = start_of_waveform_data_packet_record;
+    this.wave_packet_descr = wave_packet_descr;
+
+    long position = start_of_waveform_data_packet_record + 60;
+    stream.seek(position);
+
+    byte[] magic = new byte[25];
+    try {
+        stream.getBytes(magic, 24);
+    } catch (Exception e) {
+        fprintf(stderr, "ERROR: reading waveform descriptor cross-check\n");
+        return false;
+    }
+
+    if (strncmp(stringFromByteArray(magic), "LAStools waveform ", 18) == 0) {
+        int number; // unsigned
+        try {
+            number = stream.get16bitsLE();
+        } catch (Exception e) {
+            fprintf(stderr, "ERROR: reading number of waveform descriptors\n");
+            return false;
         }
-
-        stream = new ByteStreamInFile(file);
-
-        this.start_of_waveform_data_packet_record = start_of_waveform_data_packet_record;
-        this.wave_packet_descr = wave_packet_descr;
-
-        // attempt waveform descriptor cross-check
-
-        long position = start_of_waveform_data_packet_record + 60;
-        stream.seek(position);
-
-        byte[] magic = new byte[25];
-        try { stream.getBytes(magic, 24); } catch(Exception e)
-        {
-            fprintf(stderr,"ERROR: reading waveform descriptor cross-check\n");
-            return FALSE;
-        }
-
-        if (strncmp(stringFromByteArray(magic), "LAStools waveform ", 18) == 0)
-        {
-            // do waveform descriptor cross-check 
-
-            int number; // unsigned
-            try { number = stream.get16bitsLE(); } catch(Exception e)
+        for (int i = 0; i < number; i++) {
+            int index; // unsigned
+            try {
+                index = stream.get16bitsLE();
+            } catch (Exception e) {
+                fprintf(stderr, "ERROR: reading index of waveform descriptor %d\n", i);
+                return false;
+            }
+            if (index > 255) {
+                fprintf(stderr, "ERROR: cross-check - index %d of waveform descriptor %d out-of-range\n", index, i);
+                return false;
+            }
+            if (wave_packet_descr[index] == null) {
+                fprintf(stderr, "WARNING: cross-check - waveform descriptor %d with index %d unknown\n", i, index);
+                int dummy;
+                try { dummy = stream.get32bitsLE(); } catch(Exception e)
+                {
+                    fprintf(stderr,"ERROR: cross-check - reading rest of waveform descriptor %d\n", i);
+                    return FALSE;
+                }
+                continue;
+            }
+            byte[] compression = new byte[1];
+            try { stream.getBytes(compression, 1); } catch(Exception e)
             {
-                fprintf(stderr,"ERROR: reading number of waveform descriptors\n");
+                fprintf(stderr,"ERROR: reading compression of waveform descriptor %d\n", i);
                 return FALSE;
             }
-            for (i = 0; i < number; i++)
+            if (compression[0] != wave_packet_descr[index].getCompressionType())
             {
-                int index; // unsigned
-                try { index = stream.get16bitsLE(); } catch(Exception e)
-                {
-                    fprintf(stderr,"ERROR: reading index of waveform descriptor %d\n", i);
-                    return FALSE;
-                }
-                if (index > 255)
-                {
-                    fprintf(stderr,"ERROR: cross-check - index %d of waveform descriptor %d out-of-range\n", index, i);
-                    return FALSE;
-                }
-                if (wave_packet_descr[index] == null)
-                {
-                    fprintf(stderr,"WARNING: cross-check - waveform descriptor %d with index %d unknown\n", i, index);
-                    int dummy;
-                    try { dummy = stream.get32bitsLE(); } catch(Exception e)
-                    {
-                        fprintf(stderr,"ERROR: cross-check - reading rest of waveform descriptor %d\n", i);
-                        return FALSE;
-                    }
-                    continue;
-                }
-                byte[] compression = new byte[1];
-                try { stream.getBytes(compression, 1); } catch(Exception e)
-                {
-                    fprintf(stderr,"ERROR: reading compression of waveform descriptor %d\n", i);
-                    return FALSE;
-                }
-                if (compression[0] != wave_packet_descr[index].getCompressionType())
-                {
-                    fprintf(stderr,"ERROR: cross-check - compression %d %d of waveform descriptor %d with index %d is different\n", compression[0], wave_packet_descr[index].getCompressionType(), i, index);
-                    return FALSE;
-                }
-                byte[] nbits = new byte[1];
-                try { stream.getBytes(nbits, 1); } catch(Exception e)
-                {
-                    fprintf(stderr,"ERROR: reading nbits of waveform descriptor %d\n", i);
-                    return FALSE;
-                }
-                if (nbits[0] != wave_packet_descr[index].getBitsPerSample())
-                {
-                    fprintf(stderr,"ERROR: cross-check - nbits %d %d of waveform descriptor %d with index %d is different\n", nbits[0], wave_packet_descr[index].getBitsPerSample(), i, index);
-                    return FALSE;
-                }
-                int nsamples; // unsigned
-                try { nsamples = stream.get16bitsLE(); } catch(Exception e)
-                {
-                    fprintf(stderr,"ERROR: reading nsamples of waveform descriptor %d\n", i);
-                    return FALSE;
-                }
-                if (nsamples != wave_packet_descr[index].getNumberOfSamples())
-                {
-                    fprintf(stderr,"ERROR: cross-check - nsamples %d %d of waveform descriptor %d with index %d is different\n", nsamples, wave_packet_descr[index].getNumberOfSamples(), i, index);
-                    return FALSE;
-                }
+                fprintf(stderr,"ERROR: cross-check - compression %d %d of waveform descriptor %d with index %d is different\n", compression[0], wave_packet_descr[index].getCompressionType(), i, index);
+                return FALSE;
+            }
+            byte[] nbits = new byte[1];
+            try { stream.getBytes(nbits, 1); } catch(Exception e)
+            {
+                fprintf(stderr,"ERROR: reading nbits of waveform descriptor %d\n", i);
+                return FALSE;
+            }
+            if (nbits[0] != wave_packet_descr[index].getBitsPerSample())
+            {
+                fprintf(stderr,"ERROR: cross-check - nbits %d %d of waveform descriptor %d with index %d is different\n", nbits[0], wave_packet_descr[index].getBitsPerSample(), i, index);
+                return FALSE;
+            }
+            int nsamples; // unsigned
+            try { nsamples = stream.get16bitsLE(); } catch(Exception e)
+            {
+                fprintf(stderr,"ERROR: reading nsamples of waveform descriptor %d\n", i);
+                return FALSE;
+            }
+            if (nsamples != wave_packet_descr[index].getNumberOfSamples())
+            {
+                fprintf(stderr,"ERROR: cross-check - nsamples %d %d of waveform descriptor %d with index %d is different\n", nsamples, wave_packet_descr[index].getNumberOfSamples(), i, index);
+                return FALSE;
             }
         }
-
-        last_position = stream.tell();
-
-        // create decompressor
-
-        if (compressed)
-        {
-            if (dec == null) dec = new ArithmeticDecoder();
-            if (ic8 == null) ic8 = new IntegerCompressor(dec, 8);
-            if (ic16 == null) ic16 = new IntegerCompressor(dec, 16);
-        }
-        return TRUE;
     }
+
+    last_position = stream.tell();
+
+    if (compressed) {
+        if (dec == null) dec = new ArithmeticDecoder();
+        if (ic8 == null) ic8 = new IntegerCompressor(dec, 8);
+        if (ic16 == null) ic16 = new IntegerCompressor(dec, 16);
+    }
+
+    return true;
+}
+
 
     public boolean read_waveform(LASpoint point)
     {
