@@ -355,132 +355,78 @@ public class LASreadPoint {
         return TRUE;
     }
 
-    public boolean read(PointDataRecord[] pointRecords)
-    {
-        int i; // unsigned
+    public boolean read(PointDataRecord[] pointRecords) {
+    int i; // unsigned
 
-        try
-        {
-            if (dec != null)
-            {
-                if (chunk_count == chunk_size)
-                {
-                    if (point_start != 0)
-                    {
-                        dec.done();
-                        current_chunk++;
-                        // check integrity
-                        if (current_chunk < tabled_chunks)
-                        {
-                            long here = instream.tell();
-                            if (chunk_starts[current_chunk] != here)
-                            {
-                                // previous chunk was corrupt
-                                current_chunk--;
-                                throw new RuntimeException("4711");
-                            }
+    try {
+        if (dec != null) {
+            if (chunk_count == chunk_size) {
+                if (point_start != 0) {
+                    dec.done();
+                    current_chunk++;
+                    if (current_chunk < tabled_chunks) {
+                        long here = instream.tell();
+                        if (chunk_starts[current_chunk] != here) {
+                            current_chunk--;
+                            throw new RuntimeException("4711");
                         }
-                    }
-                    init_dec();
-                    if (current_chunk == tabled_chunks) // no or incomplete chunk table?
-                    {
-                        if (current_chunk >= number_chunks)
-                        {
-                            number_chunks += 256;
-                            chunk_starts = realloc(chunk_starts, number_chunks+1);
-                        }
-                        chunk_starts[tabled_chunks] = point_start; // needs fixing
-                        tabled_chunks++;
-                    }
-                    else if (chunk_totals != null) // variable sized chunks?
-                    {
-                        chunk_size = chunk_totals[current_chunk+1]-chunk_totals[current_chunk];
-                    }
-                    chunk_count = 0;
-                }
-                chunk_count++;
-
-                if (readers != null)
-                {
-                    for (i = 0; i < num_readers; i++)
-                    {
-                        pointRecords[i] = readers[i].read( i > 0 ? pointRecords[0].CompressionContext : 0);
                     }
                 }
-                else
-                {
-                    for (i = 0; i < num_readers; i++)
-                    {
-                        pointRecords[i] = readers_raw[i].read(0);
+                init_dec();
+                if (current_chunk == tabled_chunks) {
+                    if (current_chunk >= number_chunks) {
+                        number_chunks += 256;
+                        chunk_starts = realloc(chunk_starts, number_chunks+1);
                     }
-                    if (layered_las14_compression)
-                    {
-                        // for layered compression 'dec' only hands over the stream
-                        dec.setByteStreamIn(instream);
-                        // read how many points are in the chunk
-                        instream.get32bitsLE();
-                        // read the sizes of all layers
-                        for (i = 0; i < num_readers; i++)
-                        {
-                            ((LASreadItemCompressed)(readers_compressed[i])).chunk_sizes();
-                        }
-                        for (i = 0; i < num_readers; i++)
-                        {
-                            ((LASreadItemCompressed)(readers_compressed[i])).init(pointRecords[i], i > 0 ? pointRecords[0].CompressionContext : 0);
-                        }
-                    }
-                    else
-                    {
-                        for (i = 0; i < num_readers; i++)
-                        {
-                            ((LASreadItemCompressed)(readers_compressed[i])).init(pointRecords[i], i > 0 ? pointRecords[0].CompressionContext : 0);
-                        }
-                        dec.init(instream);
-                    }
+                    chunk_starts[tabled_chunks] = point_start;
+                    tabled_chunks++;
+                } else if (chunk_totals != null) {
+                    chunk_size = chunk_totals[current_chunk+1]-chunk_totals[current_chunk];
+                }
+                chunk_count = 0;
+            }
+            chunk_count++;
+
+            for (i = 0; i < num_readers; i++) {
+                pointRecords[i] = readers != null ? readers[i].read(i > 0 ? pointRecords[0].CompressionContext : 0) : readers_raw[i].read(0);
+            }
             
-                    readers = readers_compressed;
+            if (dec != null) {
+                if (layered_las14_compression) {
+                    dec.setByteStreamIn(instream);
+                    instream.get32bitsLE();
+                    for (i = 0; i < num_readers; i++) {
+                        ((LASreadItemCompressed)(readers_compressed[i])).chunk_sizes();
+                    }
                 }
+                for (i = 0; i < num_readers; i++) {
+                    ((LASreadItemCompressed)(readers_compressed[i])).init(pointRecords[i], i > 0 ? pointRecords[0].CompressionContext : 0);
+                }
+                if (!layered_las14_compression) {
+                    dec.init(instream);
+                }
+                readers = readers_compressed;
             }
-            else
-            {
-                for (i = 0; i < num_readers; i++)
-                {
-                    pointRecords[i] = readers[i].read( i > 0 ? pointRecords[0].CompressionContext : 0);
-                }
+        } else {
+            for (i = 0; i < num_readers; i++) {
+                pointRecords[i] = readers[i].read(i > 0 ? pointRecords[0].CompressionContext : 0);
             }
         }
-        catch (Exception exception)
-        {
-            // report error
-            if (exception instanceof EOFException)
-            {
-                // end-of-file
-                if (dec != null)
-                {
-                    last_error = String.format("end-of-file during chunk with index %d", current_chunk);
-                }
-                else
-                {
-                    last_error = "end-of-file";
-                }
+    } catch (Exception exception) {
+        if (exception instanceof EOFException) {
+            last_error = dec != null ? String.format("end-of-file during chunk with index %d", current_chunk) : "end-of-file";
+        } else {
+            last_error = String.format("chunk with index %d of %d is corrupt", current_chunk, tabled_chunks);
+            if ((current_chunk+1) < tabled_chunks) {
+                instream.seek(chunk_starts[(current_chunk+1)]);
+                chunk_count = chunk_size;
             }
-            else
-            {
-                // decompression error
-                last_error = String.format("chunk with index %d of %d is corrupt", current_chunk, tabled_chunks);
-                // if we know where the next chunk starts ...
-                if ((current_chunk+1) < tabled_chunks)
-                {
-                    // ... try to seek to the next chunk
-                    instream.seek(chunk_starts[(current_chunk+1)]);
-                    // ... ready for next read()
-                    chunk_count = chunk_size;
-                }
-            }
-            return FALSE;
         }
-        return TRUE;
+        return false;
     }
+    return true;
+}
+
 
     public boolean check_end()
     {
