@@ -41,7 +41,7 @@ import static java.lang.Boolean.TRUE;
 public abstract class LAScriterion
 {
     public abstract String name();
-    public abstract int get_command(StringBuilder string);
+    public abstract int get_Command(StringBuilder string);
     public int get_decompress_selective(){return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY;};
     public abstract boolean filter(LASpoint point);
     public void reset(){};
