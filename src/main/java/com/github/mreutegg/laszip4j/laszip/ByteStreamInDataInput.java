@@ -28,12 +28,13 @@ public abstract class ByteStreamInDataInput extends ByteStreamIn {
     private final ByteBuffer buffer;
     protected DataInput dataIn;
 
-    public ByteStreamInDataInput(DataInput in) {
-        super();
-        this.dataIn = in;
-        this.buffer = ByteBuffer.allocate(8);
-        this.buffer.order(LITTLE_ENDIAN);
-    }
+    protected ByteStreamInDataInput(DataInput in) {
+    super();
+    this.dataIn = in;
+    this.buffer = ByteBuffer.allocate(8);
+    this.buffer.order(LITTLE_ENDIAN);
+}
+
 
     @Override
     public byte getByte() {
