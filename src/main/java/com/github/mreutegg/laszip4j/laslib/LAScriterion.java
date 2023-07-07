@@ -42,7 +42,7 @@ public abstract class LAScriterion
 {
     public abstract String name();
     public abstract int get_Command(StringBuilder string);
-    public int get_decompress_selective(){return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY;};
+    public int get_Decompress_selective(){return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY;};
     public abstract boolean filter(LASpoint point);
     public void reset(){};
 };
@@ -50,9 +50,9 @@ public abstract class LAScriterion
 class LAScriterionAnd extends LAScriterion
 {
     public String name() { return "filter_and"; };
-    public int get_command(StringBuilder string) { int n = 0; n += one.get_command(string); n += two.get_command(string); n += sprintf(string, "-%s ", name()); return n; };
+    public int get_Command(StringBuilder string) { int n = 0; n += one.get_Command(string); n += two.get_Command(string); n += sprintf(string, "-%s ", name()); return n; };
     @Override
-    public int get_decompress_selective() { return (one.get_decompress_selective() | two.get_decompress_selective()); };
+    public int get_Decompress_selective() { return (one.get_Decompress_selective() | two.get_Decompress_selective()); };
     public boolean filter(LASpoint point) { return one.filter(point) && two.filter(point); };
     LAScriterionAnd(LAScriterion one, LAScriterion two) { this.one = one; this.two = two; };
     private LAScriterion one;
@@ -63,7 +63,7 @@ class LAScriterionOr extends LAScriterion
 {
     public String name() { return "filter_or"; };
     @Override
-    public int get_command(StringBuilder string) { int n = 0; n += one.get_command(string); n += two.get_command(string); n += sprintf(string, "-%s ", name()); return n; };
+    public int get_Command(StringBuilder string) { int n = 0; n += one.get_Command(string); n += two.get_Command(string); n += sprintf(string, "-%s ", name()); return n; };
     public int get_decompress_selective() { return (one.get_decompress_selective() | two.get_decompress_selective()); };
     public boolean filter(LASpoint point) { return one.filter(point) || two.filter(point); };
     public LAScriterionOr(LAScriterion one, LAScriterion two) { this.one = one; this.two = two; };
@@ -74,7 +74,7 @@ class LAScriterionOr extends LAScriterion
 class LAScriterionKeepTile extends LAScriterion
 {
     public String name() { return "keep_tile"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %g %g %g ", name(), ll_x, ll_y, tile_size); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %g %g %g ", name(), ll_x, ll_y, tile_size); };
     public boolean filter(LASpoint point) { return (!point.inside_tile(ll_x, ll_y, ur_x, ur_y)); };
     public LAScriterionKeepTile(float ll_x, float ll_y, float tile_size) { this.ll_x = ll_x; this.ll_y = ll_y; this.ur_x = ll_x+tile_size; this.ur_y = ll_y+tile_size; this.tile_size = tile_size; };
     private float ll_x, ll_y, ur_x, ur_y, tile_size;
@@ -83,7 +83,7 @@ class LAScriterionKeepTile extends LAScriterion
 class LAScriterionKeepCircle extends LAScriterion
 {
     public String name() { return "keep_circle"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %g %g %g ", name(), center_x, center_y, radius); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %g %g %g ", name(), center_x, center_y, radius); };
     public boolean filter(LASpoint point) { return (!point.inside_circle(center_x, center_y, radius_squared)); };
     public LAScriterionKeepCircle(double x, double y, double radius) { this.center_x = x; this.center_y = y; this.radius = radius; this.radius_squared = radius*radius; };
     private double center_x, center_y, radius, radius_squared;
@@ -93,7 +93,7 @@ class LAScriterionKeepxyz extends LAScriterion
 {
     @Override
     public String name() { return "keep_xyz"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %g %g %g %g %g %g ", name(), min_x, min_y, min_z, max_x, max_y, max_z); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %g %g %g %g %g %g ", name(), min_x, min_y, min_z, max_x, max_y, max_z); };
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY | LASZIP_DECOMPRESS_SELECTIVE_Z; };
     public boolean filter(LASpoint point) { return (!point.inside_box(min_x, min_y, min_z, max_x, max_y, max_z)); };
     public LAScriterionKeepxyz(double min_x, double min_y, double min_z, double max_x, double max_y, double max_z) { this.min_x = min_x; this.min_y = min_y; this.min_z = min_z; this.max_x = max_x; this.max_y = max_y; this.max_z = max_z; };
@@ -104,7 +104,7 @@ class LAScriterionDropxyz extends LAScriterion
 {
     @Override
     public String name() { return "drop_xyz"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %g %g %g %g %g %g ", name(), min_x, min_y, min_z, max_x, max_y, max_z); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %g %g %g %g %g %g ", name(), min_x, min_y, min_z, max_x, max_y, max_z); };
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY | LASZIP_DECOMPRESS_SELECTIVE_Z; };
     public boolean filter(LASpoint point) { return (point.inside_box(min_x, min_y, min_z, max_x, max_y, max_z)); };
     public LAScriterionDropxyz(double min_x, double min_y, double min_z, double max_x, double max_y, double max_z) { this.min_x = min_x; this.min_y = min_y; this.min_z = min_z; this.max_x = max_x; this.max_y = max_y; this.max_z = max_z; };
@@ -114,7 +114,7 @@ class LAScriterionDropxyz extends LAScriterion
 class LAScriterionKeepxy extends LAScriterion
 {
     public String name() { return "keep_xy"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %g %g %g %g ", name(), below_x, below_y, above_x, above_y); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %g %g %g %g ", name(), below_x, below_y, above_x, above_y); };
     public boolean filter(LASpoint point) { return (!point.inside_rectangle(below_x, below_y, above_x, above_y)); };
     public LAScriterionKeepxy(double below_x, double below_y, double above_x, double above_y) { this.below_x = below_x; this.below_y = below_y; this.above_x = above_x; this.above_y = above_y; };
     private double below_x, below_y, above_x, above_y;
@@ -123,7 +123,7 @@ class LAScriterionKeepxy extends LAScriterion
 class LAScriterionDropxy extends LAScriterion
 {
     public String name() { return "drop_xy"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %g %g %g %g ", name(), below_x, below_y, above_x, above_y); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %g %g %g %g ", name(), below_x, below_y, above_x, above_y); };
     public boolean filter(LASpoint point) { return (point.inside_rectangle(below_x, below_y, above_x, above_y)); };
     public LAScriterionDropxy(double below_x, double below_y, double above_x, double above_y) { this.below_x = below_x; this.below_y = below_y; this.above_x = above_x; this.above_y = above_y; };
     private double below_x, below_y, above_x, above_y;
@@ -132,7 +132,7 @@ class LAScriterionDropxy extends LAScriterion
 class LAScriterionKeepx extends LAScriterion
 {
     public String name() { return "keep_x"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %g %g ", name(), below_x, above_x); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %g %g ", name(), below_x, above_x); };
     public boolean filter(LASpoint point) { double x = point.get_x(); return (x < below_x) || (x >= above_x); };
     public LAScriterionKeepx(double below_x, double above_x) { this.below_x = below_x; this.above_x = above_x; };
     private double below_x, above_x;
@@ -141,7 +141,7 @@ class LAScriterionKeepx extends LAScriterion
 class LAScriterionDropx extends LAScriterion
 {
     public String name() { return "drop_x"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %g %g ", name(), below_x, above_x); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %g %g ", name(), below_x, above_x); };
     public boolean filter(LASpoint point) { double x = point.get_x(); return ((below_x <= x) && (x < above_x)); };
     public LAScriterionDropx(double below_x, double above_x) { this.below_x = below_x; this.above_x = above_x; };
     private double below_x, above_x;
@@ -150,7 +150,7 @@ class LAScriterionDropx extends LAScriterion
 class LAScriterionKeepy extends LAScriterion
 {
     public String name() { return "keep_y"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %g %g ", name(), below_y, above_y); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %g %g ", name(), below_y, above_y); };
     public boolean filter(LASpoint point) { double y = point.get_y(); return (y < below_y) || (y >= above_y); };
     public LAScriterionKeepy(double below_y, double above_y) { this.below_y = below_y; this.above_y = above_y; };
     private double below_y, above_y;
@@ -159,7 +159,7 @@ class LAScriterionKeepy extends LAScriterion
 class LAScriterionDropy extends LAScriterion
 {
     public String name() { return "drop_y"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %g %g ", name(), below_y, above_y); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %g %g ", name(), below_y, above_y); };
     public boolean filter(LASpoint point) { double y = point.get_y(); return ((below_y <= y) && (y < above_y)); };
     public LAScriterionDropy(double below_y, double above_y) { this.below_y = below_y; this.above_y = above_y; };
     private double below_y, above_y;
@@ -169,7 +169,7 @@ class LAScriterionKeepz extends LAScriterion
 {
     @Override
     public String name() { return "keep_z"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %g %g ", name(), below_z, above_z); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %g %g ", name(), below_z, above_z); };
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_Z; };
     public boolean filter(LASpoint point) { double z = point.get_z(); return (z < below_z) || (z >= above_z); };
     LAScriterionKeepz(double below_z, double above_z) { this.below_z = below_z; this.above_z = above_z; };
@@ -180,7 +180,7 @@ class LAScriterionDropz extends LAScriterion
 {
     @Override
     public String name() { return "drop_z"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %g %g ", name(), below_z, above_z); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %g %g ", name(), below_z, above_z); };
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_Z; };
     public boolean filter(LASpoint point) { double z = point.get_z(); return ((below_z <= z) && (z < above_z)); };
     public LAScriterionDropz(double below_z, double above_z) { this.below_z = below_z; this.above_z = above_z; };
@@ -190,7 +190,7 @@ class LAScriterionDropz extends LAScriterion
 class LAScriterionDropxBelow extends LAScriterion
 {
     public String name() { return "drop_x_below"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %g ", name(), below_x); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %g ", name(), below_x); };
     public boolean filter(LASpoint point) { return (point.get_x() < below_x); };
     public LAScriterionDropxBelow(double below_x) { this.below_x = below_x; };
     private double below_x;
@@ -199,7 +199,7 @@ class LAScriterionDropxBelow extends LAScriterion
 class LAScriterionDropxAbove extends LAScriterion
 {
     public String name() { return "drop_x_above"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %g ", name(), above_x); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %g ", name(), above_x); };
     public boolean filter(LASpoint point) { return (point.get_x() >= above_x); };
     public LAScriterionDropxAbove(double above_x) { this.above_x = above_x; };
     private double above_x;
@@ -208,7 +208,7 @@ class LAScriterionDropxAbove extends LAScriterion
 class LAScriterionDropyBelow extends LAScriterion
 {
     public String name() { return "drop_y_below"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %g ", name(), below_y); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %g ", name(), below_y); };
     public boolean filter(LASpoint point) { return (point.get_y() < below_y); };
     public LAScriterionDropyBelow(double below_y) { this.below_y = below_y; };
     private double below_y;
@@ -217,7 +217,7 @@ class LAScriterionDropyBelow extends LAScriterion
 class LAScriterionDropyAbove extends LAScriterion
 {
     public String name() { return "drop_y_above"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %g ", name(), above_y); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %g ", name(), above_y); };
     public boolean filter(LASpoint point) { return (point.get_y() >= above_y); };
     public LAScriterionDropyAbove(double above_y) { this.above_y = above_y; };
     private double above_y;
@@ -227,7 +227,7 @@ class LAScriterionDropzBelow extends LAScriterion
 {
     @Override
     public String name() { return "drop_z_below"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %g ", name(), below_z); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %g ", name(), below_z); };
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_Z; };
     public boolean filter(LASpoint point) { return (point.get_z() < below_z); };
     public LAScriterionDropzBelow(double below_z) { this.below_z = below_z; };
@@ -237,7 +237,7 @@ class LAScriterionDropzBelow extends LAScriterion
 class LAScriterionDropzAbove extends LAScriterion
 {
     public String name() { return "drop_z_above"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %g ", name(), above_z); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %g ", name(), above_z); };
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_Z; };
     public boolean filter(LASpoint point) { return (point.get_z() >= above_z); };
     LAScriterionDropzAbove(double above_z) { this.above_z = above_z; };
@@ -247,7 +247,7 @@ class LAScriterionDropzAbove extends LAScriterion
 class LAScriterionKeepXYInt extends LAScriterion
 {
     public String name() { return "keep_XY"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %d %d %d %d ", name(), below_X, below_Y, above_X, above_Y); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %d %d %d %d ", name(), below_X, below_Y, above_X, above_Y); };
     public boolean filter(LASpoint point) { return (point.get_X() < below_X) || (point.get_Y() < below_Y) || (point.get_X() >= above_X) || (point.get_Y() >= above_Y); };
     LAScriterionKeepXYInt(int below_X, int below_Y, int above_X, int above_Y) { this.below_X = below_X; this.below_Y = below_Y; this.above_X = above_X; this.above_Y = above_Y; };
     int below_X, below_Y, above_X, above_Y;
@@ -257,7 +257,7 @@ class LAScriterionKeepXInt extends LAScriterion
 {
     @Override
     public String name() { return "keep_X"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %d %d ", name(), below_X, above_X); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %d %d ", name(), below_X, above_X); };
     public boolean filter(LASpoint point) { return (point.get_X() < below_X) || (above_X <= point.get_X()); };
     LAScriterionKeepXInt(int below_X, int above_X) { this.below_X = below_X; this.above_X = above_X; };
     int below_X, above_X;
@@ -266,7 +266,7 @@ class LAScriterionKeepXInt extends LAScriterion
 class LAScriterionDropXInt extends LAScriterion
 {
     public String name() { return "drop_X"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %d %d ", name(), below_X, above_X); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %d %d ", name(), below_X, above_X); };
     public boolean filter(LASpoint point) { return ((below_X <= point.get_X()) && (point.get_X() < above_X)); };
     LAScriterionDropXInt(int below_X, int above_X) { this.below_X = below_X; this.above_X = above_X; };
     int below_X;
@@ -276,7 +276,7 @@ class LAScriterionDropXInt extends LAScriterion
 class LAScriterionKeepYInt extends LAScriterion
 {
     public String name() { return "keep_Y"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %d %d ", name(), below_Y, above_Y); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %d %d ", name(), below_Y, above_Y); };
     public boolean filter(LASpoint point) { return (point.get_Y() < below_Y) || (above_Y <= point.get_Y()); };
     LAScriterionKeepYInt(int below_Y, int above_Y) { this.below_Y = below_Y; this.above_Y = above_Y; };
     int below_Y, above_Y;
@@ -285,7 +285,7 @@ class LAScriterionKeepYInt extends LAScriterion
 class LAScriterionDropYInt extends LAScriterion
 {
     public String name() { return "drop_Y"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %d %d ", name(), below_Y, above_Y); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %d %d ", name(), below_Y, above_Y); };
     public boolean filter(LASpoint point) { return ((below_Y <= point.get_Y()) && (point.get_Y() < above_Y)); };
     @Override
     LAScriterionDropYInt(int below_Y, int above_Y) { this.below_Y = below_Y; this.above_Y = above_Y; };
@@ -296,7 +296,7 @@ class LAScriterionDropYInt extends LAScriterion
 class LAScriterionKeepZInt extends LAScriterion
 {
     public String name() { return "keep_Z"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %d %d ", name(), below_Z, above_Z); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %d %d ", name(), below_Z, above_Z); };
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_Z; };
     @Override
     public boolean filter(LASpoint point) { return (point.get_Z() < below_Z) || (above_Z <= point.get_Z()); };
@@ -307,7 +307,7 @@ class LAScriterionKeepZInt extends LAScriterion
 class LAScriterionDropZInt extends LAScriterion
 {
     public String name() { return "drop_Z"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %d %d ", name(), below_Z, above_Z); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %d %d ", name(), below_Z, above_Z); };
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_Z; };
     public boolean filter(LASpoint point) { return ((below_Z <= point.get_Z()) && (point.get_Z() < above_Z)); };
     LAScriterionDropZInt(int below_Z, int above_Z) { this.below_Z = below_Z; this.above_Z = above_Z; };
@@ -318,7 +318,7 @@ class LAScriterionDropZInt extends LAScriterion
 class LAScriterionDropXIntBelow extends LAScriterion
 {
     public String name() { return "drop_X_below"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), below_X); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), below_X); };
     public boolean filter(LASpoint point) { return (point.get_X() < below_X); };
     LAScriterionDropXIntBelow(int below_X) { this.below_X = below_X; };
     int below_X;
@@ -327,7 +327,7 @@ class LAScriterionDropXIntBelow extends LAScriterion
 class LAScriterionDropXIntAbove extends LAScriterion
 {
     public String name() { return "drop_X_above"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), above_X); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), above_X); };
     public boolean filter(LASpoint point) { return (point.get_X() >= above_X); };
     LAScriterionDropXIntAbove(int above_X) { this.above_X = above_X; };
     int above_X;
@@ -336,7 +336,7 @@ class LAScriterionDropXIntAbove extends LAScriterion
 class LAScriterionDropYIntBelow extends LAScriterion
 {
     public String name() { return "drop_Y_below"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), below_Y); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), below_Y); };
     public boolean filter(LASpoint point) { return (point.get_Y() < below_Y); };
     LAScriterionDropYIntBelow(int below_Y) { this.below_Y = below_Y; };
     int below_Y;
@@ -346,7 +346,7 @@ class LAScriterionDropYIntAbove extends LAScriterion
 {
     public String name() { return "drop_Y_above"; };
     @Override
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), above_Y); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), above_Y); };
     public boolean filter(LASpoint point) { return (point.get_Y() >= above_Y); };
     LAScriterionDropYIntAbove(int above_Y) { this.above_Y = above_Y; };
     int above_Y;
@@ -356,7 +356,7 @@ class LAScriterionDropZIntBelow extends LAScriterion
 {
     public String name() { return "drop_Z_below"; };
     @Override
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), below_Z); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), below_Z); };
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_Z; };
     public boolean filter(LASpoint point) { return (point.get_Z() < below_Z); };
     LAScriterionDropZIntBelow(int below_Z) { this.below_Z = below_Z; };
@@ -366,7 +366,7 @@ class LAScriterionDropZIntBelow extends LAScriterion
 class LAScriterionDropZIntAbove extends LAScriterion
 {
     public String name() { return "drop_Z_above"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), above_Z); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), above_Z); };
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_Z; };
     public boolean filter(LASpoint point) { return (point.get_Z() >= above_Z); };
     LAScriterionDropZIntAbove(int above_Z) { this.above_Z = above_Z; };
@@ -376,77 +376,77 @@ class LAScriterionDropZIntAbove extends LAScriterion
 class LAScriterionKeepFirstReturn extends LAScriterion
 {
     public String name() { return "keep_first"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s ", name()); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s ", name()); };
     public boolean filter(LASpoint point) { return (point.getReturn_number() > 1); };
 };
 
 class LAScriterionKeepFirstOfManyReturn extends LAScriterion
 {
     public String name() { return "keep_first_of_many"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s ", name()); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s ", name()); };
     public boolean filter(LASpoint point) { return ((point.getNumber_of_returns() == 1) || (point.getReturn_number() > 1)); };
 };
 
 class LAScriterionKeepMiddleReturn extends LAScriterion
 {
     public String name() { return "keep_middle"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s ", name()); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s ", name()); };
     public boolean filter(LASpoint point) { return ((point.getReturn_number() == 1) || (point.getReturn_number() >= point.getNumber_of_returns())); };
 };
 
 class LAScriterionKeepLastReturn extends LAScriterion
 {
     public String name() { return "keep_last"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s ", name()); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s ", name()); };
     public boolean filter(LASpoint point) { return (point.getReturn_number() < point.getNumber_of_returns()); };
 };
 
 class LAScriterionKeepLastOfManyReturn extends LAScriterion
 {
     public String name() { return "keep_last_of_many"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s ", name()); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s ", name()); };
     public boolean filter(LASpoint point) { return ((point.getReturn_number() == 1) || (point.getReturn_number() < point.getNumber_of_returns())); };
 };
 
 class LAScriterionDropFirstReturn extends LAScriterion
 {
     public String name() { return "drop_first"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s ", name()); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s ", name()); };
     public boolean filter(LASpoint point) { return (point.getReturn_number() == 1); };
 };
 
 class LAScriterionDropFirstOfManyReturn extends LAScriterion
 {
     public String name() { return "drop_first_of_many"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s ", name()); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s ", name()); };
     public boolean filter(LASpoint point) { return ((point.getNumber_of_returns() > 1) && (point.getReturn_number() == 1)); };
 };
 
 class LAScriterionDropMiddleReturn extends LAScriterion
 {
     public String name() { return "drop_middle"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s ", name()); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s ", name()); };
     public boolean filter(LASpoint point) { return ((point.getReturn_number() > 1) && (point.getReturn_number() < point.getNumber_of_returns())); };
 };
 
 class LAScriterionDropLastReturn extends LAScriterion
 {
     public String name() { return "drop_last"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s ", name()); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s ", name()); };
     public boolean filter(LASpoint point) { return (point.getReturn_number() >= point.getNumber_of_returns()); };
 };
 
 class LAScriterionDropLastOfManyReturn extends LAScriterion
 {
     public String name() { return "drop_last_of_many"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s ", name()); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s ", name()); };
     public boolean filter(LASpoint point) { return ((point.getNumber_of_returns() > 1) && (point.getReturn_number() >= point.getNumber_of_returns())); };
 };
 
 class LAScriterionKeepReturns extends LAScriterion
 {
     public String name() { return "keep_return_mask"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), ~drop_return_mask); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), ~drop_return_mask); };
     public boolean filter(LASpoint point) { return ((1 << point.getReturn_number()) & drop_return_mask) != 0; };
     LAScriterionKeepReturns(int keep_return_mask) { drop_return_mask = ~keep_return_mask; };
     private int drop_return_mask; // unsigned
@@ -455,7 +455,7 @@ class LAScriterionKeepReturns extends LAScriterion
 class LAScriterionKeepSpecificNumberOfReturns extends LAScriterion
 {
     public String name() { return (numberOfReturns == 1 ? "keep_single" : (numberOfReturns == 2 ? "keep_double" : (numberOfReturns == 3 ? "keep_triple" : (numberOfReturns == 4 ? "keep_quadruple" : "keep_quintuple")))); };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s ", name()); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s ", name()); };
     public boolean filter(LASpoint point) { return (point.getNumber_of_returns() != numberOfReturns); };
     LAScriterionKeepSpecificNumberOfReturns(int numberOfReturns) { this.numberOfReturns = numberOfReturns; };
     private int numberOfReturns; // unsigned
@@ -465,7 +465,7 @@ class LAScriterionDropSpecificNumberOfReturns extends LAScriterion
 {
     @Override
     public String name() { return (numberOfReturns == 1 ? "drop_single" : (numberOfReturns == 2 ? "drop_double" : (numberOfReturns == 3 ? "drop_triple" : (numberOfReturns == 4 ? "drop_quadruple" : "drop_quintuple")))); };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s ", name()); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s ", name()); };
     public boolean filter(LASpoint point) { return (point.getNumber_of_returns() == numberOfReturns); };
     LAScriterionDropSpecificNumberOfReturns(int numberOfReturns) { this.numberOfReturns = numberOfReturns; };
     private int numberOfReturns; // unsigned
@@ -475,7 +475,7 @@ class LAScriterionDropScanDirection extends LAScriterion
 {
     
     public String name() { return "drop_scan_direction"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), scan_direction); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), scan_direction); };
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_FLAGS; };
     public boolean filter(LASpoint point) { return (scan_direction == point.getScan_direction_flag()); };
     LAScriterionDropScanDirection(int scan_direction) { this.scan_direction = scan_direction; };
@@ -485,7 +485,7 @@ class LAScriterionDropScanDirection extends LAScriterion
 class LAScriterionKeepScanDirectionChange extends LAScriterion
 {
     public String name() { return "keep_scan_direction_change"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s ", name()); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s ", name()); };
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_FLAGS; };
     public boolean filter(LASpoint point) { if (scan_direction_flag == point.getScan_direction_flag()) return TRUE; int s = scan_direction_flag; scan_direction_flag = point.getScan_direction_flag(); return s == -1; };
     @Override
@@ -498,7 +498,7 @@ class LAScriterionKeepScanDirectionChange extends LAScriterion
 class LAScriterionKeepEdgeOfFlightLine extends LAScriterion
 {
     public String name() { return "keep_edge_of_flight_line"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s ", name()); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s ", name()); };
     public boolean filter(LASpoint point) { return (point.getEdge_of_flight_line() == 0); };
 }
 
@@ -506,7 +506,7 @@ class LAScriterionKeepRGB extends LAScriterion
 {
     @Override
     public String name() { return "keep_RGB"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s_%s %d %d ", name(), (channel == 0 ? "red" : (channel == 1 ? "green" : (channel == 2 ? "blue" : "nir"))),  below_RGB, above_RGB); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s_%s %d %d ", name(), (channel == 0 ? "red" : (channel == 1 ? "green" : (channel == 2 ? "blue" : "nir"))),  below_RGB, above_RGB); };
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_RGB; };
     public boolean filter(LASpoint point) { return ((point.getRgb(channel) < below_RGB) || (above_RGB < point.getRgb(channel))); };
     LAScriterionKeepRGB(int below_RGB, int above_RGB, int channel) { if (above_RGB < below_RGB) { this.below_RGB = above_RGB; this.above_RGB = below_RGB; } else { this.below_RGB = below_RGB; this.above_RGB = above_RGB; }; this.channel = channel; };
@@ -517,7 +517,7 @@ class LAScriterionKeepRGB extends LAScriterion
 class LAScriterionKeepScanAngle extends LAScriterion
 {
     public String name() { return "keep_scan_angle"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %d %d ", name(), below_scan, above_scan); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %d %d ", name(), below_scan, above_scan); };
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_SCAN_ANGLE; };
     public boolean filter(LASpoint point) { return (point.getScan_angle_rank() < below_scan) || (above_scan < point.getScan_angle_rank()); };
     LAScriterionKeepScanAngle(int below_scan, int above_scan) { if (above_scan < below_scan) { this.below_scan = above_scan; this.above_scan = below_scan; } else { this.below_scan = below_scan; this.above_scan = above_scan; } };
@@ -528,7 +528,7 @@ class LAScriterionKeepScanAngle extends LAScriterion
 class LAScriterionDropScanAngleBelow extends LAScriterion
 {
     public String name() { return "drop_scan_angle_below"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), below_scan); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), below_scan); };
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_SCAN_ANGLE; };
     public boolean filter(LASpoint point) { return (point.getScan_angle_rank() < below_scan); };
     @Override
@@ -539,7 +539,7 @@ class LAScriterionDropScanAngleBelow extends LAScriterion
 class LAScriterionDropScanAngleAbove extends LAScriterion
 {
     public String name() { return "drop_scan_angle_above"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), above_scan); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), above_scan); };
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_SCAN_ANGLE; };
     @Override
     public boolean filter(LASpoint point) { return (point.getScan_angle_rank() > above_scan); };
@@ -550,7 +550,7 @@ class LAScriterionDropScanAngleAbove extends LAScriterion
 class LAScriterionDropScanAngleBetween extends LAScriterion
 {
     public String name() { return "drop_scan_angle_between"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %d %d ", name(), below_scan, above_scan); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %d %d ", name(), below_scan, above_scan); };
     @Override
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_SCAN_ANGLE; };
     public boolean filter(LASpoint point) { return (below_scan <= point.getScan_angle_rank()) && (point.getScan_angle_rank() <= above_scan); };
@@ -562,7 +562,7 @@ class LAScriterionKeepIntensity extends LAScriterion
 {
     @Override
     public String name() { return "keep_intensity"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %d %d ", name(), below_intensity, above_intensity); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %d %d ", name(), below_intensity, above_intensity); };
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_INTENSITY; };
     public boolean filter(LASpoint point) { return (point.getIntensity() < below_intensity) || (point.getIntensity() > above_intensity); };
     LAScriterionKeepIntensity(int below_intensity, int above_intensity) { this.below_intensity = below_intensity; this.above_intensity = above_intensity; };
@@ -573,7 +573,7 @@ class LAScriterionKeepIntensityBelow extends LAScriterion
 {
     public String name() { return "keep_intensity_below"; };
     @Override
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), below_intensity); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), below_intensity); };
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_INTENSITY; };
     public boolean filter(LASpoint point) { return (point.getIntensity() >= below_intensity); };
     LAScriterionKeepIntensityBelow(int below_intensity) { this.below_intensity = below_intensity; };
@@ -584,7 +584,7 @@ class LAScriterionKeepIntensityAbove extends LAScriterion
 {
     @Override
     public String name() { return "keep_intensity_above"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), above_intensity); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), above_intensity); };
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_INTENSITY; };
     public boolean filter(LASpoint point) { return (point.getIntensity() <= above_intensity); };
     LAScriterionKeepIntensityAbove(int above_intensity) { this.above_intensity = above_intensity; };
@@ -595,7 +595,7 @@ class LAScriterionDropIntensityBelow extends LAScriterion
 {
     @Override
     public String name() { return "drop_intensity_below"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), below_intensity); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), below_intensity); };
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_INTENSITY; };
     public boolean filter(LASpoint point) { return (point.getIntensity() < below_intensity); };
     LAScriterionDropIntensityBelow(int below_intensity) { this.below_intensity = below_intensity; };
@@ -606,7 +606,7 @@ class LAScriterionDropIntensityAbove extends LAScriterion
 {
     @Override
     public String name() { return "drop_intensity_above"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), above_intensity); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), above_intensity); };
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_INTENSITY; };
     public boolean filter(LASpoint point) { return (point.getIntensity() > above_intensity); };
     LAScriterionDropIntensityAbove(int above_intensity) { this.above_intensity = above_intensity; };
@@ -617,7 +617,7 @@ class LAScriterionDropIntensityBetween extends LAScriterion
 {
     @Override
     public String name() { return "drop_intensity_between"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %d %d ", name(), below_intensity, above_intensity); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %d %d ", name(), below_intensity, above_intensity); };
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_INTENSITY; };
     @Override
     public boolean filter(LASpoint point) { return (below_intensity <= point.getIntensity()) && (point.getIntensity() <= above_intensity); };
@@ -629,7 +629,7 @@ class LAScriterionDropClassifications extends LAScriterion
 {
     @Override
     public String name() { return "drop_classification_mask"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), drop_classification_mask); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), drop_classification_mask); };
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_CLASSIFICATION; };
     public boolean filter(LASpoint point) { return ((1 << point.getClassification()) & drop_classification_mask) != 0; };
     LAScriterionDropClassifications(int drop_classification_mask) { this.drop_classification_mask = drop_classification_mask; };
@@ -640,7 +640,7 @@ class LAScriterionDropSynthetic extends LAScriterion
 {
     @Override
     public String name() { return "drop_synthetic"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s ", name()); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s ", name()); };
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_FLAGS; };
     public boolean filter(LASpoint point) { return (point.get_synthetic_flag() == 1); };
 };
@@ -649,7 +649,7 @@ class LAScriterionKeepSynthetic extends LAScriterion
 {
     @Override
     public String name() { return "keep_synthetic"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s ", name()); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s ", name()); };
     @Override
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_FLAGS; };
     public boolean filter(LASpoint point) { return (point.get_synthetic_flag() == 0); };
@@ -658,7 +658,7 @@ class LAScriterionKeepSynthetic extends LAScriterion
 class LAScriterionDropKeypoint extends LAScriterion
 {
     public String name() { return "drop_keypoint"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s ", name()); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s ", name()); };
     @Override
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_FLAGS; };
     public boolean filter(LASpoint point) { return (point.get_keypoint_flag() == 1); };
@@ -668,7 +668,7 @@ class LAScriterionKeepKeypoint extends LAScriterion
 {
     @Override
     public String name() { return "keep_keypoint"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s ", name()); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s ", name()); };
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_FLAGS; };
     public boolean filter(LASpoint point) { return (point.get_keypoint_flag() == 0); };
 };
@@ -677,7 +677,7 @@ class LAScriterionDropWithheld extends LAScriterion
 {
     @Override
     public String name() { return "drop_withheld"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s ", name()); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s ", name()); };
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_FLAGS; };
     public boolean filter(LASpoint point) { return (point.get_withheld_flag() == 1); };
 };
@@ -686,7 +686,7 @@ class LAScriterionKeepWithheld extends LAScriterion
 {
     @Override
     public String name() { return "keep_withheld"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s ", name()); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s ", name()); };
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_FLAGS; };
     public boolean filter(LASpoint point) { return (point.get_withheld_flag() == 0); };
 };
@@ -694,7 +694,7 @@ class LAScriterionKeepWithheld extends LAScriterion
 class LAScriterionDropOverlap extends LAScriterion
 {
     public String name() { return "drop_overlap"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s ", name()); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s ", name()); };
     @Override
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_FLAGS; };
     public boolean filter(LASpoint point) { return (point.get_extended_overlap_flag() == 1); };
@@ -703,7 +703,7 @@ class LAScriterionDropOverlap extends LAScriterion
 class LAScriterionKeepOverlap extends LAScriterion
 {
     public String name() { return "keep_overlap"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s ", name()); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s ", name()); };
     @Override
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_FLAGS; };
     public boolean filter(LASpoint point) { return (point.get_extended_overlap_flag() == 0); };
@@ -712,7 +712,7 @@ class LAScriterionKeepOverlap extends LAScriterion
 class LAScriterionKeepUserData extends LAScriterion
 {
     public String name() { return "keep_user_data"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), user_data); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), user_data); };
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_USER_DATA; };
     @Override
     public boolean filter(LASpoint point) { return (point.getUser_data() != user_data); };
@@ -723,7 +723,7 @@ class LAScriterionKeepUserData extends LAScriterion
 class LAScriterionKeepUserDataBelow extends LAScriterion
 {
     public String name() { return "keep_user_data_below"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), below_user_data); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), below_user_data); };
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_USER_DATA; };
     @Override
     public boolean filter(LASpoint point) { return (point.getUser_data() >= below_user_data); };
@@ -734,7 +734,7 @@ class LAScriterionKeepUserDataBelow extends LAScriterion
 class LAScriterionKeepUserDataAbove extends LAScriterion
 {
     public String name() { return "keep_user_data_above"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), above_user_data); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), above_user_data); };
     @Override
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_USER_DATA; };
     public boolean filter(LASpoint point) { return (point.getUser_data() <= above_user_data); };
@@ -746,7 +746,7 @@ class LAScriterionKeepUserDataBetween extends LAScriterion
 {
     @Override
     public String name() { return "keep_user_data_between"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %d %d ", name(), below_user_data, above_user_data); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %d %d ", name(), below_user_data, above_user_data); };
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_USER_DATA; };
     public boolean filter(LASpoint point) { return (point.getUser_data() < below_user_data) || (above_user_data < point.getUser_data()); };
     LAScriterionKeepUserDataBetween(byte below_user_data, byte above_user_data) { this.below_user_data = below_user_data; this.above_user_data = above_user_data; };
@@ -757,7 +757,7 @@ class LAScriterionDropUserData extends LAScriterion
 {
     @Override
     public String name() { return "drop_user_data"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), user_data); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), user_data); };
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_USER_DATA; };
     public boolean filter(LASpoint point) { return (point.getUser_data() == user_data); };
     LAScriterionDropUserData(byte user_data) { this.user_data = user_data; };
@@ -768,7 +768,7 @@ class LAScriterionDropUserDataBelow extends LAScriterion
 {
     @Override
     public String name() { return "drop_user_data_below"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), below_user_data); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), below_user_data); };
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_USER_DATA; };
     public boolean filter(LASpoint point) { return (point.getUser_data() < below_user_data) ; };
     LAScriterionDropUserDataBelow(byte below_user_data) { this.below_user_data = below_user_data; };
@@ -779,7 +779,7 @@ class LAScriterionDropUserDataAbove extends LAScriterion
 {
     @Override
     public String name() { return "drop_user_data_above"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), above_user_data); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), above_user_data); };
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_USER_DATA; };
     public boolean filter(LASpoint point) { return (point.getUser_data() > above_user_data); };
     LAScriterionDropUserDataAbove(byte above_user_data) { this.above_user_data = above_user_data; };
@@ -790,7 +790,7 @@ class LAScriterionDropUserDataBetween extends LAScriterion
 {
     @Override
     public String name() { return "drop_user_data_between"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %d %d ", name(), below_user_data, above_user_data); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %d %d ", name(), below_user_data, above_user_data); };
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_USER_DATA; };
     public boolean filter(LASpoint point) { return (below_user_data <= point.getUser_data()) && (point.getUser_data() <= above_user_data); };
     LAScriterionDropUserDataBetween(byte below_user_data, byte above_user_data) { this.below_user_data = below_user_data; this.above_user_data = above_user_data; };
@@ -800,7 +800,7 @@ class LAScriterionDropUserDataBetween extends LAScriterion
 class LAScriterionKeepPointSource extends LAScriterion
 {
     public String name() { return "keep_point_source"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), point_source_id); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), point_source_id); };
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_POINT_SOURCE; };
     public boolean filter(LASpoint point) { return (point.getPoint_source_ID() != point_source_id); };
     @Override
@@ -811,7 +811,7 @@ class LAScriterionKeepPointSource extends LAScriterion
 class LAScriterionKeepPointSourceBetween extends LAScriterion
 {
     public String name() { return "keep_point_source_between"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %d %d ", name(), below_point_source_id, above_point_source_id); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %d %d ", name(), below_point_source_id, above_point_source_id); };
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_POINT_SOURCE; };
     @Override
     public boolean filter(LASpoint point) { return (point.getPoint_source_ID() < below_point_source_id) || (above_point_source_id < point.getPoint_source_ID()); };
@@ -822,7 +822,7 @@ class LAScriterionKeepPointSourceBetween extends LAScriterion
 class LAScriterionDropPointSource extends LAScriterion
 {
     public String name() { return "drop_point_source"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), point_source_id); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), point_source_id); };
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_POINT_SOURCE; };
     @Override
     public boolean filter(LASpoint point) { return (point.getPoint_source_ID() == point_source_id) ; };
@@ -833,7 +833,7 @@ class LAScriterionDropPointSource extends LAScriterion
 class LAScriterionDropPointSourceBelow extends LAScriterion
 {
     public String name() { return "drop_point_source_below"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), below_point_source_id); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), below_point_source_id); };
     @Override
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_POINT_SOURCE; };
     public boolean filter(LASpoint point) { return (point.getPoint_source_ID() < below_point_source_id) ; };
@@ -845,7 +845,7 @@ class LAScriterionDropPointSourceAbove extends LAScriterion
 {
     public String name() { return "drop_point_source_above"; };
     @Override
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), above_point_source_id); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), above_point_source_id); };
     public boolean filter(LASpoint point) { return (point.getPoint_source_ID() > above_point_source_id); };
     LAScriterionDropPointSourceAbove(char above_point_source_id) { this.above_point_source_id = above_point_source_id; };
     private char above_point_source_id;
@@ -855,7 +855,7 @@ class LAScriterionDropPointSourceBetween extends LAScriterion
 {
     public String name() { return "drop_point_source_between"; };
     @Override
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %d %d ", name(), below_point_source_id, above_point_source_id); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %d %d ", name(), below_point_source_id, above_point_source_id); };
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_POINT_SOURCE; };
     public boolean filter(LASpoint point) { return (below_point_source_id <= point.getPoint_source_ID()) && (point.getPoint_source_ID() <= above_point_source_id); };
     LAScriterionDropPointSourceBetween(char below_point_source_id, char above_point_source_id) { this.below_point_source_id = below_point_source_id; this.above_point_source_id = above_point_source_id; };
@@ -866,7 +866,7 @@ class LAScriterionKeepGpsTime extends LAScriterion
 {
     @Override
     public String name() { return "keep_gps_time"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %.6f %.6f ", name(), below_gpstime, above_gpstime); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %.6f %.6f ", name(), below_gpstime, above_gpstime); };
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_GPS_TIME; };
     public boolean filter(LASpoint point) { return (point.haveGpsTime() && ((point.getGps_time() < below_gpstime) || (point.getGps_time() > above_gpstime))); };
     LAScriterionKeepGpsTime(double below_gpstime, double above_gpstime) { this.below_gpstime = below_gpstime; this.above_gpstime = above_gpstime; };
@@ -876,7 +876,7 @@ class LAScriterionKeepGpsTime extends LAScriterion
 class LAScriterionDropGpsTimeBelow extends LAScriterion
 {
     public String name() { return "drop_gps_time_below"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %.6f ", name(), below_gpstime); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %.6f ", name(), below_gpstime); };
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_GPS_TIME; };
     public boolean filter(LASpoint point) { return (point.haveGpsTime() && (point.getGps_time() < below_gpstime)); };
     LAScriterionDropGpsTimeBelow(double below_gpstime) { this.below_gpstime = below_gpstime; };
@@ -886,7 +886,7 @@ class LAScriterionDropGpsTimeBelow extends LAScriterion
 class LAScriterionDropGpsTimeAbove extends LAScriterion
 {
     public String name() { return "drop_gps_time_above"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %.6f ", name(), above_gpstime); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %.6f ", name(), above_gpstime); };
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_GPS_TIME; };
     public boolean filter(LASpoint point) { return (point.haveGpsTime() && (point.getGps_time() > above_gpstime)); };
     LAScriterionDropGpsTimeAbove(double above_gpstime) { this.above_gpstime = above_gpstime; };
@@ -896,7 +896,7 @@ class LAScriterionDropGpsTimeAbove extends LAScriterion
 class LAScriterionDropGpsTimeBetween extends LAScriterion
 {
     public String name() { return "drop_gps_time_between"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %.6f %.6f ", name(), below_gpstime, above_gpstime); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %.6f %.6f ", name(), below_gpstime, above_gpstime); };
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_GPS_TIME; };
     public boolean filter(LASpoint point) { return (point.haveGpsTime() && ((below_gpstime <= point.getGps_time()) && (point.getGps_time() <= above_gpstime))); };
     LAScriterionDropGpsTimeBetween(double below_gpstime, double above_gpstime) { this.below_gpstime = below_gpstime; this.above_gpstime = above_gpstime; };
@@ -906,7 +906,7 @@ class LAScriterionDropGpsTimeBetween extends LAScriterion
 class LAScriterionKeepWavepacket extends LAScriterion
 {
     public String name() { return "keep_wavepacket"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), keep_wavepacket); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), keep_wavepacket); };
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_WAVEPACKET; };
     public boolean filter(LASpoint point) { return (point.getWavepacketDescriptorIndex() != keep_wavepacket); };
     LAScriterionKeepWavepacket(int keep_wavepacket) { this.keep_wavepacket = keep_wavepacket; };
@@ -916,7 +916,7 @@ class LAScriterionKeepWavepacket extends LAScriterion
 class LAScriterionDropWavepacket extends LAScriterion
 {
     public String name() { return "drop_wavepacket"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), drop_wavepacket); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), drop_wavepacket); };
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_WAVEPACKET; };
     public boolean filter(LASpoint point) { return (point.getWavepacketDescriptorIndex() == drop_wavepacket); };
     LAScriterionDropWavepacket(int drop_wavepacket) { this.drop_wavepacket = drop_wavepacket; };
@@ -926,7 +926,7 @@ class LAScriterionDropWavepacket extends LAScriterion
 class LAScriterionKeepEveryNth extends LAScriterion
 {
     public String name() { return "keep_every_nth"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), every); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), every); };
     public boolean filter(LASpoint point) { if (counter == every) { counter = 1; return FALSE; } else { counter++; return TRUE; } };
     LAScriterionKeepEveryNth(int every) { this.every = every; counter = 1; };
     int counter;
@@ -936,7 +936,7 @@ class LAScriterionKeepEveryNth extends LAScriterion
 class LAScriterionKeepRandomFraction extends LAScriterion
 {
     public String name() { return "keep_random_fraction"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %g ", name(), fraction); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %g ", name(), fraction); };
     public boolean filter(LASpoint point)
     {
         srand(seed);
@@ -953,7 +953,7 @@ class LAScriterionKeepRandomFraction extends LAScriterion
 class LAScriterionThinWithGrid extends LAScriterion
 {
     public String name() { return "thin_with_grid"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %g ", name(), (grid_spacing > 0 ? grid_spacing : -grid_spacing)); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %g ", name(), (grid_spacing > 0 ? grid_spacing : -grid_spacing)); };
     public boolean filter(LASpoint point)
     {
         return FALSE;
@@ -1153,7 +1153,7 @@ class LAScriterionThinWithGrid extends LAScriterion
 class LAScriterionThinWithTime extends LAScriterion
 {
     public String name() { return "thin_with_time"; };
-    public int get_command(StringBuilder string) { return sprintf(string, "-%s %g ", name(), (time_spacing > 0 ? time_spacing : -time_spacing)); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %g ", name(), (time_spacing > 0 ? time_spacing : -time_spacing)); };
     public boolean filter(LASpoint point)
     {
         long pos_t = I64_FLOOR(point.get_gps_time() / time_spacing);
