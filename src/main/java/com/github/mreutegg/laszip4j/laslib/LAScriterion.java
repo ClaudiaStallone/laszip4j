@@ -114,7 +114,7 @@ class LAScriterionDropxyz extends LAScriterion
 class LAScriterionKeepxy extends LAScriterion
 {
     public String name() { return "keep_xy"; };
-    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %g %g %g %g ", name(), below_x, below_y, above_x, above_y); };
+    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %g %g %g %g ", name(), b_x, b_y, a_x, a_y); };
     public boolean filter(LASpoint point) { return (!point.inside_rectangle(below_x, below_y, above_x, above_y)); };
     public LAScriterionKeepxy(double below_x, double below_y, double above_x, double above_y) { this.below_x = below_x; this.below_y = below_y; this.above_x = above_x; this.above_y = above_y; };
     private double below_x, below_y, above_x, above_y;
