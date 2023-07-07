@@ -259,7 +259,7 @@ public class IntegerCompressor {
         return decompress(pred, 0);
     }
 
-    public int decompress(int pred, int u_context) {
+    public int Decompress_(int pred, int u_context) {
         assert(dec != null);
         int real = pred + readCorrector(mBits[u_context]);
         if (real < 0) real += u_corr_range;
