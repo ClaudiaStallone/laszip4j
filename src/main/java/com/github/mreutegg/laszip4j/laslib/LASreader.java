@@ -462,7 +462,7 @@ public abstract class LASreader implements Closeable {
 
     public abstract ByteStreamIn get_stream();
     public void close() { close(true);}
-    public abstract void close(boolean close_stream);
+    private abstract void close(boolean close_stream);
 
     protected abstract boolean read_point_default();
 
