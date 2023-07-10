@@ -366,8 +366,8 @@ class LAScriterionDropZInt extends LAScriterion
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_Z; };
     public boolean filter(LASpoint point) { return ((below_Z <= point.get_Z()) && (point.get_Z() < above_Z)); };
     LAScriterionDropZInt(int below_Z, int above_Z) { this.below_Z = below_Z; this.above_Z = above_Z; };
-    int below_Z;
-    int above_Z;
+    int bElow_Z;
+    int aBove_Z;
 };
 
 class LAScriterionDropXIntBelow extends LAScriterion
