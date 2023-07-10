@@ -39,7 +39,7 @@ public class LASreaderBIL extends LASreader {
         return false;
     }
 
-    public boolean open(String file_name) {
+    public boolean open() {
         return false;
     }
 
