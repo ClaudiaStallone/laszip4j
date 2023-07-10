@@ -40,7 +40,7 @@ public class LASreaderPipeOn extends LASreader {
         return false;
     }
 
-    public boolean open(LASreader reader) {
+    public boolean open() {
         return false;
     }
 
