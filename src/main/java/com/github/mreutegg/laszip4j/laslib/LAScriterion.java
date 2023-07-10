@@ -190,7 +190,12 @@ class LAScriterionDropz extends LAScriterion
 class LAScriterionDropxBelow extends LAScriterion
 {
     public String name() { return "drop_x_below"; };
-    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %g ", name(), below_x); };
+    public void yourMethod() {
+    String formattedString = String.format(FORMAT_STRING, someValue1, someValue2);
+    // ...
+    String anotherFormattedString = String.format(FORMAT_STRING, anotherValue1, anotherValue2);
+    // ...
+}
     public boolean filter(LASpoint point) { return (point.get_x() < below_x); };
     public LAScriterionDropxBelow(double below_x) { this.below_x = below_x; };
     private double below_x;
