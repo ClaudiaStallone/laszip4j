@@ -52,7 +52,7 @@ public final class Cstdio {
         return fopenR(new String(filename), mode);
     }
 
-    public static InputStream fopenR(String filename, String mode) {
+    public static InputStream fopenR(String filename) {
         File f = new File(filename);
         if (f.exists() && !f.delete()) {
             return null;
@@ -62,11 +62,12 @@ public final class Cstdio {
                 return new FileInputStream(filename);
             }
         } catch (IOException ignore) {
+            return null;
         }
         return null;
     }
 
-    public static OutputStream fopen(String filename, String mode) {
+    public static OutputStream fopen(String filename) {
         File f = new File(filename);
         if (f.exists() && !f.delete()) {
             return null;
@@ -104,7 +105,7 @@ public final class Cstdio {
         }
     }
 
-    public static long ftell(PrintStream file) {
+    public static long ftell() {
         return -1;
     }
 
