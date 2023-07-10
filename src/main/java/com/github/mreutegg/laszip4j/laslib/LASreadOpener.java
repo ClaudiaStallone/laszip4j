@@ -47,8 +47,18 @@ import static java.lang.Boolean.TRUE;
 
 public class LASreadOpener {
 
+import java.util.logging.Logger;
+
+public class YourClass {
+    private static final Logger logger = Logger.getLogger(YourClass.class.getName());
+
     private static final PrintStream stderr = System.err;
 
+    public static void main(String[] args) {
+        logger.warning("This is a warning message"); 
+        stderr.println("This is an error message"); 
+    }
+}
     private int io_ibuffer_size;
     private final List<String> file_names = new ArrayList<>();
     private String file_name;
