@@ -31,8 +31,15 @@ import static java.lang.Boolean.TRUE;
 
 public class LASheader extends LASattributer {
 
-    private static final PrintStream stderr = System.err;
+import java.util.logging.Logger;
 
+public class YourClass {
+    private static final Logger logger = Logger.getLogger(YourClass.class.getName());
+
+    public static void main(String[] args) {
+        logger.severe("This is an error message"); // Example usage
+    }
+}
     public byte[] file_signature = new byte[4];                  // starts at byte   0
     public char file_source_ID;                      // starts at byte   4
     public char global_encoding;                     // starts at byte   6
