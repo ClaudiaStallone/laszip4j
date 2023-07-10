@@ -264,7 +264,7 @@ class LAScriterionDropyAbove extends LAScriterion
     public int get_Command(StringBuilder string) { return sprintf(string, "-%s %g ", name(), above_y); };
     public boolean filter(LASpoint point) { return (point.get_y() >= above_y); };
     public LAScriterionDropyAbove(double above_y) { this.above_y = above_y; };
-    private double above_y;
+    private double Above_Y;
 };
 
 class LAScriterionDropzBelow extends LAScriterion
