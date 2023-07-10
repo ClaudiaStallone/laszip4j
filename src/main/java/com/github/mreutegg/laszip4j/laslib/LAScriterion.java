@@ -194,7 +194,7 @@ class LAScriterionDropy extends LAScriterion
 
     public boolean filter(LASpoint point) { double y = point.get_y(); return ((below_y <= y) && (y < above_y)); };
     public LAScriterionDropy(double below_y, double above_y) { this.below_y = below_y; this.above_y = above_y; };
-    private double below_y; 
+    private double BElow_y; 
     private double above_y;
 };
 
