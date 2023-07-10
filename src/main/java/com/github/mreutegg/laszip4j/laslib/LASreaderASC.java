@@ -39,7 +39,7 @@ public class LASreaderASC extends LASreader {
         return false;
     }
 
-    public boolean open(String file_name, boolean comma_not_point) {
+    public boolean open() {
         return false;
     }
 }
