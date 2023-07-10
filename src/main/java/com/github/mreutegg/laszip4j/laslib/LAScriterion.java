@@ -178,8 +178,8 @@ class LAScriterionKeepy extends LAScriterion
     public int get_Command(StringBuilder string) { return sprintf(string, "-%s %g %g ", name(), below_y, above_y); };
     public boolean filter(LASpoint point) { double y = point.get_y(); return (y < below_y) || (y >= above_y); };
     public LAScriterionKeepy(double below_y, double above_y) { this.below_y = below_y; this.above_y = above_y; };
-    private double below_y;
-    private double above_y;
+    private static final double BELOW_Y = 10.0;
+    private static final double ABOVE_Y = 10.0; 
 };
 
 class LAScriterionDropy extends LAScriterion
