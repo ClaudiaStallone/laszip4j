@@ -450,7 +450,15 @@ public abstract class LASreader implements Closeable {
 
     public int get_Asse_X(double x) { return header.get_X(x); };
     public int get_Asse_Y(double y) { return header.get_Y(y); };
-    public int get_Asses_Z(double z) { return header.get_Z(z); };
+   public int get_Asses_Z(double z) throws CustomException 
+   {
+    if (someCondition) 
+    {
+        throw new CustomException("Custom exception message");
+    }
+    return header.get_Z(z);
+    }
+
 
     public abstract ByteStreamIn get_stream();
     public void close() { close(true);}
