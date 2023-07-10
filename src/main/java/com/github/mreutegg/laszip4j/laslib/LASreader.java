@@ -416,7 +416,19 @@ public abstract class LASreader implements Closeable {
         try {
             return this.read_simple.call();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+
+        public class MyCustomException extends Exception {
+        public MyCustomException(String message) {
+        super(message);
+
+        try {} 
+        catch (Exception e) {
+        throw new MyCustomException("An error occurred: " + e.getMessage());
+        }
+
+    }
+}
+
         }
     }
 
