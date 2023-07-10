@@ -77,7 +77,11 @@ class LAScriterionKeepTile extends LAScriterion
     public int get_Command(StringBuilder string) { return sprintf(string, "-%s %g %g %g ", name(), ll_x, ll_y, tile_size); };
     public boolean filter(LASpoint point) { return (!point.inside_tile(ll_x, ll_y, ur_x, ur_y)); };
     public LAScriterionKeepTile(float ll_x, float ll_y, float tile_size) { this.ll_x = ll_x; this.ll_y = ll_y; this.ur_x = ll_x+tile_size; this.ur_y = ll_y+tile_size; this.tile_size = tile_size; };
-    private float ll_x, ll_y, ur_x, ur_y, tile_size;
+    private float ll_x; 
+    private float ll_y; 
+    private float ur_x; 
+    private float ur_y; 
+    private float tile_size;
 };
 
 class LAScriterionKeepCircle extends LAScriterion
@@ -86,7 +90,10 @@ class LAScriterionKeepCircle extends LAScriterion
     public int get_Command(StringBuilder string) { return sprintf(string, "-%s %g %g %g ", name(), center_x, center_y, radius); };
     public boolean filter(LASpoint point) { return (!point.inside_circle(center_x, center_y, radius_squared)); };
     public LAScriterionKeepCircle(double x, double y, double radius) { this.center_x = x; this.center_y = y; this.radius = radius; this.radius_squared = radius*radius; };
-    private double center_x, center_y, radius, radius_squared;
+    private double center_x;
+    private float center_y;
+    private float radius;
+    private float radius_squared;
 };
 
 class LAScriterionKeepxyz extends LAScriterion
@@ -108,7 +115,13 @@ class LAScriterionDropxyz extends LAScriterion
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY | LASZIP_DECOMPRESS_SELECTIVE_Z; };
     public boolean filter(LASpoint point) { return (point.inside_box(min_x, min_y, min_z, max_x, max_y, max_z)); };
     public LAScriterionDropxyz(double min_x, double min_y, double min_z, double max_x, double max_y, double max_z) { this.min_x = min_x; this.min_y = min_y; this.min_z = min_z; this.max_x = max_x; this.max_y = max_y; this.max_z = max_z; };
-    private double min_x, min_y, min_z, max_x, max_y, max_z;
+    private double min_x;
+    private double min_y;
+    private double min_z;
+    private double max_x;
+    private double max_y;
+    private double max_z;
+
 };
 
 class LAScriterionKeepxy extends LAScriterion
@@ -117,16 +130,26 @@ class LAScriterionKeepxy extends LAScriterion
     public int get_Command(StringBuilder string) { return sprintf(string, "-%s %g %g %g %g ", name(), b_x, b_y, a_x, a_y); };
     public boolean filter(LASpoint point) { return (!point.inside_rectangle(below_x, below_y, above_x, above_y)); };
     public LAScriterionKeepxy(double below_x, double below_y, double above_x, double above_y) { this.below_x = below_x; this.below_y = below_y; this.above_x = above_x; this.above_y = above_y; };
-    private double below_x, below_y, above_x, above_y;
+    private double below_x;
+    private double below_y;
+    private double above_x;
+    private double above_y;
 };
 
 class LAScriterionDropxy extends LAScriterion
 {
     public String name() { return "drop_xy"; };
-    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %g %g %g %g ", name(), below_x, below_y, above_x, above_y); };
+public static final String COMMAND_FORMAT = "-%s %g %g %g %g";
+
+public int getCommand(StringBuilder string) {
+    return sprintf(string, COMMAND_FORMAT, name(), below_x, below_y, above_x, above_y);
+}
     public boolean filter(LASpoint point) { return (point.inside_rectangle(below_x, below_y, above_x, above_y)); };
     public LAScriterionDropxy(double below_x, double below_y, double above_x, double above_y) { this.below_x = below_x; this.below_y = below_y; this.above_x = above_x; this.above_y = above_y; };
-    private double below_x, below_y, above_x, above_y;
+    private double below_x;
+    private double below_y;
+    private double above_x;
+    private double above_y;
 };
 
 class LAScriterionKeepx extends LAScriterion
@@ -135,7 +158,8 @@ class LAScriterionKeepx extends LAScriterion
     public int get_Command(StringBuilder string) { return sprintf(string, "-%s %g %g ", name(), below_x, above_x); };
     public boolean filter(LASpoint point) { double x = point.get_x(); return (x < below_x) || (x >= above_x); };
     public LAScriterionKeepx(double below_x, double above_x) { this.below_x = below_x; this.above_x = above_x; };
-    private double below_x, above_x;
+    private double below_x; 
+    private double above_x;
 };
 
 class LAScriterionDropx extends LAScriterion
@@ -144,7 +168,8 @@ class LAScriterionDropx extends LAScriterion
     public int get_Command(StringBuilder string) { return sprintf(string, "-%s %g %g ", name(), below_x, above_x); };
     public boolean filter(LASpoint point) { double x = point.get_x(); return ((below_x <= x) && (x < above_x)); };
     public LAScriterionDropx(double below_x, double above_x) { this.below_x = below_x; this.above_x = above_x; };
-    private double below_x, above_x;
+    private double below_x; 
+    private double above_x;
 };
 
 class LAScriterionKeepy extends LAScriterion
@@ -153,7 +178,8 @@ class LAScriterionKeepy extends LAScriterion
     public int get_Command(StringBuilder string) { return sprintf(string, "-%s %g %g ", name(), below_y, above_y); };
     public boolean filter(LASpoint point) { double y = point.get_y(); return (y < below_y) || (y >= above_y); };
     public LAScriterionKeepy(double below_y, double above_y) { this.below_y = below_y; this.above_y = above_y; };
-    private double below_y, above_y;
+    private double below_y;
+    private double above_y;
 };
 
 class LAScriterionDropy extends LAScriterion
@@ -162,7 +188,8 @@ class LAScriterionDropy extends LAScriterion
     public int get_Command(StringBuilder string) { return sprintf(string, "-%s %g %g ", name(), below_y, above_y); };
     public boolean filter(LASpoint point) { double y = point.get_y(); return ((below_y <= y) && (y < above_y)); };
     public LAScriterionDropy(double below_y, double above_y) { this.below_y = below_y; this.above_y = above_y; };
-    private double below_y, above_y;
+    private double below_y; 
+    private double above_y;
 };
 
 class LAScriterionKeepz extends LAScriterion
@@ -173,7 +200,8 @@ class LAScriterionKeepz extends LAScriterion
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_Z; };
     public boolean filter(LASpoint point) { double z = point.get_z(); return (z < below_z) || (z >= above_z); };
     LAScriterionKeepz(double below_z, double above_z) { this.below_z = below_z; this.above_z = above_z; };
-    double below_z, above_z;
+    double below_z;
+    private float above_z;
 };
 
 class LAScriterionDropz extends LAScriterion
@@ -184,7 +212,8 @@ class LAScriterionDropz extends LAScriterion
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_Z; };
     public boolean filter(LASpoint point) { double z = point.get_z(); return ((below_z <= z) && (z < above_z)); };
     public LAScriterionDropz(double below_z, double above_z) { this.below_z = below_z; this.above_z = above_z; };
-    public double below_z, above_z;
+    public double below_z;
+    private float above_z;
 };
 
 class LAScriterionDropxBelow extends LAScriterion
@@ -255,7 +284,10 @@ class LAScriterionKeepXYInt extends LAScriterion
     public int get_Command(StringBuilder string) { return sprintf(string, "-%s %d %d %d %d ", name(), below_X, below_Y, above_X, above_Y); };
     public boolean filter(LASpoint point) { return (point.get_X() < below_X) || (point.get_Y() < below_Y) || (point.get_X() >= above_X) || (point.get_Y() >= above_Y); };
     LAScriterionKeepXYInt(int below_X, int below_Y, int above_X, int above_Y) { this.below_X = below_X; this.below_Y = below_Y; this.above_X = above_X; this.above_Y = above_Y; };
-    int below_X, below_Y, above_X, above_Y;
+    int below_X;
+    int below_Y;
+    int above_X;
+    int above_Y;
 };
 
 class LAScriterionKeepXInt extends LAScriterion
@@ -265,7 +297,8 @@ class LAScriterionKeepXInt extends LAScriterion
     public int get_Command(StringBuilder string) { return sprintf(string, "-%s %d %d ", name(), below_X, above_X); };
     public boolean filter(LASpoint point) { return (point.get_X() < below_X) || (above_X <= point.get_X()); };
     LAScriterionKeepXInt(int below_X, int above_X) { this.below_X = below_X; this.above_X = above_X; };
-    int below_X, above_X;
+    int below_X; 
+    int above_X;
 };
 
 class LAScriterionDropXInt extends LAScriterion
@@ -284,7 +317,8 @@ class LAScriterionKeepYInt extends LAScriterion
     public int get_Command(StringBuilder string) { return sprintf(string, "-%s %d %d ", name(), below_Y, above_Y); };
     public boolean filter(LASpoint point) { return (point.get_Y() < below_Y) || (above_Y <= point.get_Y()); };
     LAScriterionKeepYInt(int below_Y, int above_Y) { this.below_Y = below_Y; this.above_Y = above_Y; };
-    int below_Y, above_Y;
+    int below_Y; 
+    int above_Y;
 };
 
 class LAScriterionDropYInt extends LAScriterion
@@ -306,7 +340,8 @@ class LAScriterionKeepZInt extends LAScriterion
     @Override
     public boolean filter(LASpoint point) { return (point.get_Z() < below_Z) || (above_Z <= point.get_Z()); };
     LAScriterionKeepZInt(int below_Z, int above_Z) { this.below_Z = below_Z; this.above_Z = above_Z; };
-    int below_Z, above_Z;
+    int below_Z; 
+    int above_Z;
 };
 
 class LAScriterionDropZInt extends LAScriterion
