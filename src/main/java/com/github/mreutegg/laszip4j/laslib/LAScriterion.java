@@ -625,7 +625,7 @@ class LAScriterionKeepScanAngle extends LAScriterion
     public boolean filter(LASpoint point) { return (point.getScan_angle_rank() < below_scan) || (above_scan < point.getScan_angle_rank()); };
     LAScriterionKeepScanAngle(int below_scan, int above_scan) { if (above_scan < below_scan) { this.below_scan = above_scan; this.above_scan = below_scan; } else { this.below_scan = below_scan; this.above_scan = above_scan; } };
     @Override
-    private int below_scan, above_scan;
+    private int below_scan, abOve_Scan;
 };
 
 class LAScriterionDropScanAngleBelow extends LAScriterion
