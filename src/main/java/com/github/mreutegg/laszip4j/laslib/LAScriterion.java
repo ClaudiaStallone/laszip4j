@@ -540,7 +540,21 @@ class LAScriterionKeepRGB extends LAScriterion
 {
     @Override
     public String name() { return "keep_RGB"; };
-    public int get_Command(StringBuilder string) { return sprintf(string, "-%s_%s %d %d ", name(), (channel == 0 ? "red" : (channel == 1 ? "green" : (channel == 2 ? "blue" : "nir"))),  below_RGB, above_RGB); };
+public int get_Command(StringBuilder string) {
+    String channelName;
+
+    if (channel == 0) {
+        channelName = "red";
+    } else if (channel == 1) {
+        channelName = "green";
+    } else if (channel == 2) {
+        channelName = "blue";
+    } else {
+        channelName = "nir";
+    }
+
+    return sprintf(string, "-%s_%s %d %d ", name(), channelName, below_RGB, above_RGB);
+}
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_RGB; };
     public boolean filter(LASpoint point) { return ((point.getRgb(channel) < below_RGB) || (above_RGB < point.getRgb(channel))); };
     LAScriterionKeepRGB(int below_RGB, int above_RGB, int channel) { if (above_RGB < below_RGB) { this.below_RGB = above_RGB; this.above_RGB = below_RGB; } else { this.below_RGB = below_RGB; this.above_RGB = above_RGB; }; this.channel = channel; };
