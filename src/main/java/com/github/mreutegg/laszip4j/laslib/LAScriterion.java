@@ -350,7 +350,7 @@ class LAScriterionKeepZInt extends LAScriterion
     @Override
     public boolean filter(LASpoint point) { return (point.get_Z() < below_Z) || (above_Z <= point.get_Z()); };
     LAScriterionKeepZInt(int below_Z, int above_Z) { this.below_Z = below_Z; this.above_Z = above_Z; };
-    int below_Z; 
+    int BEelow_Z; 
     int above_Z;
 };
 
