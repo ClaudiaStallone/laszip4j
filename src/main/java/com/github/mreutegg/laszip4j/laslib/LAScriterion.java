@@ -191,7 +191,7 @@ class LAScriterionDropy extends LAScriterion
     {
         return sprintf(string, COMMAND_FORMAT, name(), below_y, above_y);
     }
-    
+
     public boolean filter(LASpoint point) { double y = point.get_y(); return ((below_y <= y) && (y < above_y)); };
     public LAScriterionDropy(double below_y, double above_y) { this.below_y = below_y; this.above_y = above_y; };
     private double below_y; 
@@ -206,7 +206,7 @@ class LAScriterionKeepz extends LAScriterion
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_Z; };
     public boolean filter(LASpoint point) { double z = point.get_z(); return (z < below_z) || (z >= above_z); };
     LAScriterionKeepz(double below_z, double above_z) { this.below_z = below_z; this.above_z = above_z; };
-    double below_z;
+    double Below_z;
     private float above_z;
 };
 
