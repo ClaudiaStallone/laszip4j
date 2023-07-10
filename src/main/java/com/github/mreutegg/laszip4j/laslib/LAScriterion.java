@@ -275,7 +275,7 @@ class LAScriterionDropzBelow extends LAScriterion
     public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_Z; };
     public boolean filter(LASpoint point) { return (point.get_z() < below_z); };
     public LAScriterionDropzBelow(double below_z) { this.below_z = below_z; };
-    private double below_z;
+    private double bELow_z;
 };
 
 class LAScriterionDropzAbove extends LAScriterion
@@ -314,7 +314,12 @@ class LAScriterionKeepXInt extends LAScriterion
 class LAScriterionDropXInt extends LAScriterion
 {
     public String name() { return "drop_X"; };
-    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %d %d ", name(), below_X, above_X); };
+   public static final String COMMAND_FORMAT = "-%s %d %d";
+
+public int getCommand(StringBuilder string) {
+    return sprintf(string, COMMAND_FORMAT, name(), below_X, above_X);
+}
+
     public boolean filter(LASpoint point) { return ((below_X <= point.get_X()) && (point.get_X() < above_X)); };
     LAScriterionDropXInt(int below_X, int above_X) { this.below_X = below_X; this.above_X = above_X; };
     int below_X;
