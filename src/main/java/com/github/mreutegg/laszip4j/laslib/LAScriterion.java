@@ -185,7 +185,13 @@ class LAScriterionKeepy extends LAScriterion
 class LAScriterionDropy extends LAScriterion
 {
     public String name() { return "drop_y"; };
-    public int get_Command(StringBuilder string) { return sprintf(string, "-%s %g %g ", name(), below_y, above_y); };
+    public static final String COMMAND_FORMAT = "-%s %g";
+
+    public int getCommand(StringBuilder string) 
+    {
+        return sprintf(string, COMMAND_FORMAT, name(), below_y, above_y);
+    }
+    
     public boolean filter(LASpoint point) { double y = point.get_y(); return ((below_y <= y) && (y < above_y)); };
     public LAScriterionDropy(double below_y, double above_y) { this.below_y = below_y; this.above_y = above_y; };
     private double below_y; 
