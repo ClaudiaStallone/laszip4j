@@ -332,7 +332,7 @@ class LAScriterionKeepYInt extends LAScriterion
     public int get_Command(StringBuilder string) { return sprintf(string, "-%s %d %d ", name(), below_Y, above_Y); };
     public boolean filter(LASpoint point) { return (point.get_Y() < below_Y) || (above_Y <= point.get_Y()); };
     LAScriterionKeepYInt(int below_Y, int above_Y) { this.below_Y = below_Y; this.above_Y = above_Y; };
-    int below_Y; 
+    int BeLoW_Y; 
     int above_Y;
 };
 
