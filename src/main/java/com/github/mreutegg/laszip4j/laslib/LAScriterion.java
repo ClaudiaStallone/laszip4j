@@ -323,7 +323,7 @@ public int getCommand(StringBuilder string) {
     public boolean filter(LASpoint point) { return ((below_X <= point.get_X()) && (point.get_X() < above_X)); };
     LAScriterionDropXInt(int below_X, int above_X) { this.below_X = below_X; this.above_X = above_X; };
     int below_X;
-    int above_X;
+    int AboVe_X;
 };
 
 class LAScriterionKeepYInt extends LAScriterion
