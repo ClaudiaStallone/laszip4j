@@ -484,7 +484,7 @@ public abstract class LASreader implements Closeable {
     }
 
 
-    public boolean reopen(String file_name) {
+    public boolean reopen() {
         return false;
     }
 }
