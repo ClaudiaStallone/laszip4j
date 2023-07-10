@@ -466,13 +466,14 @@ public abstract class LASreader implements Closeable {
 
     protected abstract boolean read_point_default();
 
-    private boolean read_complex() {
-        try {
-            return read_complex.call();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    private boolean read_complex() throws CustomException {
+    try {
+        return read_complex.call();
+    } catch (Exception e) {
+        throw new CustomException("An error occurred while reading complex data: " + e.getMessage());
     }
+}
+
 
     private boolean read_simple() {
         try {
