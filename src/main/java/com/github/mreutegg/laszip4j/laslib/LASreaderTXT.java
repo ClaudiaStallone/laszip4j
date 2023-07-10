@@ -77,7 +77,7 @@ public class LASreaderTXT extends LASreader {
 
     }
 
-    public boolean open(String file_name, String parse_string, int skip_lines, boolean populate_header) {
+    public boolean open() {
         return false;
     }
 
