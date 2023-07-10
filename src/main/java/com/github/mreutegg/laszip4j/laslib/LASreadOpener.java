@@ -1282,10 +1282,7 @@ private LASreader createLASReaderPipeOn(LASreader lasreader) {
         {
             this.decompress_selective |= transform.get_decompress_selective();
         }
-        //if (ignore != null)
-        //{
-            //this.decompress_selective |= ignore.get_decompress_selective();
-        //}
+ 
     }
 
     void set_inside_tile(float ll_x, float ll_y, float size)
