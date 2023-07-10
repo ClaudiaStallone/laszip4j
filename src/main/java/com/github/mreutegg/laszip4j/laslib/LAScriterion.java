@@ -454,7 +454,21 @@ class LAScriterionKeepReturns extends LAScriterion
 
 class LAScriterionKeepSpecificNumberOfReturns extends LAScriterion
 {
-    public String name() { return (numberOfReturns == 1 ? "keep_single" : (numberOfReturns == 2 ? "keep_double" : (numberOfReturns == 3 ? "keep_triple" : (numberOfReturns == 4 ? "keep_quadruple" : "keep_quintuple")))); };
+    public String name() {
+    String result;
+    if (numberOfReturns == 1) {
+        result = "keep_single";
+    } else if (numberOfReturns == 2) {
+        result = "keep_double";
+    } else if (numberOfReturns == 3) {
+        result = "keep_triple";
+    } else if (numberOfReturns == 4) {
+        result = "keep_quadruple";
+    } else {
+        result = "keep_quintuple";
+    }
+    return result;
+}
     public int get_Command(StringBuilder string) { return sprintf(string, "-%s ", name()); };
     public boolean filter(LASpoint point) { return (point.getNumber_of_returns() != numberOfReturns); };
     LAScriterionKeepSpecificNumberOfReturns(int numberOfReturns) { this.numberOfReturns = numberOfReturns; };
@@ -464,7 +478,27 @@ class LAScriterionKeepSpecificNumberOfReturns extends LAScriterion
 class LAScriterionDropSpecificNumberOfReturns extends LAScriterion
 {
     @Override
-    public String name() { return (numberOfReturns == 1 ? "drop_single" : (numberOfReturns == 2 ? "drop_double" : (numberOfReturns == 3 ? "drop_triple" : (numberOfReturns == 4 ? "drop_quadruple" : "drop_quintuple")))); };
+public String name() {
+    String result;
+    switch (numberOfReturns) {
+        case 1:
+            result = "drop_single";
+            break;
+        case 2:
+            result = "drop_double";
+            break;
+        case 3:
+            result = "drop_triple";
+            break;
+        case 4:
+            result = "drop_quadruple";
+            break;
+        default:
+            result = "drop_quintuple";
+            break;
+    }
+    return result;
+}    
     public int get_Command(StringBuilder string) { return sprintf(string, "-%s ", name()); };
     public boolean filter(LASpoint point) { return (point.getNumber_of_returns() == numberOfReturns); };
     LAScriterionDropSpecificNumberOfReturns(int numberOfReturns) { this.numberOfReturns = numberOfReturns; };
