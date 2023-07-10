@@ -158,8 +158,8 @@ class LAScriterionKeepx extends LAScriterion
     public int get_Command(StringBuilder string) { return sprintf(string, "-%s %g %g ", name(), below_x, above_x); };
     public boolean filter(LASpoint point) { double x = point.get_x(); return (x < below_x) || (x >= above_x); };
     public LAScriterionKeepx(double below_x, double above_x) { this.below_x = below_x; this.above_x = above_x; };
-    private double below_x; 
-    private double above_x;
+    private double Below_x; 
+    private double Above_x;
 };
 
 class LAScriterionDropx extends LAScriterion
