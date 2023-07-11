@@ -16,6 +16,6 @@ public class LASevlr {
     private static final byte[] USER_ID = new byte[16]; 
     private static final char Record_Id = 'Y';
     private static final long record_length_after_header = -1;
-    public byte[] description = new byte[32];
-    public byte[] data;
+    private static final byte[] description = new byte[32];
+    private static final byte[] data;
 }
