@@ -77,15 +77,15 @@ public class LASreaderBuffered extends LASreader {
     }
 
     public void set_scale_scan_angle(float scale_scan_angle) {
-
+        throw new UnsupportedOperationException("close(boolean) method is not supported");
     }
 
     public void set_file_name(String file_name) {
-
+        throw new UnsupportedOperationException("close(boolean) method is not supported");
     }
 
     public void add_neighbor_file_name(String s) {
-
+        throw new UnsupportedOperationException("close(boolean) method is not supported");
     }
 
     public boolean open() {
