@@ -79,15 +79,15 @@ throw new UnsupportedOperationException();
     }
 
     public void set_scale_scan_angle(float scale_scan_angle) {
-
+throw new UnsupportedOperationException();
     }
 
     public void set_io_ibuffer_size(int io_ibuffer_size) {
-
+throw new UnsupportedOperationException();
     }
 
     public void add_file_name(String s) {
-
+throw new UnsupportedOperationException();
     }
 
     public boolean open() {
@@ -95,11 +95,11 @@ throw new UnsupportedOperationException();
     }
 
     public void set_files_are_flightlines(boolean files_are_flightlines) {
-
+throw new UnsupportedOperationException();
     }
 
     public void set_apply_file_source_ID(boolean apply_file_source_ID) {
-
+throw new UnsupportedOperationException();
     }
 
     public boolean reopen() {
