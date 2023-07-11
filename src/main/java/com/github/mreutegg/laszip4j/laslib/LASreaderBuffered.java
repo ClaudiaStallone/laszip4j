@@ -49,7 +49,7 @@ public class LASreaderBuffered extends LASreader {
     }
 
     public void set_offset(double[] offset) {
-
+        throw new UnsupportedOperationException("close(boolean) method is not supported");
     }
 
     public void set_parse_string(String parse_string) {
