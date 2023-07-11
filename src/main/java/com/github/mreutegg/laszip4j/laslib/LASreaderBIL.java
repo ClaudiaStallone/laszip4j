@@ -31,9 +31,9 @@ public class LASreaderBIL extends LASreader {
 
     @Override
     public void close(boolean close_stream) {
-
+        throw new UnsupportedOperationException("close(boolean) method is not supported");
     }
-
+    
     @Override
     protected boolean read_point_default() {
         return false;
