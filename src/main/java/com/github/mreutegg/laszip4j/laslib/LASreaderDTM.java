@@ -31,7 +31,7 @@ public class LASreaderDTM extends LASreader {
 
     @Override
     public void close(boolean close_stream) {
-
+        throw new UnsupportedOperationException();
     }
 
     @Override
