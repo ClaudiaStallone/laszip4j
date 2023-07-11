@@ -31,8 +31,11 @@ public class LASreaderASC extends LASreader {
 
     @Override
     public void close(boolean close_stream) {
-
-    }
+        // Add implementation logic here
+        if (close_stream) {
+            // Close the stream
+        }
+    }    
 
     @Override
     protected boolean read_point_default() {
