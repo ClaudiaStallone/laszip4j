@@ -65,15 +65,15 @@ public class LASreaderBuffered extends LASreader {
     }
 
     public void set_translate_intensity(float translate_intensity) {
-
+        throw new UnsupportedOperationException("close(boolean) method is not supported");
     }
 
     public void set_scale_intensity(float scale_intensity) {
-
+        throw new UnsupportedOperationException("close(boolean) method is not supported");
     }
 
     public void set_translate_scan_angle(float translate_scan_angle) {
-
+        throw new UnsupportedOperationException("close(boolean) method is not supported");
     }
 
     public void set_scale_scan_angle(float scale_scan_angle) {
