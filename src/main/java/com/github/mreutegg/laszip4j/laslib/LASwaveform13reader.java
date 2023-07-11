@@ -288,8 +288,7 @@ public class LASwaveform13reader {
 
         size = ((nbits/8) * nsamples);
 
-        // read waveform
-
+        
         long position = start_of_waveform_data_packet_record + point.getWavepacketOffsetToWaveformData();
         stream.seek(position);
 
