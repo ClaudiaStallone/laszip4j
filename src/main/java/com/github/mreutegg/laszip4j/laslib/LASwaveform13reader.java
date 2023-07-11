@@ -32,7 +32,7 @@ import static java.lang.Boolean.TRUE;
 
 public class LASwaveform13reader {
 
-    private static final PrintStream stderr = System.err;
+    private static final PrintStream stderr = logger.log;
     
     public int nbits; // unsigned
     public int nsamples; // unsigned
