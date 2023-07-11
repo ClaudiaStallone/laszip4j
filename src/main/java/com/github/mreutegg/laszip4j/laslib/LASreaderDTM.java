@@ -16,7 +16,7 @@ import com.github.mreutegg.laszip4j.laszip.ByteStreamIn;
 public class LASreaderDTM extends LASreader {
     @Override
     public int get_format() {
-        return 0;
+        throw new UnsupportedOperationException(); 
     }
 
     @Override
