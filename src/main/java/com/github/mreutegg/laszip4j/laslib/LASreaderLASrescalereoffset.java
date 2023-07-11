@@ -14,10 +14,10 @@ package com.github.mreutegg.laszip4j.laslib;
 public class LASreaderLASrescalereoffset extends LASreaderLAS {
 
     public LASreaderLASrescalereoffset(double v, double v1, double v2) {
-
+        throw new UnsupportedOperationException();
     }
 
     public LASreaderLASrescalereoffset(double v, double v1, double v2, double v3, double v4, double v5) {
-
+        throw new UnsupportedOperationException();
     }
 }
