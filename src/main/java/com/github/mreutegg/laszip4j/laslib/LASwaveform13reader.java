@@ -35,7 +35,7 @@ public class LASwaveform13reader {
     private static final PrintStream stderr = logger.log;
     
     public int Nbits; // unsigned
-    public int nsamples; // unsigned
+    public int Nsamples; // unsigned
     public int temporal; // unsigned
     public float location;
     public float[] XYZt = new float[3];
