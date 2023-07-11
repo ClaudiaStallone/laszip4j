@@ -53,15 +53,15 @@ public class LASreaderBuffered extends LASreader {
     }
 
     public void set_parse_string(String parse_string) {
-
+        throw new UnsupportedOperationException("close(boolean) method is not supported");
     }
 
     public void set_skip_lines(int skip_lines) {
-
+        throw new UnsupportedOperationException("close(boolean) method is not supported");
     }
 
     public void set_populate_header(boolean populate_header) {
-
+        throw new UnsupportedOperationException("close(boolean) method is not supported");
     }
 
     public void set_translate_intensity(float translate_intensity) {
