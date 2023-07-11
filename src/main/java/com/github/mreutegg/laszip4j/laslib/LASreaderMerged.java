@@ -34,7 +34,7 @@ public class LASreaderMerged extends LASreader {
 
     @Override
     public void close(boolean close_stream) {
-
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -43,15 +43,15 @@ public class LASreaderMerged extends LASreader {
     }
 
     public void set_scale_factor(double[] scale_factor) {
-
+        throw new UnsupportedOperationException();
     }
 
     public void set_offset(double[] offset) {
-
+        throw new UnsupportedOperationException();
     }
 
     public void set_parse_string(String parse_string) {
-
+        throw new UnsupportedOperationException();
     }
 
     public void set_skip_lines(int skip_lines) {
