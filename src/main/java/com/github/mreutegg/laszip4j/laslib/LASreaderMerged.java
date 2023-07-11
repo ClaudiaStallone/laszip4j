@@ -55,27 +55,27 @@ public class LASreaderMerged extends LASreader {
     }
 
     public void set_skip_lines(int skip_lines) {
-
+        throw new UnsupportedOperationException();
     }
 
     public void set_populate_header(boolean populate_header) {
-
+    throw new UnsupportedOperationException();
     }
 
     public void set_keep_lastiling(boolean keep_lastiling) {
-
+throw new UnsupportedOperationException();
     }
 
     public void set_translate_intensity(float translate_intensity) {
-
+throw new UnsupportedOperationException();
     }
 
     public void set_scale_intensity(float scale_intensity) {
-
+throw new UnsupportedOperationException();
     }
 
     public void set_translate_scan_angle(float translate_scan_angle) {
-
+throw new UnsupportedOperationException();
     }
 
     public void set_scale_scan_angle(float scale_scan_angle) {
