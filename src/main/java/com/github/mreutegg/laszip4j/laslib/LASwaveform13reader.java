@@ -34,7 +34,7 @@ public class LASwaveform13reader {
 
     private static final PrintStream stderr = logger.log;
     
-    public int nbits; // unsigned
+    public int Nbits; // unsigned
     public int nsamples; // unsigned
     public int temporal; // unsigned
     public float location;
@@ -198,7 +198,7 @@ public class LASwaveform13reader {
                 fprintf(stderr,"ERROR: cross-check - compression %d %d of waveform descriptor %d with index %d is different\n", compression[0], wave_packet_descr[index].getCompressionType(), i, index);
                 return FALSE;
             }
-            byte[] nbits = new byte[1];
+            byte[] Nbits = new byte[1];
             try { stream.getBytes(nbits, 1); } catch(Exception e)
             {
                 fprintf(stderr,"ERROR: reading nbits of waveform descriptor %d\n", i);
