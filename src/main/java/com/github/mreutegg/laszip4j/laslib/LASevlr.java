@@ -12,9 +12,9 @@ package com.github.mreutegg.laszip4j.laslib;
 
 public class LASevlr {
 
-    public char reserved;
-    public byte[] user_id = new byte[16];
-    public char record_id;
+    private static final char RESERVED = 'X'; 
+    private static final byte[] USER_ID = new byte[16]; 
+    private static final char Record_Id = 'Y';
     public long record_length_after_header;
     public byte[] description = new byte[32];
     public byte[] data;
