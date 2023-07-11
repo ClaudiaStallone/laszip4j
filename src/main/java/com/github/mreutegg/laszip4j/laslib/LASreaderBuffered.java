@@ -41,9 +41,10 @@ public class LASreaderBuffered extends LASreader {
 
 
     public void set_buffer_size(float buffer_size) {
+        throw new UnsupportedOperationException("close(boolean) method is not supported");
 
     }
-
+  
     public void set_scale_factor(double[] scale_factor) {
 
     }
