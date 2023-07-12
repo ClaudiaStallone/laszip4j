@@ -10,7 +10,7 @@
  */
 package com.github.mreutegg.laszip4j.laszip;
 
-public class LASwriteItemRaw_BYTE extends LASwriteItemRaw<PointDataRecordBytes> {
+public class LASwriteItemRaw_BYTE_ extends LASwriteItemRaw<PointDataRecordBytes> {
 
     private final int byteCount;
 
