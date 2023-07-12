@@ -85,7 +85,7 @@ public class LASinventory {
         return TRUE;
     }
 
-    boolean update_header(LASheader header) {
+    boolean update_header_H(LASheader header) {
     if (header != null) {
         if (extended_number_of_point_records > Integer.toUnsignedLong(U32_MAX)) {
             if (header.version_minor >= 4) {
