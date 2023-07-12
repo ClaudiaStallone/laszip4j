@@ -10,7 +10,7 @@
  */
 package com.github.mreutegg.laszip4j.laszip;
 
-public class LASreadItemCompressed_BYTE_v1 extends LASreadItemCompressed {
+public class LASreadItemCompressed_BYTE_v1_VV extends LASreadItemCompressed {
 
     private int number; // unsigned
     private PointDataRecordBytes last_item;
