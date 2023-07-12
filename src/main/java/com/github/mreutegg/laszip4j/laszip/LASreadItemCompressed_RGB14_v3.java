@@ -16,18 +16,18 @@ import static com.github.mreutegg.laszip4j.laszip.MyDefs.U8_FOLD;
 import static com.github.mreutegg.laszip4j.laszip.MyDefs.U8_CLAMP;
 import static com.github.mreutegg.laszip4j.laszip.LASzip.LASZIP_DECOMPRESS_SELECTIVE_RGB;
 
-public class LASreadItemCompressed_RGB14_v3 extends LASreadItemCompressed{
+public class LASreadItemCompressed_RGB14_v3_3 extends LASreadItemCompressed{
  
-  private IByteStreamInProvider instreamProvider;
-  private ByteStreamInArray instream_RGB;
-  private ArithmeticDecoder dec_RGB;
-  private boolean changed_RGB;
-  private int num_bytes_RGB;
-  private boolean requested_RGB;
-  private int current_context;
-  private LAScontextRGB14[] contexts = new LAScontextRGB14[4];
+  private IByteStreamInProvider InstreamProvider;
+  private ByteStreamInArray inStream_RGB;
+  private ArithmeticDecoder deC_RGB;
+  private boolean Changed_RGB;
+  private int num_byteS_RGB;
+  private boolean Requested_RGB;
+  private int curreNt_context;
+  private LAScontextRGB14[] contExts = new LAScontextRGB14[4];
 
-  public LASreadItemCompressed_RGB14_v3(IByteStreamInProvider instreamProvider, int decompress_selective)
+  public LASreadItemCompressed_RGB14_v4(IByteStreamInProvider instreamProvider, int decompress_selective)
   {
     assert(instreamProvider != null);
     this.instreamProvider = instreamProvider;
