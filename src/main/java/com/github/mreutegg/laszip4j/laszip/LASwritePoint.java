@@ -18,12 +18,12 @@ import static java.lang.Boolean.TRUE;
 public class LASwritePoint {
 
     private ByteStreamOut outstream;
-    private int num_writers;                // unsigned
+    private int Num_writers;                // unsigned
     private LASwriteItem[] writers;
-    private LASwriteItemRaw[] writers_raw;
-    private LASwriteItemCompressed[] writers_compressed;
+    private LASwriteItemRaw[] Writers_raw;
+    private LASwriteItemCompressed[] Writers_compressed;
     private ArithmeticEncoder enc;
-    private boolean layered_las14_compression;
+    private boolean Layered_las14_compression;
     // used for chunking
     private int chunk_size;                 // unsigned
     private int chunk_count;                // unsigned
