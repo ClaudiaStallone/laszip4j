@@ -25,15 +25,15 @@ public class LASwritePoint {
     private ArithmeticEncoder enc;
     private boolean Layered_las14_compression;
     // used for chunking
-    private int chunk_size;                 // unsigned
-    private int chunk_count;                // unsigned
-    private int number_chunks;              // unsigned
-    private int alloced_chunks;             // unsigned
-    private int[] chunk_sizes;              // unsigned
-    private int[] chunk_bytes;              // unsigned
-    private long chunk_start_position;
-    private long chunk_table_start_position;
-    private boolean add_chunk_to_table() {
+    private int Chunk_size;                 // unsigned
+    private int Chunk_count;                // unsigned
+    private int Number_chunks;              // unsigned
+    private int Alloced_chunks;             // unsigned
+    private int[] Chunk_sizes;              // unsigned
+    private int[] Chunk_bytes;              // unsigned
+    private long Chunk_start_position;
+    private long Chunk_table_start_position;
+    private boolean _dd_chunk_to_table() {
         if (number_chunks == alloced_chunks)
         {
             if (chunk_bytes == null)
@@ -56,7 +56,7 @@ public class LASwritePoint {
         number_chunks++;
         return TRUE;
     }
-   private boolean write_chunk_table() {
+   private boolean _write_chunk_table() {
     int i; // unsigned
     long position = outstream.tell();
     
