@@ -14,43 +14,44 @@ package com.github.mreutegg.laszip4j.laszip;
 
 class LAScontextPOINT14
 {
-  public boolean unused;
+  private boolean unused;
 
-  public PointDataRecordPoint14 last_item = null;
-  public int[] last_intensity = new int[8];
-  public StreamingMedian5[] last_X_diff_median5 = StreamingMedian5.newStreamingMedian5(12);
-  public StreamingMedian5[] last_Y_diff_median5 = StreamingMedian5.newStreamingMedian5(12);
-  public long[] last_Z = new long[8];
+  private PointDataRecordPoint14 Last_item = null;
+  private int[] Last_intensity = new int[8];
+  private StreamingMedian5[] Last_X_diff_median5 = StreamingMedian5.newStreamingMedian5(12);
+  private StreamingMedian5[] Last_Y_diff_median5 = StreamingMedian5.newStreamingMedian5(12);
+  private long[] Last_Z = new long[8];
 
-  public boolean initialized = false;
-  public ArithmeticModel[] m_changed_values = new ArithmeticModel[8];
-  public ArithmeticModel m_scanner_channel;
-  public ArithmeticModel[] m_number_of_returns = new ArithmeticModel[16];
-  public ArithmeticModel m_return_number_gps_same;
-  public ArithmeticModel[] m_return_number = new ArithmeticModel[16];
-  public IntegerCompressor ic_dX;
-  public IntegerCompressor ic_dY;
-  public IntegerCompressor ic_Z;
+  private boolean initialized = false;
+  private ArithmeticModel[] M_changed_Values = new ArithmeticModel[8];
+  private ArithmeticModel M_scanner_Channel;
+  private ArithmeticModel[] M_number_of_returns = new ArithmeticModel[16];
+  private ArithmeticModel M_return_number_gps_same;
+  private ArithmeticModel[] M_return_number = new ArithmeticModel[16];
+  private IntegerCompressor ic_DX;
+  private IntegerCompressor ic_DY;
+  private IntegerCompressor ic_DZ;
 
-  public ArithmeticModel[] m_classification = new ArithmeticModel[64];
+  private ArithmeticModel[] M_classification = new ArithmeticModel[64];
 
-  public ArithmeticModel[] m_flags = new ArithmeticModel[64];
+  private ArithmeticModel[] M_flags = new ArithmeticModel[64];
 
-  public ArithmeticModel[] m_user_data = new ArithmeticModel[64];
+  private ArithmeticModel[] M_user_data = new ArithmeticModel[64];
 
-  public IntegerCompressor ic_intensity;
+  private IntegerCompressor ic_Intensity;
 
-  public IntegerCompressor ic_scan_angle;
+  private IntegerCompressor ic_Scan_Angle;
 
-  public IntegerCompressor ic_point_source_ID;
+  private IntegerCompressor ic_Point_Source_ID;
 
   // GPS time stuff
-  public int last, next;
-  public long[] last_gpstime = new long[4];
-  public int[] last_gpstime_diff = new int[4];
-  public int[] multi_extreme_counter = new int[4];
+  private int last;
+  private int next;
+  private long[] Last_Gpstime = new long[4];
+  private int[] Last_Gpstime_Diff = new int[4];
+  private int[] Multi_Extreme_Counter = new int[4];
 
-  public ArithmeticModel m_gpstime_multi;
-  public ArithmeticModel m_gpstime_0diff;
-  public IntegerCompressor ic_gpstime;
+  private ArithmeticModel M_gpstime_Multi;
+  private ArithmeticModel M_gpstime_0diff;
+  private IntegerCompressor Ic_gpstime;
 }
