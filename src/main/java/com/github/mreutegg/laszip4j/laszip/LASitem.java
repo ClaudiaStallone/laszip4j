@@ -50,16 +50,16 @@ public class LASitem {
     public char size; // unsigned
     public char version; // unsigned
 
-    public static LASitem Point10(int ver) { return new LASitem(Type.POINT10, 20, ver); }
-    public static LASitem GpsTime11(int ver) { return new LASitem(Type.GPSTIME11, 8, ver); }
-    public static LASitem Rgb12(int ver) { return new LASitem(Type.RGB12, 6, ver); }
-    public static LASitem WavePacket13(int ver) { return new LASitem(Type.WAVEPACKET13, 29, ver); }
-    public static LASitem Point14(int ver) { return new LASitem(Type.POINT14, 30, ver); }
-    public static LASitem RgbNIR14(int ver) { return new LASitem(Type.RGBNIR14, 8, ver); }
-    public static LASitem ExtraBytes(int size, int ver) { return new LASitem(Type.BYTE, size, ver); }
-    public static LASitem Rgb14(int ver) { return new LASitem(Type.RGB14, 6, ver); }
-    public static LASitem WavePacket14(int ver) { return new LASitem(Type.WAVEPACKET14, 29, ver); }
-    public static LASitem ExtraBytes14(int size, int ver) { return new LASitem(Type.BYTE14, size, ver); }
+    public static LASitem Point10_1(int ver) { return new LASitem(Type.POINT10, 20, ver); }
+    public static LASitem GpsTime11_2(int ver) { return new LASitem(Type.GPSTIME11, 8, ver); }
+    public static LASitem Rgb12_3(int ver) { return new LASitem(Type.RGB12, 6, ver); }
+    public static LASitem WavePacket13_4(int ver) { return new LASitem(Type.WAVEPACKET13, 29, ver); }
+    public static LASitem Point14_5(int ver) { return new LASitem(Type.POINT14, 30, ver); }
+    public static LASitem RgbNIR14_6(int ver) { return new LASitem(Type.RGBNIR14, 8, ver); }
+    public static LASitem ExtraBytes_7(int size, int ver) { return new LASitem(Type.BYTE, size, ver); }
+    public static LASitem Rgb14_8(int ver) { return new LASitem(Type.RGB14, 6, ver); }
+    public static LASitem WavePacket14_9(int ver) { return new LASitem(Type.WAVEPACKET14, 29, ver); }
+    public static LASitem ExtraBytes14_10(int size, int ver) { return new LASitem(Type.BYTE14, size, ver); }
 
     boolean isType(Type t) {
     switch (t) {
