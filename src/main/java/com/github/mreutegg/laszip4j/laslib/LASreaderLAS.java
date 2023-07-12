@@ -49,7 +49,7 @@ public class LASreaderLAS extends LASreader {
     private LASreadPoint reader;
     private boolean checked_end;
 
-    boolean open(String file_name, int io_buffer_size, boolean peek_only, int decompress_selective)
+    boolean open_a(String file_name, int io_buffer_size, boolean peek_only, int decompress_selective)
     {
         if (file_name == null)
         {
@@ -70,7 +70,7 @@ public class LASreaderLAS extends LASreader {
         return open(in, peek_only, decompress_selective);
     }
 
-    boolean open(RandomAccessFile file, boolean peek_only, int decompress_selective)
+    boolean open_b(RandomAccessFile file, boolean peek_only, int decompress_selective)
     {
         if (file == null)
         {
@@ -85,11 +85,11 @@ public class LASreaderLAS extends LASreader {
     }
 
 
-    public boolean open(InputStream in, int decompress_selective) {
+    public boolean open_c(InputStream in, int decompress_selective) {
         return open(in, false, decompress_selective);
     }
 
-    boolean open(InputStream stream, boolean peek_only, int decompress_selective)
+    boolean open_d(InputStream stream, boolean peek_only, int decompress_selective)
     {
         // create input
         ByteStreamIn in = new ByteStreamInStream(stream);
@@ -97,11 +97,11 @@ public class LASreaderLAS extends LASreader {
         return open(in, peek_only, decompress_selective);
     }
 
-    boolean open(ByteStreamIn stream, int decompress_selective) {
+    boolean open_e(ByteStreamIn stream, int decompress_selective) {
         return open(stream, false, decompress_selective);
     }
 
-   boolean open(ByteStreamIn stream, boolean peek_only, int decompress_selective) {
+   boolean open_f(ByteStreamIn stream, boolean peek_only, int decompress_selective) {
     int i, j;
 
     if (stream == null) {
