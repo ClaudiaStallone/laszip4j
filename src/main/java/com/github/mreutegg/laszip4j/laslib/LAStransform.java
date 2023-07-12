@@ -21,7 +21,7 @@ public class LAStransform {
 
     }
 
-    public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; }
+    public int get_decompress_selective_() { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; }
 
     public void reset() {
 
