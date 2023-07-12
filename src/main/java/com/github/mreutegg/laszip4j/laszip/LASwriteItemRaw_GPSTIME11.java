@@ -10,7 +10,7 @@
  */
 package com.github.mreutegg.laszip4j.laszip;
 
-public class LASwriteItemRaw_GPSTIME11 extends LASwriteItemRaw<PointDataRecordGpsTime> {
+public class LASwriteItemRaw_GPSTIME11_ extends LASwriteItemRaw<PointDataRecordGpsTime> {
     @Override
     public boolean write(PointDataRecordGpsTime point, int context) {
         outstream.put64bitsLE(point.GPSTime);
