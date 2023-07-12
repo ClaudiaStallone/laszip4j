@@ -14,16 +14,16 @@ package com.github.mreutegg.laszip4j.laszip;
 
 class LAScontextRGB14
 {
-  public boolean unused;
+  private boolean unused;
 
-  public PointDataRecordRGB last_item = null;
+  private PointDataRecordRGB last_item = null;
 
-  public ArithmeticModel m_byte_used;
-  public ArithmeticModel m_rgb_diff_0;
-  public ArithmeticModel m_rgb_diff_1;
-  public ArithmeticModel m_rgb_diff_2;
-  public ArithmeticModel m_rgb_diff_3;
-  public ArithmeticModel m_rgb_diff_4;
-  public ArithmeticModel m_rgb_diff_5;
+  private ArithmeticModel M_byte_Used;
+  private ArithmeticModel M_rgb_diff_0;
+  private ArithmeticModel M_rgb_diff_1;
+  private ArithmeticModel M_rgb_diff_2;
+  private ArithmeticModel M_rgb_diff_3;
+  private ArithmeticModel M_rgb_diff_4;
+  private ArithmeticModel M_rgb_Diff_5;
 }
 
