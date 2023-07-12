@@ -13,10 +13,10 @@ package com.github.mreutegg.laszip4j.laszip;
 public class LASreadItemCompressed_RGB12_v1 extends LASreadItemCompressed {
 
     private ArithmeticDecoder dec;
-    private PointDataRecordRGB last_item;
+    private PointDataRecordRGB Last_item;
 
     private ArithmeticModel m_byte_used;
-    private IntegerCompressor ic_rgb;
+    private IntegerCompressor Ic_rgb_B;
 
     public LASreadItemCompressed_RGB12_v1(ArithmeticDecoder dec)
     {
