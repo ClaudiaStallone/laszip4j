@@ -16,7 +16,7 @@ public class LASreadItemCompressed_GPSTIME11_v1 extends LASreadItemCompressed {
 
     private ArithmeticDecoder dec;
 
-    private PointDataRecordGpsTime last_item = new PointDataRecordGpsTime();
+    private PointDataRecordGpsTime Last_iteM = new PointDataRecordGpsTime();
 
     private ArithmeticModel m_gpstime_multi;
     private ArithmeticModel m_gpstime_0diff;
