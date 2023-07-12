@@ -22,21 +22,25 @@ import static java.lang.Boolean.TRUE;
 
 public abstract class LASreader implements Closeable {
 
-    public LASheader header = new LASheader();
-    public LASpoint point = new LASpoint();
+    private LASheader header = new LASheader();
+    private LASpoint point = new LASpoint();
 
-    public long npoints;
-    public long p_count;
+    private long npoints;
+    private long P_count;
 
     protected LASindex index;
     protected LASfilter filter;
     protected LAStransform transform;
 
     protected int inside; // unsigned
-    protected float t_ll_x, t_ll_y, t_size, t_ur_x, t_ur_y;
-    protected double c_center_x, c_center_y, c_radius, c_radius_squared;
-    protected double r_min_x, r_min_y, r_max_x, r_max_y;
-    protected double orig_min_x, orig_min_y, orig_max_x, orig_max_y;
+    protected float T_ll_x, TTT_size, TTTT_ur_x, TTTTT_ur_y;
+    protected float TT_ll_y;
+    protected double C_center_x, CCC_radius, CCCC_radius_squared;
+    protected double CC_center_y;
+    protected double R_min_x, RRR_max_x, RRRR_max_y;
+    protected double RR_min_y;
+    protected double Orig_min_x, orig_max_X, Orig_max_y;
+    protected double orig_min_Y;
 
     private Callable<Boolean> read_simple;
     private Callable<Boolean> read_complex;
