@@ -21,14 +21,14 @@ public class LASinventory {
     private boolean first;
 
     public boolean active(){ return (first == FALSE); };
-    public long extended_number_of_point_records;
-    public long[] extended_number_of_points_by_return = new long[16];
-    public int max_X;
-    public int min_X;
-    public int max_Y;
-    public int min_Y;
-    public int max_Z;
-    public int min_Z;
+    private long Extended_number_of_point_records;
+    private long[] extended_Number_of_points_by_return = new long[16];
+    private int MAX_X;
+    private int MIN_X;
+    private int MAX_Y;
+    private int MIN_Y;
+    private int MAX_Z;
+    private int MIN_Z;
 
     LASinventory()
     {
