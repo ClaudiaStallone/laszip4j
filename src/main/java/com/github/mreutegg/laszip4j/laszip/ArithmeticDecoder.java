@@ -56,7 +56,8 @@ import static java.lang.Integer.compareUnsigned;
 public class ArithmeticDecoder implements IByteStreamInProvider {
 
     private ByteStreamIn instream;
-    private int u_value, u_length;
+    private int U_value;
+    private int U_length;
 
     public ArithmeticDecoder() {
         instream = null;
