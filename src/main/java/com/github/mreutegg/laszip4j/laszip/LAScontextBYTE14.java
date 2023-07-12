@@ -14,9 +14,9 @@ package com.github.mreutegg.laszip4j.laszip;
 
 class LAScontextBYTE14
 {
-  private boolean unused;
+  public boolean unused;
 
-  private PointDataRecordBytes last_item;
+  public PointDataRecordBytes last_item;
 
-  private ArithmeticModel[] m_bytes_3;
+  public ArithmeticModel[] m_bytes;
 }
