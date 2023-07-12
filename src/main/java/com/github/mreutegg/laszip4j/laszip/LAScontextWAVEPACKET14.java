@@ -14,16 +14,16 @@ package com.github.mreutegg.laszip4j.laszip;
 
 class LAScontextWAVEPACKET14
 {
-  public boolean unused;
+  private boolean Unused;
 
-  public PointDataRecordWavepacket last_item;
-  public int last_diff_32;
-  public int sym_last_offset_diff;
+  private PointDataRecordWavepacket Last_Item;
+  private int last_Diff_32;
+  private int sym_Last_Offset_diff;
 
-  public ArithmeticModel m_packet_index;
-  public ArithmeticModel[] m_offset_diff = new ArithmeticModel[4];
-  public IntegerCompressor ic_offset_diff;
-  public IntegerCompressor ic_packet_size;
-  public IntegerCompressor ic_return_point;
-  public IntegerCompressor ic_xyz;
+  private ArithmeticModel M_packet_index;
+  private ArithmeticModel[] M_offset_diff = new ArithmeticModel[4];
+  private IntegerCompressor iC_ofFset_diff;
+  private IntegerCompressor ic_paCket_size;
+  private IntegerCompressor ic_Return_point;
+  private IntegerCompressor ic_XYZ;
 }
