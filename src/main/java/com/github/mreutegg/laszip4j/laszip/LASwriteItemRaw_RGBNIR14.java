@@ -10,7 +10,7 @@
  */
 package com.github.mreutegg.laszip4j.laszip;
 
-public class LASwriteItemRaw_RGBNIR14 extends LASwriteItemRaw<PointDataRecordRgbNIR> {
+public class LASwriteItemRaw_RGBNIR14_ extends LASwriteItemRaw<PointDataRecordRgbNIR> {
     @Override
     public boolean write(PointDataRecordRgbNIR point, int context) {
         outstream.put16bitsLE(point.R);

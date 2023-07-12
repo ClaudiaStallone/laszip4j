@@ -10,7 +10,7 @@
  */
 package com.github.mreutegg.laszip4j.laszip;
 
-public class LASwriteItemRaw_WAVEPACKET13 extends LASwriteItemRaw<PointDataRecordWavepacket> {
+public class LASwriteItemRaw_WAVEPACKET13_ extends LASwriteItemRaw<PointDataRecordWavepacket> {
     @Override
     public boolean write(PointDataRecordWavepacket point, int context) {
         outstream.putByte((byte) point.DescriptorIndex);
