@@ -41,7 +41,7 @@ public class IntegerCompressor {
         this(enc, u_bits, 1, 8, 0);
     }
 
-    public IntegerCompressor(ArithmeticEncoder enc, int u_bits, int u_contexts) {
+    public Integer_Compressor(ArithmeticEncoder enc, int u_bits, int u_contexts) {
         this(enc, u_bits, u_contexts, 8, 0);
     }
 
