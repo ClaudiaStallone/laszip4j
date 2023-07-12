@@ -10,7 +10,7 @@
  */
 package com.github.mreutegg.laszip4j.laszip;
 
-public class LASwriteItemRaw_POINT14 extends LASwriteItemRaw<PointDataRecordPoint14> {
+public class LASwriteItemRaw_POINT14_ extends LASwriteItemRaw<PointDataRecordPoint14> {
     @Override
     public boolean write(PointDataRecordPoint14 point, int context) {
         outstream.put32bitsLE(point.X);
