@@ -33,7 +33,7 @@ public class LASquadtree {
 
     public static final int LAS_SPATIAL_QUAD_TREE = 0;
 
-    private static final PrintStream stderr = System.err;
+    private static final PrintStream stderr = logger.log;
 
     public int levels; // unsigned
     public float cell_size;
