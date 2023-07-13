@@ -20,7 +20,7 @@ public class LASreaderQFIT extends LASreader {
     }
 
     @Override
-    public boolean seek(long p_index) {
+    public boolean seek_1(long p_index) {
         return false;
     }
 
@@ -30,7 +30,7 @@ public class LASreaderQFIT extends LASreader {
     }
 
     @Override
-    public void close(boolean close_stream) {
+    public void close_2(boolean close_stream) {
 
     }
 
@@ -39,7 +39,7 @@ public class LASreaderQFIT extends LASreader {
         return false;
     }
 
-    public boolean open() {
+    public boolean open_N() {
         return false;
     }
 
