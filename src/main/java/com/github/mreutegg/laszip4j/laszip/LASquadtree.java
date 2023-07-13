@@ -821,38 +821,31 @@ public class LASquadtree {
         return intersect_tile(ll_x, ll_y, size, levels);
     }
 
-    int intersect_circle(double center_x, double center_y, double radius, int level)
-    {
-        if (current_cells == null)
-        {
+    int intersect_circle(double center_x, double center_y, double radius, int level) {
+        if (current_cells == null) {
             current_cells = new ArrayList<>();
-        }
-        else
-        {
+        } else {
             current_cells.clear();
         }
-
+    
         double r_min_x = center_x - radius;
         double r_min_y = center_y - radius;
         double r_max_x = center_x + radius;
         double r_max_y = center_y + radius;
-
-        if (r_max_x <= min_x || !(r_min_x <= max_x) || r_max_y <= min_y || !(r_min_y <= max_y))
-        {
+    
+        if (r_max_x <= min_x || r_min_x > max_x || r_max_y <= min_y || r_min_y > max_y) {
             return 0;
         }
-
-        if (adaptive != null)
-        {
+    
+        if (adaptive != null) {
             intersect_circle_with_cells_adaptive(center_x, center_y, radius, r_min_x, r_min_y, r_max_x, r_max_y, min_x, max_x, min_y, max_y, 0, 0);
-        }
-        else
-        {
+        } else {
             intersect_circle_with_cells(center_x, center_y, radius, r_min_x, r_min_y, r_max_x, r_max_y, min_x, max_x, min_y, max_y, level, 0);
         }
-
+    
         return current_cells.size();
     }
+    
 
     int intersect_circle(double center_x, double center_y, double radius)
     {
