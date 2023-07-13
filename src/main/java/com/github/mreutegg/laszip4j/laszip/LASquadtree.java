@@ -1103,93 +1103,58 @@ public class LASquadtree {
             current_cells.add(level_index);
         }
     }
-
-    void intersect_tile_with_cells_adaptive(float ll_x, float ll_y, float ur_x, float ur_y, float cell_min_x, float cell_max_x, float cell_min_y, float cell_max_y, int level, int level_index)
-    {
+    
+    void intersect_tile_with_cells_adaptive(float ll_x, float ll_y, float ur_x, float ur_y, float cell_min_x, float cell_max_x, float cell_min_y, float cell_max_y, int level, int level_index) {
         float cell_mid_x;
         float cell_mid_y;
         int cell_index = get_cell_index(level_index, level);
-        int adaptive_pos = cell_index/32;
-        int adaptive_bit = (1) << (cell_index%32);
-        if ((level < levels) && ((adaptive[adaptive_pos] & adaptive_bit) != 0))
-        {
+        int adaptive_pos = cell_index / 32;
+        int adaptive_bit = 1 << (cell_index % 32);
+        
+        if ((level < levels) && ((adaptive[adaptive_pos] & adaptive_bit) != 0)) {
             level++;
             level_index <<= 2;
-
-            cell_mid_x = (cell_min_x + cell_max_x)/2;
-            cell_mid_y = (cell_min_y + cell_max_y)/2;
-
-            if (ur_x <= cell_mid_x)
-            {
-                // cell_max_x = cell_mid_x;
-                if (ur_y <= cell_mid_y)
-                {
-                    // cell_max_y = cell_mid_y;
+    
+            cell_mid_x = (cell_min_x + cell_max_x) / 2;
+            cell_mid_y = (cell_min_y + cell_max_y) / 2;
+    
+            if (ur_x <= cell_mid_x) {
+                if (ur_y <= cell_mid_y) {
                     intersect_tile_with_cells_adaptive(ll_x, ll_y, ur_x, ur_y, cell_min_x, cell_mid_x, cell_min_y, cell_mid_y, level, level_index);
-                }
-                else if (!(ll_y < cell_mid_y))
-                {
-                    // cell_min_y = cell_mid_y;
-                    // level_index |= 1;
+                } else if (!(ll_y < cell_mid_y)) {
                     intersect_tile_with_cells_adaptive(ll_x, ll_y, ur_x, ur_y, cell_min_x, cell_mid_x, cell_mid_y, cell_max_y, level, level_index | 2);
-                }
-                else
-                {
+                } else {
                     intersect_tile_with_cells_adaptive(ll_x, ll_y, ur_x, ur_y, cell_min_x, cell_mid_x, cell_min_y, cell_mid_y, level, level_index);
                     intersect_tile_with_cells_adaptive(ll_x, ll_y, ur_x, ur_y, cell_min_x, cell_mid_x, cell_mid_y, cell_max_y, level, level_index | 2);
                 }
-            }
-            else if (!(ll_x < cell_mid_x))
-            {
-                // cell_min_x = cell_mid_x;
-                // level_index |= 1;
-                if (ur_y <= cell_mid_y)
-                {
-                    // cell_max_y = cell_mid_y;
+            } else if (!(ll_x < cell_mid_x)) {
+                if (ur_y <= cell_mid_y) {
                     intersect_tile_with_cells_adaptive(ll_x, ll_y, ur_x, ur_y, cell_mid_x, cell_max_x, cell_min_y, cell_mid_y, level, level_index | 1);
-                }
-                else if (!(ll_y < cell_mid_y))
-                {
-                    // cell_min_y = cell_mid_y;
-                    // level_index |= 1;
+                } else if (!(ll_y < cell_mid_y)) {
                     intersect_tile_with_cells_adaptive(ll_x, ll_y, ur_x, ur_y, cell_mid_x, cell_max_x, cell_mid_y, cell_max_y, level, level_index | 3);
-                }
-                else
-                {
+                } else {
                     intersect_tile_with_cells_adaptive(ll_x, ll_y, ur_x, ur_y, cell_mid_x, cell_max_x, cell_min_y, cell_mid_y, level, level_index | 1);
                     intersect_tile_with_cells_adaptive(ll_x, ll_y, ur_x, ur_y, cell_mid_x, cell_max_x, cell_mid_y, cell_max_y, level, level_index | 3);
                 }
-            }
-            else
-            {
-                if (ur_y <= cell_mid_y)
-                {
-                    // cell_max_y = cell_mid_y;
+            } else {
+                if (ur_y <= cell_mid_y) {
                     intersect_tile_with_cells_adaptive(ll_x, ll_y, ur_x, ur_y, cell_min_x, cell_mid_x, cell_min_y, cell_mid_y, level, level_index);
                     intersect_tile_with_cells_adaptive(ll_x, ll_y, ur_x, ur_y, cell_mid_x, cell_max_x, cell_min_y, cell_mid_y, level, level_index | 1);
-                }
-                else if (!(ll_y < cell_mid_y))
-                {
-                    // cell_min_y = cell_mid_y;
-                    // level_index |= 1;
+                } else if (!(ll_y < cell_mid_y)) {
                     intersect_tile_with_cells_adaptive(ll_x, ll_y, ur_x, ur_y, cell_min_x, cell_mid_x, cell_mid_y, cell_max_y, level, level_index | 2);
                     intersect_tile_with_cells_adaptive(ll_x, ll_y, ur_x, ur_y, cell_mid_x, cell_max_x, cell_mid_y, cell_max_y, level, level_index | 3);
-                }
-                else
-                {
+                } else {
                     intersect_tile_with_cells_adaptive(ll_x, ll_y, ur_x, ur_y, cell_min_x, cell_mid_x, cell_min_y, cell_mid_y, level, level_index);
                     intersect_tile_with_cells_adaptive(ll_x, ll_y, ur_x, ur_y, cell_mid_x, cell_max_x, cell_min_y, cell_mid_y, level, level_index | 1);
                     intersect_tile_with_cells_adaptive(ll_x, ll_y, ur_x, ur_y, cell_min_x, cell_mid_x, cell_mid_y, cell_max_y, level, level_index | 2);
                     intersect_tile_with_cells_adaptive(ll_x, ll_y, ur_x, ur_y, cell_mid_x, cell_max_x, cell_mid_y, cell_max_y, level, level_index | 3);
                 }
             }
-        }
-        else
-        {
+        } else {
             current_cells.add(cell_index);
         }
     }
-
+ 
     void intersect_circle_with_cells(double center_x, double center_y, double radius, double r_min_x, double r_min_y, double r_max_x, double r_max_y, float cell_min_x, float cell_max_x, float cell_min_y, float cell_max_y, int level, int level_index)
     {
         float cell_mid_x;
