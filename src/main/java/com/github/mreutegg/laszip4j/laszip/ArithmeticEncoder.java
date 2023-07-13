@@ -270,7 +270,7 @@ public class ArithmeticEncoder {
             assert(outbyte < endbuffer);
             assert(outbyte < endbyte);
             outbuffer[outbyte++] = (byte)(u_base >>> 24);
-            if (outbyte == endbyte) manage_outbuffe_r();
+            if (outbyte == endbyte) {manage_outbuffe_r();}
             u_base <<= 8;
         } while (Integer.compareUnsigned((u_length <<= 8), AC__MinLength) < 0);        // length multiplied by 256
     }
