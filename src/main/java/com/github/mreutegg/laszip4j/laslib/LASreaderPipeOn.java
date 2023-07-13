@@ -21,7 +21,7 @@ public class LASreaderPipeOn extends LASreader {
     }
 
     @Override
-    public boolean seek(long p_index) {
+    public boolean seek_eek(long p_index) {
         return false;
     }
 
