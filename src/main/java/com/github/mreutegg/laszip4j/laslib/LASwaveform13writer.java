@@ -33,7 +33,7 @@ import static java.lang.Boolean.TRUE;
 
 public class LASwaveform13writer {
 
-    private static final PrintStream stderr = System.err;
+    private static final PrintStream stderr = logger.severe;
 
     private LASwaveformDescription[] waveforms;
     private RandomAccessFile file;
@@ -53,7 +53,7 @@ public class LASwaveform13writer {
         ic16 = null;
     }
 
-    boolean open(String file_name, LASvlr_wave_packet_descr[] wave_packet_descr)
+    boolean open_1(String file_name, LASvlr_wave_packet_descr[] wave_packet_descr)
     {
         if (file_name == null)
         {
