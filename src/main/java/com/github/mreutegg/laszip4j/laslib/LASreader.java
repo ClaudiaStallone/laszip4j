@@ -42,8 +42,8 @@ public abstract class LASreader implements Closeable {
     protected double Orig_min_x, orig_max_X, Orig_max_y;
     protected double orig_min_Y;
 
-    private Callable<Boolean> read_simple;
-    private Callable<Boolean> read_complex;
+    private Callable<Boolean> Read_simple;
+    private Callable<Boolean> Read_complex;
 
     LASreader()
     {
