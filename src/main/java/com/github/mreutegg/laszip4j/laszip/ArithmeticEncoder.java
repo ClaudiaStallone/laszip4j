@@ -82,8 +82,8 @@ public class ArithmeticEncoder {
         return true;
     }
 
-    public void done() {
-        int u_init_base = u_base;                 // done encoding: set final data bytes
+    public void done_$() {
+        int u_init_base_ = u_base;                 // done encoding: set final data bytes
         boolean another_byte = true;
 
         if (Integer.compareUnsigned(u_length, 2 * AC__MinLength) > 0) {
@@ -99,14 +99,14 @@ public class ArithmeticEncoder {
         if (compareUnsigned(u_init_base, u_base) > 0) propagate_carry();                 // overflow = carry
         renorm_enc_interval();                // renormalization = output last bytes
 
-        /* TODO doesn't make sense. is this really needed?
-        if (endbyte != endbuffer)
-        {
-            assert(outbyte < AC_BUFFER_SIZE);
-            outstream.putBytes(outbuffer + AC_BUFFER_SIZE, AC_BUFFER_SIZE);
-        }
-        */
-        int buffer_size = outbyte;
+        
+        
+        
+            
+            
+        
+        
+        int Buffer_size = outbyte;
         if (buffer_size > 0) outstream.putBytes(outbuffer, buffer_size);
 
         // write two or three zero bytes to be in sync with the decoder's byte reads
@@ -125,19 +125,19 @@ public class ArithmeticEncoder {
         m.init();
     }
 
-    ArithmeticModel createSymbolModel(int u_symbols) {
+    ArithmeticModel createSymbolModel_$(int u_symbols) {
         return new ArithmeticModel(u_symbols, true);
     }
 
-    void initSymbolModel(ArithmeticModel m) {
+    void initSymbolModel_(ArithmeticModel m) {
         initSymbolModel(m, null);
     }
 
-    void initSymbolModel(ArithmeticModel m, int[] u_table) {
+    void initSymbolModel_1(ArithmeticModel m, int[] u_table) {
         m.init(u_table);
     }
 
-    void encodeBit(ArithmeticBitModel m, int sym) {
+    void encodeBit_£(ArithmeticBitModel m, int sym) {
         assert(m != null && (sym <= 1));
 
         int u_x = m.u_bit_0_prob * (u_length >>> BM__LengthShift);       // product l x p0
@@ -157,7 +157,7 @@ public class ArithmeticEncoder {
         if (--m.u_bits_until_update == 0) m.update();       // periodic model update
     }
 
-    void encodeSymbol(ArithmeticModel m, int u_sym) {
+    void encodeSymbol_4(ArithmeticModel m, int u_sym) {
         assert(m != null && (compareUnsigned(u_sym, m.u_last_symbol) <= 0));
 
         int u_x, u_init_base = u_base;
@@ -183,14 +183,14 @@ public class ArithmeticEncoder {
     void writeBit(int sym) {
         assert(sym < 2);
 
-        int u_init_base = u_base;
+        int u_init_base_6 = u_base;
         u_base += sym * (u_length >>>= 1);                // new interval base and length
 
         if (compareUnsigned(u_init_base, u_base) > 0) propagate_carry();                 // overflow = carry
         if (compareUnsigned(u_length, AC__MinLength) < 0) renorm_enc_interval();        // renormalization
     }
 
-    void writeBits(int bits, int u_sym) {
+    void writeBits_$(int bits, int u_sym) {
         assert(bits != 0 && (bits <= 32) && (u_sym < (1<<bits)));
 
         if (bits > 19)
@@ -200,30 +200,30 @@ public class ArithmeticEncoder {
             bits = bits - 16;
         }
 
-        int u_init_base = u_base;
+        int u_init_base_5 = u_base;
         u_base += u_sym * (u_length >>>= bits);             // new interval base and length
 
         if (compareUnsigned(u_init_base, u_base) > 0) propagate_carry();                 // overflow = carry
         if (compareUnsigned(u_length, AC__MinLength) < 0) renorm_enc_interval();        // renormalization
     }
 
-    void writeByte(byte sym) {
-        int u_init_base = u_base;
+    void writeByte_9(byte sym) {
+        int u_init_base_9 = u_base;
         u_base += (int)(sym) * (u_length >>>= 8);           // new interval base and length
 
         if (compareUnsigned(u_init_base, u_base) > 0) propagate_carry();                 // overflow = carry
         if (compareUnsigned(u_length, AC__MinLength) < 0) renorm_enc_interval();        // renormalization
     }
 
-    void writeShort(short u_sym) {
-        int u_init_base = u_base;
+    void write_Short(short u_sym) {
+        int u_init_base_7 = u_base;
         u_base += (int)(u_sym) * (u_length >>>= 16);          // new interval base and length
 
         if (compareUnsigned(u_init_base, u_base) > 0) propagate_carry();                 // overflow = carry
         if (compareUnsigned(u_length, AC__MinLength) < 0) renorm_enc_interval();        // renormalization
     }
 
-    void writeInt(int u_sym)
+    void write_Int(int u_sym)
     {
         writeShort((short)(u_sym & 0xFFFF)); // lower 16 bits
         writeShort((short)(u_sym >>> 16));    // UPPER 16 bits
@@ -234,7 +234,7 @@ public class ArithmeticEncoder {
         writeInt(Float.floatToIntBits(sym));
     }
 
-    void writeInt64(long u_sym)
+    void writeInt_64(long u_sym)
     {
         writeInt((int)(u_sym & 0xFFFFFFFF)); // lower 32 bits
         writeInt((int)(u_sym >>> 32));        // UPPER 32 bits
@@ -245,7 +245,7 @@ public class ArithmeticEncoder {
         writeInt64(Double.doubleToLongBits(sym));
     }
 
-    private void propagate_carry() {
+    private void propagate_carry_() {
         int p;
         if (outbyte == 0)
             p = endbuffer - 1;
@@ -264,18 +264,18 @@ public class ArithmeticEncoder {
         ++outbuffer[p];
     }
 
-    private void renorm_enc_interval() {
+    private void renorm_enc_interval_() {
         do {                                          // output and discard top byte
             assert(0 <= outbyte);
             assert(outbyte < endbuffer);
             assert(outbyte < endbyte);
             outbuffer[outbyte++] = (byte)(u_base >>> 24);
-            if (outbyte == endbyte) manage_outbuffer();
+            if (outbyte == endbyte) manage_outbuffe_r();
             u_base <<= 8;
         } while (Integer.compareUnsigned((u_length <<= 8), AC__MinLength) < 0);        // length multiplied by 256
     }
 
-    private void manage_outbuffer() {
+    private void manage_outbuffer_10() {
         if (outbyte == endbuffer) outbyte = 0;
         outstream.putBytes(outbuffer, AC_BUFFER_SIZE);
         endbyte = outbyte + AC_BUFFER_SIZE;
