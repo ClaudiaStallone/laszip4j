@@ -14,6 +14,7 @@ import java.io.PrintStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
@@ -451,61 +452,75 @@ public class LASquadtree {
     }
 
     // recursively does the actual rastering of the occupancy
-    void raster_occupancy(Function<Integer, Boolean> does_cell_exist, int[] data, int min_x, int min_y, int level_index, int level, int stop_level)
-    {
-        int cell_index = get_cell_index(level_index, level);
-        int adaptive_pos = cell_index/32;
-        int adaptive_bit = 1 << (cell_index%32);
-        // have we reached a leaf
-        if ((adaptive[adaptive_pos] & adaptive_bit) != 0) // interior node
-        {
-            if (level < stop_level) // do we need to continue
-            {
-                level_index <<= 2;
-                level += 1;
-                int size = 1 << (stop_level-level);
-                // recurse into the four children
-                raster_occupancy(does_cell_exist, data, min_x, min_y, level_index, level, stop_level);
-                raster_occupancy(does_cell_exist, data, min_x+size, min_y, level_index + 1, level, stop_level);
-                raster_occupancy(does_cell_exist, data, min_x, min_y+size, level_index + 2, level, stop_level);
-                raster_occupancy(does_cell_exist, data, min_x+size, min_y+size, level_index + 3, level, stop_level);
-                return;
-            }
-            else // no ... raster remaining subtree
-            {
-                int full_size = (1 << stop_level);
-                int size = 1 << (stop_level-level);
-                int max_y = min_y + size;
-                int pos, pos_x, pos_y;
-                for (pos_y = min_y; pos_y < max_y; pos_y++)
-                {
-                    pos = pos_y*full_size + min_x;
-                    for (pos_x = 0; pos_x < size; pos_x++)
-                    {
-                        data[pos/32] |= (1<<(pos%32));
-                        pos++;
-                    }
+ void raster_occupancy(Function<Integer, Boolean> does_cell_exist, int[] data, int min_x, int min_y, int level_index, int level, int stop_level) {
+    int cell_index = get_cell_index(level_index, level);
+    int adaptive_pos = cell_index / 32;
+    int adaptive_bit = 1 << (cell_index % 32);
+
+    if ((adaptive[adaptive_pos] & adaptive_bit) != 0) {
+        if (level < stop_level) {
+            level_index <<= 2;
+            level += 1;
+            int size = 1 << (stop_level - level);
+
+            raster_occupancy(does_cell_exist, data, min_x, min_y, level_index, level, stop_level);
+            raster_occupancy(does_cell_exist, data, min_x + size, min_y, level_index + 1, level, stop_level);
+            raster_occupancy(does_cell_exist, data, min_x, min_y + size, level_index + 2, level, stop_level);
+            raster_occupancy(does_cell_exist, data, min_x + size, min_y + size, level_index + 3, level, stop_level);
+
+            return;
+        } else {
+
+            int full_size = (1 << stop_level);
+            int size = 1 << (stop_level - level);
+            int max_y = min_y + dimensione;
+            int pos, pos_x, pos_y;
+
+            int bitMask = (1 << dimensione) - 1;
+            int basePos = min_y * full_size + min_x;
+            int bitOffset = basePos % 32;
+            int bitIndex = basePos / 32;
+
+            for (pos_y = min_y; pos_y < max_y; pos_y++) {
+                pos = pos_y * full_size + min_x;
+
+                if (bitOffset == 0) {
+                    data[bitIndex] |= bitMask;
+                } else {
+                    int bitIndexNext = bitIndex + 1;
+                    data[bitIndex] |= bitMask >>> bitOffset;
+                    data[bitIndexNext] |= bitMask << (32 - bitOffset);
+                    bitIndex = bitIndexNext;
                 }
             }
         }
-        else if (does_cell_exist.apply(cell_index))
-        {
-            // raster actual cell
-            int full_size = (1 << stop_level);
-            int size = 1 << (stop_level-level);
-            int max_y = min_y + size;
-            int pos, pos_x, pos_y;
-            for (pos_y = min_y; pos_y < max_y; pos_y++)
-            {
-                pos = pos_y*full_size + min_x;
-                for (pos_x = 0; pos_x < size; pos_x++)
-                {
-                    data[pos/32] |= (1<<(pos%32));
-                    pos++;
-                }
+    } else if (does_cell_exist.apply(cell_index)) {
+        // Cella effettiva raster
+        int full_size = (1 << stop_level);
+        int size = 1 << (stop_level - level);
+        int max_y = min_y + dimensione;
+        int pos, pos_x, pos_y;
+
+        int bitMask = (1 << dimensione) - 1;
+        int basePos = min_y * full_size + min_x;
+        int bitOffset = basePos % 32;
+        int bitIndex = basePos / 32;
+
+        for (pos_y = min_y; pos_y < max_y; pos_y++) {
+            pos = pos_y * full_size + min_x;
+
+            if (bitOffset == 0) {
+                data[bitIndex] |= bitMask;
+            } else {
+                int bitIndexNext = bitIndex + 1;
+                data[bitIndex] |= bitMask >>> bitOffset;
+                data[bitIndexNext] |= bitMask << (32 - bitOffset);
+                bitIndex = bitIndexNext;
             }
         }
     }
+}
+
 
     // rasters the occupancy to a simple binary raster at depth level
     int[] raster_occupancy(Function<Integer, Boolean> does_cell_exist, int level)
