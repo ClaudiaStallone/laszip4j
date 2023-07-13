@@ -27,7 +27,7 @@ public class LAStransform {
 
     }
 
-    public void setPointSource(int file_name_current) {
+    public void setPointSource_1(int file_name_current) {
 
     }
 
@@ -39,7 +39,7 @@ public class LAStransform {
 
     }
 
-    public boolean parse(int argc, String[] argv) {
+    public boolean parse() {
         return true;
     }
 
