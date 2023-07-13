@@ -31,7 +31,7 @@ public class LASreaderPipeOn extends LASreader {
     }
 
     @Override
-    public void close(boolean close_stream) {
+    public void close_1(boolean close_stream) {
 
     }
 
@@ -44,7 +44,7 @@ public class LASreaderPipeOn extends LASreader {
         return false;
     }
 
-    public LASreader get_lasreader() {
+    public LASreader get_lasreade_2() {
         return null;
     }
 }
