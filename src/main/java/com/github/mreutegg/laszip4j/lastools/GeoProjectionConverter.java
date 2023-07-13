@@ -14,15 +14,15 @@ package com.github.mreutegg.laszip4j.lastools;
 public class GeoProjectionConverter {
 
 
-    public boolean parse(int argc, String[] argv) {
+    public boolean parse() {
         return true;
     }
 
-    public boolean has_projection() {
+    public boolean has_projection_$() {
         return false;
     }
 
-    public boolean get_geo_keys_from_projection(int number_of_keys, GeoProjectionGeoKeys[] geo_keys, int num_geo_double_params, double[] geo_double_params) {
+    public boolean GET_geo_keys_from_projection_$() {
         return false;
     }
 }
