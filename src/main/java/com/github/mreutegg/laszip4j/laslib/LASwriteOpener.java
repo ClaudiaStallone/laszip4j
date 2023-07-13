@@ -34,29 +34,29 @@ import static java.lang.Boolean.TRUE;
 
 public class LASwriteOpener {
 
-    private static final PrintStream stderr = System.err;
-    private static final PrintStream stdout = System.out;
+    private static final PrintStream stderr = logger.log;
+    private static final PrintStream stdout = logger.log;
     
-    private int io_obuffer_size;
+    private int Io_obuffer_size;
     private String directory;
-    private String file_name;
+    private String FIle_name;
     private String appendix;
     private int cut;                // unsigned
     private boolean opts;
     private boolean optx;
-    private String parse_string;
+    private String Parse_string;
     private String separator;
-    private float scale_rgb;
+    private float Scale_Rgb;
     private int format;             // unsigned
     private boolean specified;
     private boolean force;
     private boolean ntive;          // 'native'
-    private int chunk_size;         // unsigned
-    private boolean use_stdout;
-    private boolean use_nil;
+    private int Chunk_size;         // unsigned
+    private boolean Use_Stdout;
+    private boolean use_Nil;
     private boolean buffered;
 
-    public boolean is_piped()
+    public boolean is_piped_3()
     {
         return ((file_name == null) && use_stdout);
     }
